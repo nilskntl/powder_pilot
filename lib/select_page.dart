@@ -13,9 +13,6 @@ class SelectPage extends StatefulWidget {
 
 class _SelectPageState extends State<SelectPage> {
 
-  int currentPage = 1;
-  int numberOfPages = 2;
-
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -46,10 +43,10 @@ class _SelectPageState extends State<SelectPage> {
         AnimatedPositioned(
           duration: const Duration(milliseconds: 200),
           top: 0,
-          left: (MediaQuery.of(context).size.width / numberOfPages) *
-              (currentPage - 1),
+          left: (MediaQuery.of(context).size.width / SkiTracker.getMainWidgetState().numberPages) *
+              (SkiTracker.getMainWidgetState().currentPage - 1),
           child: Container(
-            width: MediaQuery.of(context).size.width / numberOfPages,
+            width: MediaQuery.of(context).size.width / SkiTracker.getMainWidgetState().numberPages,
             height: 4,
             color: ColorTheme.contrastColor,
           ),
@@ -78,7 +75,8 @@ class _SelectPageState extends State<SelectPage> {
 
   void _animateToPage(int page) {
     setState(() {
-      currentPage = page;
+      SkiTracker.getMainWidgetState().currentPage = page;
+      SkiTracker.getMainWidgetState().update();
     });
   }
 
