@@ -1,13 +1,13 @@
+import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:ski_tracker/activity/activity_bar.dart';
-import 'package:ski_tracker/select_page.dart';
-import 'package:ski_tracker/utils.dart';
+import 'package:ski_tracker/page.dart';
 
 import 'activity/activity.dart';
 import 'activity/activity_info.dart';
+import 'bar.dart';
 import 'history.dart';
-
-import 'package:provider/provider.dart';
 
 void main() {
   runApp(
@@ -38,6 +38,8 @@ class SkiTracker extends StatelessWidget {
   static Activity _activity = Activity();
 
   static late ActivityData _activityData;
+
+  static final PageController _pageController = PageController();
 
   static int currentPage = 1;
   static int numberPages = 2;
@@ -80,8 +82,8 @@ class SkiTracker extends StatelessWidget {
     _activity = Activity();
   }
 
-  static GlobalKey<MainWidgetState> getMainWidgetState() {
-    return MainWidgetState.mainWidgetState;
+  static PageController getPageController() {
+    return _pageController;
   }
 }
 
@@ -104,7 +106,7 @@ class MyHomePage extends StatelessWidget {
             width: double.infinity,
             color: ColorTheme.primaryColor,
           ),
-          _bar(),
+          const Bar(),
           const SizedBox(height: 64),
           const MainWidget(),
           const Spacer(),
@@ -112,30 +114,6 @@ class MyHomePage extends StatelessWidget {
           const SizedBox(height: 32),
           const SelectPage(),
         ],
-      ),
-    );
-  }
-
-  Widget _bar() {
-    return Container(
-      height: 64,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: ColorTheme.primaryColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Utils.buildText(
-            text: 'Simple Ski Tracker',
-            fontSize: FontTheme.sizeSubHeader,
-            fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -149,10 +127,6 @@ class MainWidget extends StatefulWidget {
 }
 
 class MainWidgetState extends State<MainWidget> {
-  // Global Key erstellen
-  static GlobalKey<MainWidgetState> mainWidgetState =
-      GlobalKey<MainWidgetState>();
-
   final ActivityInfo _activity = const ActivityInfo();
   final History _history = const History();
 
@@ -162,7 +136,6 @@ class MainWidgetState extends State<MainWidget> {
   }
 
   void updateState() {
-    print(mounted);
     if (mounted) {
       setState(() {});
     }
@@ -170,16 +143,16 @@ class MainWidgetState extends State<MainWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return _mainWidget();
-  }
-
-  Widget _mainWidget() {
-    if (SkiTracker.currentPage == 1) {
-      return _activity;
-    } else if (SkiTracker.currentPage == 2) {
-      return _history;
-    } else {
-      return Container();
-    }
+    return ExpandablePageView(
+      scrollDirection: Axis.horizontal,
+      controller: SkiTracker.getPageController(),
+      onPageChanged: (int page) {
+        setState(() {});
+      },
+      children: [
+        _activity,
+        _history,
+      ],
+    );
   }
 }

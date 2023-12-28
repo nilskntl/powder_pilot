@@ -75,7 +75,11 @@ class _SelectPageState extends State<SelectPage> {
   void _animateToPage(int page) {
     setState(() {
       SkiTracker.currentPage = page;
-      SkiTracker.getMainWidgetState().currentState?.updateState();
+      SkiTracker.getPageController().animateToPage(
+            page - 1,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+          );
     });
   }
 
