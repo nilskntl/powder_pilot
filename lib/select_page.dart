@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ski_tracker/utils.dart';
 
@@ -43,10 +42,10 @@ class _SelectPageState extends State<SelectPage> {
         AnimatedPositioned(
           duration: const Duration(milliseconds: 200),
           top: 0,
-          left: (MediaQuery.of(context).size.width / SkiTracker.getMainWidgetState().numberPages) *
-              (SkiTracker.getMainWidgetState().currentPage - 1),
+          left: (MediaQuery.of(context).size.width / SkiTracker.numberPages) *
+              (SkiTracker.currentPage - 1),
           child: Container(
-            width: MediaQuery.of(context).size.width / SkiTracker.getMainWidgetState().numberPages,
+            width: MediaQuery.of(context).size.width / SkiTracker.numberPages,
             height: 4,
             color: ColorTheme.contrastColor,
           ),
@@ -75,8 +74,8 @@ class _SelectPageState extends State<SelectPage> {
 
   void _animateToPage(int page) {
     setState(() {
-      SkiTracker.getMainWidgetState().currentPage = page;
-      SkiTracker.getMainWidgetState().update();
+      SkiTracker.currentPage = page;
+      SkiTracker.getMainWidgetState().currentState?.updateState();
     });
   }
 

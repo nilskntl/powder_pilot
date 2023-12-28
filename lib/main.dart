@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:ski_tracker/activity/start_activity.dart';
+import 'package:ski_tracker/activity/activity_bar.dart';
 import 'package:ski_tracker/select_page.dart';
 import 'package:ski_tracker/utils.dart';
 
 import 'activity/activity.dart';
+import 'activity/activity_info.dart';
 import 'history.dart';
 
+import 'package:provider/provider.dart';
+
 void main() {
-  runApp(const SkiTracker());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ActivityData(),
+      child: const SkiTracker(),
+    ),
+  );
 }
 
 class ColorTheme {
@@ -27,11 +35,12 @@ class FontTheme {
 class SkiTracker extends StatelessWidget {
   const SkiTracker({super.key});
 
-  static ActivityWidgetState _activityState = ActivityWidgetState();
-  static MainWidgetState _mainWidgetState = MainWidgetState();
+  static Activity _activity = Activity();
 
-  static final Activity _activity = Activity();
+  static late ActivityData _activityData;
 
+  static int currentPage = 1;
+  static int numberPages = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -51,39 +60,55 @@ class SkiTracker extends StatelessWidget {
     return _activity;
   }
 
-  static ActivityWidgetState getActivityState() {
-    return _activityState;
+  static ActivityData getActivityData() {
+    return _activityData;
   }
 
-  static void setActivityState(ActivityWidgetState activityState) {
-    _activityState = activityState;
+  static void setActivityData(ActivityData activityData) {
+    _activityData = activityData;
   }
 
-  static MainWidgetState getMainWidgetState() {
-    return _mainWidgetState;
+  static void startActivity() {
+    _activity.startActivity();
   }
 
-  static void setMainWidgetState(MainWidgetState mainWidgetState) {
-    _mainWidgetState = mainWidgetState;
+  static void stopActivity() {
+    _activity.stopActivity();
+  }
+
+  static void createNewActivity() {
+    _activity = Activity();
+  }
+
+  static GlobalKey<MainWidgetState> getMainWidgetState() {
+    return MainWidgetState.mainWidgetState;
   }
 }
 
-
-class MyHomePage extends StatelessWidget{
+class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key, required this.title});
 
   final String title;
+
+  double getStatusBarHeight(BuildContext context) {
+    return MediaQuery.of(context).padding.top;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
+          Container(
+            height: getStatusBarHeight(context),
+            width: double.infinity,
+            color: ColorTheme.primaryColor,
+          ),
           _bar(),
           const SizedBox(height: 64),
           const MainWidget(),
           const Spacer(),
-          StartActivity(),
+          ActivityBar(),
           const SizedBox(height: 32),
           const SelectPage(),
         ],
@@ -107,7 +132,10 @@ class MyHomePage extends StatelessWidget{
         ],
       ),
       child: Center(
-        child: Utils.buildText(text: 'Simple Ski Tracker', fontSize: FontTheme.sizeSubHeader, fontWeight: FontWeight.bold),
+        child: Utils.buildText(
+            text: 'Simple Ski Tracker',
+            fontSize: FontTheme.sizeSubHeader,
+            fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -121,20 +149,23 @@ class MainWidget extends StatefulWidget {
 }
 
 class MainWidgetState extends State<MainWidget> {
-  int currentPage = 1;
-  int numberPages = 2;
+  // Global Key erstellen
+  static GlobalKey<MainWidgetState> mainWidgetState =
+      GlobalKey<MainWidgetState>();
 
-  final ActivityWidget _activity = const ActivityWidget();
+  final ActivityInfo _activity = const ActivityInfo();
   final History _history = const History();
 
   @override
   void initState() {
     super.initState();
-    SkiTracker.setMainWidgetState(this);
   }
 
-  update() {
-    setState(() {});
+  void updateState() {
+    print(mounted);
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -143,9 +174,9 @@ class MainWidgetState extends State<MainWidget> {
   }
 
   Widget _mainWidget() {
-    if (currentPage == 1) {
+    if (SkiTracker.currentPage == 1) {
       return _activity;
-    } else if (currentPage == 2) {
+    } else if (SkiTracker.currentPage == 2) {
       return _history;
     } else {
       return Container();
