@@ -7,7 +7,7 @@ class SelectPage extends StatefulWidget {
   const SelectPage({super.key});
 
   @override
-  _SelectPageState createState() => _SelectPageState();
+  State<SelectPage> createState() => _SelectPageState();
 }
 
 class _SelectPageState extends State<SelectPage> {

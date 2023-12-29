@@ -4,8 +4,10 @@ import '../main.dart';
 import '../utils.dart';
 
 class ActivityBar extends StatefulWidget {
+  const ActivityBar({super.key});
+
   @override
-  _ActivityBarState createState() => _ActivityBarState();
+  State<ActivityBar> createState() => _ActivityBarState();
 
   void startActivity() {
     SkiTracker.startActivity();
@@ -15,7 +17,7 @@ class ActivityBar extends StatefulWidget {
 class _ActivityBarState extends State<ActivityBar> {
   @override
   Widget build(BuildContext context) {
-    if (SkiTracker.getActivity().isRunning()) {
+    if (SkiTracker.getActivity().isActive) {
       return _runningActivity();
     } else {
       return _startActivity();
@@ -26,8 +28,7 @@ class _ActivityBarState extends State<ActivityBar> {
     return GestureDetector(
       onTap: () {
         widget.startActivity();
-        setState(() {
-        });
+        setState(() {});
       },
       child: Container(
         padding: const EdgeInsets.all(8.0),
@@ -54,30 +55,68 @@ class _ActivityBarState extends State<ActivityBar> {
       children: [
         const SizedBox(width: 16),
         Expanded(
-          child: GestureDetector(
-            onTap: () {
-              SkiTracker.stopActivity();
-              setState(() {
-              });
-            },
-            child: Container(
+          child: Container(
               padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
                 color: ColorTheme.primaryColor,
                 borderRadius: BorderRadius.circular(16.0),
               ),
-              child: Column(
+              child: Row(
                 children: [
-                  const Icon(
-                    Icons.stop_rounded,
-                    size: 64,
-                    color: ColorTheme.contrastColor,
+                  Column(
+                    children: [
+                      const Icon(
+                        Icons.timer_rounded,
+                        size: 48,
+                        color: ColorTheme.contrastColor,
+                      ),
+                      Utils.buildText(text: 'Time'),
+                    ],
                   ),
-                  Utils.buildText(text: 'End Activity'),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () {
+                      SkiTracker.getActivity().isRunning
+                          ? SkiTracker.getActivity().pauseActivity()
+                          : SkiTracker.getActivity().resumeActivity();
+                      setState(() {});
+                    },
+                    child: Column(
+                      children: [
+                        Icon(
+                          SkiTracker.getActivity().isRunning
+                              ? Icons.pause_rounded
+                              : Icons.play_arrow_rounded,
+                          size: 48,
+                          color: ColorTheme.contrastColor,
+                        ),
+                        Utils.buildText(
+                            text: SkiTracker.getActivity().isRunning
+                                ? 'Pause Activity'
+                                : 'Resume Activity'),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      SkiTracker.getActivity().stopActivity();
+                      setState(() {});
+                    },
+                    child: Column(
+                      children: [
+                        const Icon(
+                      Icons.stop_rounded,
+                          size: 48,
+                          color: ColorTheme.contrastColor,
+                        ),
+                        Utils.buildText(
+                            text: 'End Activity')
+                      ],
+                    ),
+                  ),
                 ],
-              ),
-            ),
-          ),
+              )),
         ),
         const SizedBox(width: 16),
       ],

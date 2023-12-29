@@ -5,14 +5,15 @@ import 'package:ski_tracker/activity/activity_bar.dart';
 import 'package:ski_tracker/page.dart';
 
 import 'activity/activity.dart';
-import 'activity/activity_info.dart';
+import 'activity/activity_data_provider.dart';
+import 'activity/activity_display.dart';
 import 'bar.dart';
 import 'history.dart';
 
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (context) => ActivityData(),
+      create: (context) => ActivityDataProvider(),
       child: const SkiTracker(),
     ),
   );
@@ -37,7 +38,7 @@ class SkiTracker extends StatelessWidget {
 
   static Activity _activity = Activity();
 
-  static late ActivityData _activityData;
+  static late ActivityDataProvider _activityData;
 
   static final PageController _pageController = PageController();
 
@@ -62,11 +63,11 @@ class SkiTracker extends StatelessWidget {
     return _activity;
   }
 
-  static ActivityData getActivityData() {
+  static ActivityDataProvider getActivityDataProvider() {
     return _activityData;
   }
 
-  static void setActivityData(ActivityData activityData) {
+  static void setActivityDataProvider(ActivityDataProvider activityData) {
     _activityData = activityData;
   }
 
@@ -110,7 +111,7 @@ class MyHomePage extends StatelessWidget {
           const SizedBox(height: 64),
           const MainWidget(),
           const Spacer(),
-          ActivityBar(),
+          const ActivityBar(),
           const SizedBox(height: 32),
           const SelectPage(),
         ],
@@ -123,10 +124,10 @@ class MainWidget extends StatefulWidget {
   const MainWidget({super.key});
 
   @override
-  State<MainWidget> createState() => MainWidgetState();
+  State<MainWidget> createState() => _MainWidgetState();
 }
 
-class MainWidgetState extends State<MainWidget> {
+class _MainWidgetState extends State<MainWidget> {
   final ActivityInfo _activity = const ActivityInfo();
   final History _history = const History();
 

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../main.dart';
 import '../utils.dart';
-import 'activity.dart';
+import 'activity_data_provider.dart';
 
 class ActivityInfo extends StatefulWidget {
   const ActivityInfo({super.key});
@@ -32,19 +32,21 @@ class ActivityInfoState extends State<ActivityInfo> {
   static const String unitVertical = 'm';
   static const String unitSlope = '%';
 
+
+
   @override
   Widget build(BuildContext context) {
-    ActivityData activityData = Provider.of<ActivityData>(context);
-    SkiTracker.setActivityData(activityData);
+    ActivityDataProvider activityDataProvider = Provider.of<ActivityDataProvider>(context);
+    SkiTracker.setActivityDataProvider(activityDataProvider);
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             const SizedBox(width: horizontalSpaceLeft),
-            _speed(activityData),
+            _speed(activityDataProvider),
             const SizedBox(width: horizontalSpaceMiddle),
-            _distance(activityData),
+            _distance(activityDataProvider),
             const SizedBox(width: horizontalSpaceRight),
           ],
         ),
@@ -53,28 +55,31 @@ class ActivityInfoState extends State<ActivityInfo> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             const SizedBox(width: horizontalSpaceLeft),
-            _altitude(activityData),
+            _altitude(activityDataProvider),
             const SizedBox(width: horizontalSpaceMiddle),
-            _vertical(activityData),
+            _slope(activityDataProvider),
+            // _vertical(activityDataProvider),
             const SizedBox(width: horizontalSpaceRight),
           ],
         ),
         const SizedBox(height: verticalSpace),
+        /*
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             const SizedBox(width: horizontalSpaceLeft),
-            _slope(activityData),
+            _slope(activityDataProvider),
             const SizedBox(width: horizontalSpaceMiddle),
             Expanded(child: Container(height: 12)),
             const SizedBox(width: horizontalSpaceRight),
           ],
         ),
+        */
       ],
     );
   }
 
-  Widget _speed(ActivityData activityData) {
+  Widget _speed(ActivityDataProvider activityData) {
     return Expanded(
       child: _buildActivityContainer(
         child: Column(
@@ -83,15 +88,15 @@ class ActivityInfoState extends State<ActivityInfo> {
             _buildActivityHeader(text: 'Speed', iconData: Icons.speed_rounded),
             const SizedBox(height: 8),
             _buildActivityItem(
-                value: (activityData.speed).toStringAsFixed(1),
+                value: (activityData.speed * SkiTracker.getActivity().speedFactor).toStringAsFixed(1),
                 unit: unitSpeed),
             _buildActivitySubItem(
                 text: 'Max',
-                value: activityData.maxSpeed.toStringAsFixed(1),
+                value: (activityData.maxSpeed  * SkiTracker.getActivity().speedFactor).toStringAsFixed(1),
                 unit: unitSpeed),
             _buildActivitySubItem(
                 text: 'Avg',
-                value: activityData.avgSpeed.toStringAsFixed(1),
+                value: (activityData.avgSpeed * SkiTracker.getActivity().speedFactor).toStringAsFixed(1),
                 unit: unitSpeed),
           ],
         ),
@@ -99,7 +104,7 @@ class ActivityInfoState extends State<ActivityInfo> {
     );
   }
 
-  Widget _distance(ActivityData activityData) {
+  Widget _distance(ActivityDataProvider activityData) {
     return Expanded(
       child: _buildActivityContainer(
         child: Column(
@@ -125,7 +130,7 @@ class ActivityInfoState extends State<ActivityInfo> {
     );
   }
 
-  Widget _altitude(ActivityData activityData) {
+  Widget _altitude(ActivityDataProvider activityData) {
     return Expanded(
       child: _buildActivityContainer(
         child: Column(
@@ -151,7 +156,7 @@ class ActivityInfoState extends State<ActivityInfo> {
     );
   }
 
-  Widget _vertical(ActivityData activityData) {
+  Widget _vertical(ActivityDataProvider activityData) {
     return Expanded(
       child: _buildActivityContainer(
         child: Column(
@@ -177,7 +182,7 @@ class ActivityInfoState extends State<ActivityInfo> {
     );
   }
 
-  Widget _slope(ActivityData activityData) {
+  Widget _slope(ActivityDataProvider activityData) {
     return Expanded(
       child: _buildActivityContainer(
         child: Column(
@@ -229,16 +234,15 @@ class ActivityInfoState extends State<ActivityInfo> {
   }
 
   Widget _buildActivityItem({required String value, String unit = ''}) {
-    ActivityData activityData = SkiTracker.getActivityData();
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Utils.buildText(
-            text: activityData.running ? value : placeholder,
+            text: SkiTracker.getActivity().isActive ? value : placeholder,
             fontSize: FontTheme.sizeSubHeader,
             fontWeight: FontWeight.bold),
-        if (activityData.running) const SizedBox(width: 4),
-        if (activityData.running)
+        if (SkiTracker.getActivity().isActive) const SizedBox(width: 4),
+        if (SkiTracker.getActivity().isActive)
           Utils.buildText(text: unit, fontWeight: FontWeight.bold),
       ],
     );
@@ -246,16 +250,15 @@ class ActivityInfoState extends State<ActivityInfo> {
 
   Widget _buildActivitySubItem(
       {required String text, required String value, String unit = ''}) {
-    ActivityData activityData = SkiTracker.getActivityData();
     return Row(
       children: [
         Utils.buildText(text: text),
         const Spacer(),
         Utils.buildText(
-            text: activityData.running ? value : placeholder,
+            text: SkiTracker.getActivity().isActive ? value : placeholder,
             fontWeight: FontWeight.bold),
-        if (activityData.running) const SizedBox(width: 2),
-        if (activityData.running)
+        if (SkiTracker.getActivity().isActive) const SizedBox(width: 2),
+        if (SkiTracker.getActivity().isActive)
           Utils.buildText(text: unit, fontWeight: FontWeight.bold),
         const SizedBox(width: 4),
       ],
