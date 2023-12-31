@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:ski_tracker/activity/activity.dart';
 
 class ActivityDataProvider extends ChangeNotifier {
   // Speed
@@ -17,11 +19,6 @@ class ActivityDataProvider extends ChangeNotifier {
   double minAltitude = 0.0;
   double avgAltitude = 0.0;
 
-  // Vertical
-  double vertical = 0.0;
-  double uphillVertical = 0.0;
-  double downhillVertical = 0.0;
-
   // Slope
   double slope = 0.0;
   double maxSlope = 0.0;
@@ -29,6 +26,16 @@ class ActivityDataProvider extends ChangeNotifier {
 
   // Duration
   Duration elapsedTime = Duration.zero;
+  Duration elapsedPauseTime = Duration.zero;
+  Duration elapsedUphillTime = Duration.zero;
+  Duration elapsedDownhillTime = Duration.zero;
+
+  // Current location
+  double currentLatitude = 0.0;
+  double currentLongitude = 0.0;
+
+  // GPS accuracy
+  GpsAccuracy gpsAccuracy = GpsAccuracy.none;
 
   void updateData({
     required double newSpeed,
@@ -41,13 +48,16 @@ class ActivityDataProvider extends ChangeNotifier {
     required double newMaxAltitude,
     required double newMinAltitude,
     required double newAvgAltitude,
-    required double newVertical,
-    required double newUphillVertical,
-    required double newDownhillVertical,
     required double newSlope,
     required double newMaxSlope,
     required double newAvgSlope,
     required Duration newElapsedTime,
+    required Duration newElapsedPauseTime,
+    required Duration newElapsedUphillTime,
+    required Duration newElapsedDownhillTime,
+    required double newCurrentLatitude,
+    required double newCurrentLongitude,
+    required GpsAccuracy newGpsAccuracy,
   }) {
     speed = newSpeed;
     maxSpeed = newMaxSpeed;
@@ -59,13 +69,16 @@ class ActivityDataProvider extends ChangeNotifier {
     maxAltitude = newMaxAltitude;
     minAltitude = newMinAltitude;
     avgAltitude = newAvgAltitude;
-    vertical = newVertical;
-    uphillVertical = newUphillVertical;
-    downhillVertical = newDownhillVertical;
     slope = newSlope;
     maxSlope = newMaxSlope;
     avgSlope = newAvgSlope;
     elapsedTime = newElapsedTime;
+    elapsedPauseTime = newElapsedPauseTime;
+    elapsedUphillTime = newElapsedUphillTime;
+    elapsedDownhillTime = newElapsedDownhillTime;
+    currentLatitude = newCurrentLatitude;
+    currentLongitude = newCurrentLongitude;
+    gpsAccuracy = newGpsAccuracy;
 
     notifyListeners();
   }

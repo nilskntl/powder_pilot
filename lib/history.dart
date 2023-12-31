@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ski_tracker/utils.dart';
+
+import 'main.dart';
 
 class History extends StatefulWidget {
   const History({super.key});
@@ -10,70 +13,14 @@ class History extends StatefulWidget {
 class _HistoryState extends State<History> {
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      children: [
-        Text(
-          'History',
-          style: TextStyle(
-            fontSize: 32,
-            color: Colors.deepPurple,
-          ),
-        ),
-        SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Container(
+        color: ColorTheme.backgroundColor,
+        child: ListView(
+          physics: const NeverScrollableScrollPhysics(),
           children: [
-            Column(
-              children: [
-                Icon(
-                  Icons.calendar_today_rounded,
-                  size: 32,
-                  color: Colors.deepPurple,
-                ),
-                Text(
-                  'Today',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.deepPurple,
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                Icon(
-                  Icons.calendar_view_month_rounded,
-                  size: 32,
-                  color: Colors.deepPurple,
-                ),
-                Text(
-                  'Month',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.deepPurple,
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              children: [
-                Icon(
-                  Icons.calendar_view_week_rounded,
-                  size: 32,
-                  color: Colors.deepPurple,
-                ),
-                Text(
-                  'Week',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.deepPurple,
-                  ),
-                ),
-              ],
-            ),
+            Utils.buildText(text: 'Test'),
           ],
         ),
-      ],
     );
   }
 }

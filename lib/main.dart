@@ -1,8 +1,6 @@
-import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ski_tracker/activity/activity_bar.dart';
-import 'package:ski_tracker/page.dart';
+import 'package:ski_tracker/utils.dart';
 
 import 'activity/activity.dart';
 import 'activity/activity_data_provider.dart';
@@ -27,9 +25,9 @@ class ColorTheme {
 }
 
 class FontTheme {
-  static const double size = 16;
-  static const double sizeHeader = 32;
-  static const double sizeSubHeader = 24;
+  static const double size = 14;
+  static const double sizeHeader = 28;
+  static const double sizeSubHeader = 21;
   static const String fontFamily = 'Roboto';
 }
 
@@ -39,11 +37,6 @@ class SkiTracker extends StatelessWidget {
   static Activity _activity = Activity();
 
   static late ActivityDataProvider _activityData;
-
-  static final PageController _pageController = PageController();
-
-  static int currentPage = 1;
-  static int numberPages = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -82,78 +75,133 @@ class SkiTracker extends StatelessWidget {
   static void createNewActivity() {
     _activity = Activity();
   }
-
-  static PageController getPageController() {
-    return _pageController;
-  }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
   final String title;
 
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
   double getStatusBarHeight(BuildContext context) {
     return MediaQuery.of(context).padding.top;
   }
 
+
+  final ActivityDisplay _activity = const ActivityDisplay();
+  final History _history = const History();
+
+  final PageController _pageController = PageController();
+  final int _numberOfPages = 2;
+  int _pageIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      appBar: AppBar(
+          toolbarHeight: Bar.barHeight,
+          backgroundColor: ColorTheme.primaryColor,
+          flexibleSpace: Column(
+            children: [
+              Container(
+                height: getStatusBarHeight(context),
+                width: double.infinity,
+                color: ColorTheme.primaryColor,
+              ),
+              const Bar(),
+            ],
+          )),
+      body: PageView(
+        controller: _pageController,
+        scrollDirection: Axis.horizontal,
+        onPageChanged: (int page) {
+          setState(() {});
+          _pageIndex = page;
+        },
         children: [
-          Container(
-            height: getStatusBarHeight(context),
-            width: double.infinity,
-            color: ColorTheme.primaryColor,
+          _activity,
+          _history,
+        ],
+      ),
+      bottomNavigationBar: _buildBottomBar(),
+    );
+  }
+
+  Widget _buildBottomBar() {
+    return SizedBox(
+      height: 75,
+      child: Stack(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    _pageIndex = 0;
+                    _pageController.animateToPage(
+                      0,
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  child: _buildBottomBarContainer(
+                      iconData: Icons.downhill_skiing_rounded,
+                      text: 'Activity'),
+                ),
+              ),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    _pageIndex = 1;
+                    _pageController.animateToPage(
+                      1,
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  child: _buildBottomBarContainer(
+                      iconData: Icons.calendar_month_rounded, text: 'History'),
+                ),
+              ),
+            ],
           ),
-          const Bar(),
-          const SizedBox(height: 64),
-          const MainWidget(),
-          const Spacer(),
-          const ActivityBar(),
-          const SizedBox(height: 32),
-          const SelectPage(),
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 200),
+            top: 0,
+            left: (MediaQuery.of(context).size.width / _numberOfPages) *
+                (_pageIndex),
+            child: Container(
+              width: MediaQuery.of(context).size.width / _numberOfPages,
+              height: 4,
+              color: ColorTheme.contrastColor,
+            ),
+          ),
         ],
       ),
     );
   }
-}
 
-class MainWidget extends StatefulWidget {
-  const MainWidget({super.key});
-
-  @override
-  State<MainWidget> createState() => _MainWidgetState();
-}
-
-class _MainWidgetState extends State<MainWidget> {
-  final ActivityInfo _activity = const ActivityInfo();
-  final History _history = const History();
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  void updateState() {
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ExpandablePageView(
-      scrollDirection: Axis.horizontal,
-      controller: SkiTracker.getPageController(),
-      onPageChanged: (int page) {
-        setState(() {});
-      },
-      children: [
-        _activity,
-        _history,
-      ],
+  Widget _buildBottomBarContainer(
+      {required IconData iconData, required String text}) {
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      color: ColorTheme.primaryColor,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Icon(
+            iconData,
+            size: 32,
+            color: ColorTheme.contrastColor,
+          ),
+          Utils.buildText(text: text),
+        ],
+      ),
     );
   }
 }
