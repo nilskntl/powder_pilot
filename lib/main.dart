@@ -36,6 +36,8 @@ class SkiTracker extends StatelessWidget {
 
   static Activity _activity = Activity();
 
+  static int _activityId = 0;
+
   static late ActivityDataProvider _activityData;
 
   @override
@@ -54,6 +56,18 @@ class SkiTracker extends StatelessWidget {
 
   static Activity getActivity() {
     return _activity;
+  }
+
+  static void setActivity(Activity activity) {
+    _activity = activity;
+  }
+
+  static int getActivityId() {
+    return _activityId;
+  }
+
+  static void setActivityId(int activityId) {
+    _activityId = activityId;
   }
 
   static ActivityDataProvider getActivityDataProvider() {

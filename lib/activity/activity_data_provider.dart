@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 import 'package:ski_tracker/activity/activity.dart';
 
 class ActivityDataProvider extends ChangeNotifier {
+
   // Speed
   double speed = 0.0;
   double maxSpeed = 0.0;
@@ -37,6 +39,9 @@ class ActivityDataProvider extends ChangeNotifier {
   // GPS accuracy
   GpsAccuracy gpsAccuracy = GpsAccuracy.none;
 
+  // Location loaded
+  bool locationLoaded = false;
+
   void updateData({
     required double newSpeed,
     required double newMaxSpeed,
@@ -58,6 +63,7 @@ class ActivityDataProvider extends ChangeNotifier {
     required double newCurrentLatitude,
     required double newCurrentLongitude,
     required GpsAccuracy newGpsAccuracy,
+    required bool newLocationLoaded,
   }) {
     speed = newSpeed;
     maxSpeed = newMaxSpeed;
@@ -79,6 +85,7 @@ class ActivityDataProvider extends ChangeNotifier {
     currentLatitude = newCurrentLatitude;
     currentLongitude = newCurrentLongitude;
     gpsAccuracy = newGpsAccuracy;
+    locationLoaded = newLocationLoaded;
 
     notifyListeners();
   }

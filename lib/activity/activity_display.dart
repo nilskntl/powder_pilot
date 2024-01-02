@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:ski_tracker/activity/activity.dart';
 import 'package:ski_tracker/activity/activity_bar.dart';
@@ -6,6 +9,7 @@ import 'package:ski_tracker/activity/activity_bar.dart';
 import '../main.dart';
 import '../utils.dart';
 import 'activity_data_provider.dart';
+import 'activity_map.dart';
 
 class ActivityDisplay extends StatefulWidget {
   const ActivityDisplay({super.key});
@@ -43,14 +47,48 @@ class ActivityInfo extends StatefulWidget {
 }
 
 class _ActivityInfoState extends State<ActivityInfo> {
+  Location location = Location();
+
+  late Timer _timer;
+
   @override
   void initState() {
     super.initState();
+    SkiTracker.getActivity().infoMounted = true;
+    _startTimer();
+  }
+
+  void _startTimer() {
+    bool mapInitialized = false;
+    bool addressInitialized = false;
+    int id = 0;
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (!mapInitialized) {
+          if (SkiTracker.getActivity().initializedMap) {
+          setState(() {});
+          mapInitialized = true;
+        }
+      }
+      if (!addressInitialized) {
+        if (SkiTracker.getActivity().country != 'Unknown') {
+          setState(() {});
+          addressInitialized = true;
+        }
+      }
+      if (id != Activity.id) {
+        id = Activity.id;
+        mapInitialized = false;
+        addressInitialized = false;
+        setState(() {});
+      }
+    });
   }
 
   static const double horizontalSpaceMiddle = 8;
   static const double horizontalSpaceLeft = 16;
   static const double horizontalSpaceRight = 16;
+
+  static const int animationDuration = 500;
 
   static const double verticalSpace = 8;
 
@@ -61,6 +99,10 @@ class _ActivityInfoState extends State<ActivityInfo> {
   static const String unitTime = 's';
 
   static const double speedFactor = 3.6;
+
+  static const double standardContainerHeight = 140;
+  static const double standardContainerHeightFolded = 56;
+  static const double mapPreviewHeight = 100;
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +133,81 @@ class _ActivityInfoState extends State<ActivityInfo> {
               ],
             ),
             const SizedBox(height: verticalSpace),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MapPage(),
+                    settings: const RouteSettings(
+                        name:
+                            '/fullscreen'), // Setzen Sie hier den gewünschten Routennamen
+                  ),
+                );
+              },
+              child: _buildActivityContainer(
+                height: SkiTracker.getActivity().initializedMap &&
+                        SkiTracker.getActivity().country != 'Unknown'
+                    ? mapPreviewHeight + FontTheme.size + 24
+                    : SkiTracker.getActivity().initializedMap
+                        ? mapPreviewHeight
+                        : SkiTracker.getActivity().country != 'Unknown'
+                            ? FontTheme.size + 24
+                            : 0,
+                alwaysSameHeight: true,
+                margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: 0.0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (SkiTracker.getActivity().initializedMap)
+                      Stack(children: [
+                        SizedBox(
+                          height: mapPreviewHeight,
+                          child: SkiTracker.getActivity().activityMap,
+                        ),
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: Center(
+                            child: CustomPaint(
+                              size: const Size(24, 24),
+                              painter: LocationMark(),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: mapPreviewHeight,
+                          decoration: BoxDecoration(
+                            gradient: RadialGradient(
+                              colors: [
+                                Colors.transparent,
+                                const Color(0xFF505050).withOpacity(0.9)
+                              ],
+                              center: Alignment.center,
+                              radius:
+                                  2.5, // Radius steuert die Größe des Gradients
+                            ),
+                          ),
+                        ),
+                      ]),
+                    if (SkiTracker.getActivity().country != 'Unknown')
+                      Container(
+                          height: FontTheme.size + 24,
+                          padding: const EdgeInsets.all(8.0),
+                          child: Utils.buildText(
+                            text: SkiTracker.getActivity().country == 'Unknown'
+                                ? 'No location data available'
+                                : '${SkiTracker.getActivity().city}, ${SkiTracker.getActivity().country}',
+                            fontSize: FontTheme.size,
+                          )),
+                  ],
+                ),
+              ),
+            ),
+            if(SkiTracker.getActivity().initializedMap || SkiTracker.getActivity().country != 'Unknown')const SizedBox(height: verticalSpace),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -108,42 +225,40 @@ class _ActivityInfoState extends State<ActivityInfo> {
   }
 
   Widget _gps(ActivityDataProvider activityData) {
+    Widget buildGpsIcon(IconData icon, Color color) {
+      return Icon(
+        icon,
+        size: 48,
+        color: color,
+      );
+    }
+
     return Expanded(
+      flex: 1,
       child: _buildActivityContainer(
-        height: 110,
+        height: 72,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildActivityHeader(
-                text: 'GPS', iconData: Icons.gps_fixed_rounded),
-            const SizedBox(height: 12),
-            Stack(
-              children: [
-                const Icon(
-                  Icons.signal_cellular_alt_rounded,
-                  size: 48,
-                  color: Colors.grey,
-                ),
-                if (activityData.gpsAccuracy == GpsAccuracy.high)
-                  const Icon(
-                    Icons.signal_cellular_alt_rounded,
-                    size: 48,
-                    color: Colors.green,
-                  ),
-                if (activityData.gpsAccuracy == GpsAccuracy.medium)
-                  const Icon(
-                    Icons.signal_cellular_alt_2_bar_rounded,
-                    size: 48,
-                    color: Colors.yellow,
-                  ),
-                if (activityData.gpsAccuracy == GpsAccuracy.low)
-                  const Icon(
-                    Icons.signal_cellular_alt_1_bar_rounded,
-                    size: 48,
-                    color: Colors.red,
-                  ),
-              ],
-            )
+            if (!SkiTracker.getActivity().isActive)
+              _buildActivityHeader(
+                  text: 'GPS', iconData: Icons.gps_fixed_rounded),
+            if (SkiTracker.getActivity().isActive)
+              Stack(
+                children: [
+                  buildGpsIcon(Icons.signal_cellular_alt_rounded, Colors.grey),
+                  if (activityData.gpsAccuracy == GpsAccuracy.high)
+                    buildGpsIcon(
+                        Icons.signal_cellular_alt_rounded, Colors.green),
+                  if (activityData.gpsAccuracy == GpsAccuracy.medium)
+                    buildGpsIcon(
+                        Icons.signal_cellular_alt_2_bar_rounded, Colors.yellow),
+                  if (activityData.gpsAccuracy == GpsAccuracy.low)
+                    buildGpsIcon(
+                        Icons.signal_cellular_alt_1_bar_rounded, Colors.red),
+                ],
+              )
           ],
         ),
       ),
@@ -151,31 +266,112 @@ class _ActivityInfoState extends State<ActivityInfo> {
   }
 
   Widget _time(ActivityDataProvider activityData) {
+    int downhillFlex = 1;
+    int uphillFlex = 1;
+    if (activityData.elapsedDownhillTime.inSeconds > 0) {
+      downhillFlex = ((activityData.elapsedDownhillTime.inSeconds /
+                  (activityData.elapsedUphillTime.inSeconds +
+                      activityData.elapsedDownhillTime.inSeconds)) *
+              100)
+          .round();
+      if (activityData.elapsedUphillTime.inSeconds == 0) {
+        uphillFlex = 1;
+      }
+    }
+    if (activityData.elapsedUphillTime.inSeconds > 0) {
+      uphillFlex = ((activityData.elapsedUphillTime.inSeconds /
+                  (activityData.elapsedUphillTime.inSeconds +
+                      activityData.elapsedDownhillTime.inSeconds)) *
+              100)
+          .round();
+      if (activityData.elapsedDownhillTime.inSeconds == 0) {
+        downhillFlex = 1;
+      }
+    }
+
+    Widget buildTimeBar(Color color, bool left) {
+      return Container(
+        height: 8,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: left
+              ? const BorderRadius.only(
+                  topLeft: Radius.circular(4), bottomLeft: Radius.circular(4))
+              : const BorderRadius.only(
+                  topRight: Radius.circular(4),
+                  bottomRight: Radius.circular(4)),
+        ),
+      );
+    }
+
     return Expanded(
+      flex: 2,
       child: _buildActivityContainer(
-        height: 110,
+        height: 72,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildActivityHeader(text: 'Time', iconData: Icons.timer_rounded),
-            const SizedBox(height: 8),
-            _buildActivitySubItem(
-                text: 'Pause',
-                fontSize: 12.0,
-                value: activityData.elapsedPauseTime.toString().substring(0, 7),
-                unit: unitTime),
-            _buildActivitySubItem(
-                text: 'Uphill',
-                fontSize: 12.0,
-                value:
-                    activityData.elapsedUphillTime.toString().substring(0, 7),
-                unit: unitTime),
-            _buildActivitySubItem(
-                text: 'Downhill',
-                fontSize: 12.0,
-                value:
-                    activityData.elapsedDownhillTime.toString().substring(0, 7),
-                unit: unitTime),
+            if (!SkiTracker.getActivity().isActive)
+              _buildActivityHeader(text: 'Time', iconData: Icons.timer_rounded),
+            if (SkiTracker.getActivity().isActive)
+              const SizedBox(height: 4),
+            if (SkiTracker.getActivity().isActive)
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const SizedBox(width: 4),
+                      Utils.buildText(text: 'Downhill'),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Utils.buildText(text: 'Uphill'),
+                      const SizedBox(width: 4),
+                    ],
+                  ),
+                ],
+              ),
+            if (SkiTracker.getActivity().isActive)
+              const SizedBox(height: 2),
+            if (SkiTracker.getActivity().isActive)
+              Row(
+                children: [
+                  Expanded(
+                    flex: downhillFlex,
+                    child: buildTimeBar(Colors.red, true),
+                  ),
+                  Expanded(
+                    flex: uphillFlex,
+                    child: buildTimeBar(Colors.green, false),
+                  ),
+                ],
+              ),
+            if (SkiTracker.getActivity().isActive)
+              const SizedBox(height: 2),
+            if (SkiTracker.getActivity().isActive)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const SizedBox(width: 4),
+                      Utils.buildText(
+                          text:
+                          '${activityData.elapsedDownhillTime.toString().substring(0, 7)} $unitTime'),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Utils.buildText(
+                          text:
+                          '${activityData.elapsedUphillTime.toString().substring(0, 7)} $unitTime'),
+                      const SizedBox(width: 4),],
+                  ),
+                ],
+              ),
           ],
         ),
       ),
@@ -313,25 +509,40 @@ class _ActivityInfoState extends State<ActivityInfo> {
     );
   }
 
-  Widget _buildActivityContainer({required Widget child, double height = 140}) {
+  Widget _buildActivityContainer(
+      {required Widget child,
+      double height = standardContainerHeight,
+      bool alwaysSameHeight = false,
+      double padding = 8.0,
+      EdgeInsets margin = const EdgeInsets.all(0.0)}) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 500),
-      height: SkiTracker.getActivity().isActive ? height : 56,
-      padding: const EdgeInsets.all(8.0),
+      duration: const Duration(milliseconds: animationDuration),
+      height: alwaysSameHeight
+          ? height
+          : SkiTracker.getActivity().isActive
+              ? height
+              : standardContainerHeightFolded,
+      padding: EdgeInsets.all(padding),
+      margin: margin,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         color: ColorTheme.primaryColor.withOpacity(0.5),
         borderRadius: BorderRadius.circular(16.0),
       ),
-      child: ListView(
-        padding: EdgeInsets.zero,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [
-          child,
-        ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16.0),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            child,
+          ],
+        ),
       ),
     );
   }
+
+  static const double headerIconSize = 28.0;
 
   Widget _buildActivityHeader(
       {required String text, required IconData iconData}) {
@@ -341,7 +552,7 @@ class _ActivityInfoState extends State<ActivityInfo> {
         Utils.buildText(text: text),
         Icon(
           iconData,
-          size: 28,
+          size: headerIconSize,
           color: ColorTheme.contrastColor,
         ),
       ],
@@ -359,7 +570,8 @@ class _ActivityInfoState extends State<ActivityInfo> {
               fontWeight: FontWeight.bold),
           if (SkiTracker.getActivity().isActive) const SizedBox(width: 4),
           if (SkiTracker.getActivity().isActive)
-            Utils.buildText(text: unit, fontWeight: FontWeight.bold),
+            Utils.buildText(
+                text: unit, fontWeight: FontWeight.bold, caps: false),
         ],
       );
     } else {
@@ -381,12 +593,20 @@ class _ActivityInfoState extends State<ActivityInfo> {
               text: value, fontSize: fontSize, fontWeight: FontWeight.bold),
           if (SkiTracker.getActivity().isActive) const SizedBox(width: 2),
           if (SkiTracker.getActivity().isActive)
-            Utils.buildText(text: unit, fontWeight: FontWeight.bold),
+            Utils.buildText(
+                text: unit, fontWeight: FontWeight.bold, caps: false),
           const SizedBox(width: 4),
         ],
       );
     } else {
       return Container();
     }
+  }
+
+  @override
+  void dispose() {
+    SkiTracker.getActivity().infoMounted = false;
+    _timer.cancel();
+    super.dispose();
   }
 }
