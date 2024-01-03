@@ -133,80 +133,7 @@ class _ActivityInfoState extends State<ActivityInfo> {
               ],
             ),
             const SizedBox(height: verticalSpace),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MapPage(),
-                    settings: const RouteSettings(
-                        name:
-                            '/fullscreen'), // Setzen Sie hier den gewünschten Routennamen
-                  ),
-                );
-              },
-              child: _buildActivityContainer(
-                height: SkiTracker.getActivity().initializedMap &&
-                        SkiTracker.getActivity().areaName != 'Unknown'
-                    ? mapPreviewHeight + FontTheme.size + 24
-                    : SkiTracker.getActivity().initializedMap
-                        ? mapPreviewHeight
-                        : SkiTracker.getActivity().areaName != 'Unknown'
-                            ? FontTheme.size + 24
-                            : 0,
-                alwaysSameHeight: true,
-                margin: const EdgeInsets.symmetric(horizontal: 16.0),
-                padding: 0.0,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (SkiTracker.getActivity().initializedMap)
-                      Stack(children: [
-                        SizedBox(
-                          height: mapPreviewHeight,
-                          child: SkiTracker.getActivity().activityMap,
-                        ),
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          child: Center(
-                            child: CustomPaint(
-                              size: const Size(24, 24),
-                              painter: LocationMark(),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          height: mapPreviewHeight,
-                          decoration: BoxDecoration(
-                            gradient: RadialGradient(
-                              colors: [
-                                Colors.transparent,
-                                const Color(0xFF505050).withOpacity(0.9)
-                              ],
-                              center: Alignment.center,
-                              radius:
-                                  2.5, // Radius steuert die Größe des Gradients
-                            ),
-                          ),
-                        ),
-                      ]),
-                    if (SkiTracker.getActivity().areaName != 'Unknown')
-                      Container(
-                          height: FontTheme.size + 24,
-                          padding: const EdgeInsets.all(8.0),
-                          child: Utils.buildText(
-                            text: SkiTracker.getActivity().areaName == 'Unknown'
-                                ? 'No location data available'
-                                : '${SkiTracker.getActivity().areaName}, ${SkiTracker.getActivity().areaName}',
-                            fontSize: FontTheme.size,
-                          )),
-                  ],
-                ),
-              ),
-            ),
+            _map(),
             if(SkiTracker.getActivity().initializedMap || SkiTracker.getActivity().areaName != 'Unknown')const SizedBox(height: verticalSpace),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -218,6 +145,83 @@ class _ActivityInfoState extends State<ActivityInfo> {
                 const SizedBox(width: horizontalSpaceRight),
               ],
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _map() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MapPage(),
+            settings: const RouteSettings(
+                name:
+                '/fullscreen'), // Setzen Sie hier den gewünschten Routennamen
+          ),
+        );
+      },
+      child: _buildActivityContainer(
+        height: SkiTracker.getActivity().initializedMap &&
+            SkiTracker.getActivity().areaName != 'Unknown'
+            ? mapPreviewHeight + FontTheme.size + 24
+            : SkiTracker.getActivity().initializedMap
+            ? mapPreviewHeight
+            : SkiTracker.getActivity().areaName != 'Unknown'
+            ? FontTheme.size + 24
+            : 0,
+        alwaysSameHeight: true,
+        margin: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: 0.0,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (SkiTracker.getActivity().initializedMap)
+              Stack(children: [
+                SizedBox(
+                  height: mapPreviewHeight,
+                  child: SkiTracker.getActivity().activityMap,
+                ),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: CustomPaint(
+                      size: const Size(24, 24),
+                      painter: LocationMark(),
+                    ),
+                  ),
+                ),
+                Container(
+                  height: mapPreviewHeight,
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      colors: [
+                        Colors.transparent,
+                        const Color(0xFF505050).withOpacity(0.9)
+                      ],
+                      center: Alignment.center,
+                      radius:
+                      2.5, // Radius steuert die Größe des Gradients
+                    ),
+                  ),
+                ),
+              ]),
+            if (SkiTracker.getActivity().areaName != 'Unknown')
+              Container(
+                  height: FontTheme.size + 24,
+                  padding: const EdgeInsets.all(8.0),
+                  child: Utils.buildText(
+                    text: SkiTracker.getActivity().areaName == 'Unknown'
+                        ? 'No location data available'
+                        : '${SkiTracker.getActivity().areaName}, ${SkiTracker.getActivity().areaName}',
+                    fontSize: FontTheme.size,
+                  )),
           ],
         ),
       ),
