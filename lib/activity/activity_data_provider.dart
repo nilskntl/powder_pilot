@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
 import 'package:ski_tracker/activity/activity.dart';
 
 class ActivityDataProvider extends ChangeNotifier {
@@ -11,9 +10,13 @@ class ActivityDataProvider extends ChangeNotifier {
   double avgSpeed = 0.0;
 
   // Distance
-  double totalDistance = 0.0;
-  double uphillDistance = 0.0;
-  double downhillDistance = 0.0;
+  double distance = 0.0;
+  double distanceUphill = 0.0;
+  double distanceDownhill = 0.0;
+
+  // Runs
+  int totalRuns = 0;
+  double longestRun = 0.0;
 
   // Altitude
   double altitude = 0.0;
@@ -46,9 +49,9 @@ class ActivityDataProvider extends ChangeNotifier {
     required double newSpeed,
     required double newMaxSpeed,
     required double newAvgSpeed,
-    required double newTotalDistance,
-    required double newUphillDistance,
-    required double newDownhillDistance,
+    required double newDistance,
+    required double newDistanceUphill,
+    required double newDistanceDownhill,
     required double newAltitude,
     required double newMaxAltitude,
     required double newMinAltitude,
@@ -64,13 +67,15 @@ class ActivityDataProvider extends ChangeNotifier {
     required double newCurrentLongitude,
     required GpsAccuracy newGpsAccuracy,
     required bool newLocationLoaded,
+    required int newTotalRuns,
+    required double newLongestRun,
   }) {
     speed = newSpeed;
     maxSpeed = newMaxSpeed;
     avgSpeed = newAvgSpeed;
-    totalDistance = newTotalDistance;
-    uphillDistance = newUphillDistance;
-    downhillDistance = newDownhillDistance;
+    distance = newDistance;
+    distanceUphill = newDistanceUphill;
+    distanceDownhill = newDistanceDownhill;
     altitude = newAltitude;
     maxAltitude = newMaxAltitude;
     minAltitude = newMinAltitude;
@@ -86,6 +91,8 @@ class ActivityDataProvider extends ChangeNotifier {
     currentLongitude = newCurrentLongitude;
     gpsAccuracy = newGpsAccuracy;
     locationLoaded = newLocationLoaded;
+    totalRuns = newTotalRuns;
+    longestRun = newLongestRun;
 
     notifyListeners();
   }

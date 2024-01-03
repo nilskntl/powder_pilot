@@ -70,7 +70,7 @@ class _ActivityInfoState extends State<ActivityInfo> {
         }
       }
       if (!addressInitialized) {
-        if (SkiTracker.getActivity().country != 'Unknown') {
+        if (SkiTracker.getActivity().areaName != 'Unknown') {
           setState(() {});
           addressInitialized = true;
         }
@@ -147,11 +147,11 @@ class _ActivityInfoState extends State<ActivityInfo> {
               },
               child: _buildActivityContainer(
                 height: SkiTracker.getActivity().initializedMap &&
-                        SkiTracker.getActivity().country != 'Unknown'
+                        SkiTracker.getActivity().areaName != 'Unknown'
                     ? mapPreviewHeight + FontTheme.size + 24
                     : SkiTracker.getActivity().initializedMap
                         ? mapPreviewHeight
-                        : SkiTracker.getActivity().country != 'Unknown'
+                        : SkiTracker.getActivity().areaName != 'Unknown'
                             ? FontTheme.size + 24
                             : 0,
                 alwaysSameHeight: true,
@@ -193,21 +193,21 @@ class _ActivityInfoState extends State<ActivityInfo> {
                           ),
                         ),
                       ]),
-                    if (SkiTracker.getActivity().country != 'Unknown')
+                    if (SkiTracker.getActivity().areaName != 'Unknown')
                       Container(
                           height: FontTheme.size + 24,
                           padding: const EdgeInsets.all(8.0),
                           child: Utils.buildText(
-                            text: SkiTracker.getActivity().country == 'Unknown'
+                            text: SkiTracker.getActivity().areaName == 'Unknown'
                                 ? 'No location data available'
-                                : '${SkiTracker.getActivity().city}, ${SkiTracker.getActivity().country}',
+                                : '${SkiTracker.getActivity().areaName}, ${SkiTracker.getActivity().areaName}',
                             fontSize: FontTheme.size,
                           )),
                   ],
                 ),
               ),
             ),
-            if(SkiTracker.getActivity().initializedMap || SkiTracker.getActivity().country != 'Unknown')const SizedBox(height: verticalSpace),
+            if(SkiTracker.getActivity().initializedMap || SkiTracker.getActivity().areaName != 'Unknown')const SizedBox(height: verticalSpace),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -412,16 +412,16 @@ class _ActivityInfoState extends State<ActivityInfo> {
             _buildActivityHeader(text: 'Distance', iconData: Icons.map_rounded),
             const SizedBox(height: 8),
             _buildActivityItem(
-                value: (activityData.totalDistance / 1000).toStringAsFixed(1),
+                value: (activityData.distance / 1000).toStringAsFixed(1),
                 unit: unitDistance),
             _buildActivitySubItem(
                 text: 'Downhill',
                 value:
-                    (activityData.downhillDistance / 1000).toStringAsFixed(1),
+                    (activityData.distanceDownhill / 1000).toStringAsFixed(1),
                 unit: unitDistance),
             _buildActivitySubItem(
                 text: 'Uphill',
-                value: (activityData.uphillDistance / 1000).toStringAsFixed(1),
+                value: (activityData.distanceUphill / 1000).toStringAsFixed(1),
                 unit: unitDistance),
           ],
         ),

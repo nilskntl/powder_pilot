@@ -26,7 +26,6 @@ enum GpsAccuracy {
 }
 
 class Activity extends ActivityLocation {
-
   static int id = -1;
 
   Activity() {
@@ -95,7 +94,7 @@ class ActivityLocation extends ActivityUtils {
   int _numberOfSpeedUpdates = 0;
   int _numberOfSlopeUpdates = 0;
   int _numberOfAltitudeUpdates = 0;
-  int _numberOfLocationUpdates = 0;
+  // int _numberOfLocationUpdates = 0;
 
   Future<bool> _requestPermission() async {
     bool serviceEnabled;
@@ -121,6 +120,8 @@ class ActivityLocation extends ActivityUtils {
 
   void _locationStream() {
 
+    double currentRunLength = 0.0;
+
     void updateSpeed(LocationData location) {
       if (location.speed! < 55) {
         speed = location.speed!;
@@ -138,7 +139,6 @@ class ActivityLocation extends ActivityUtils {
     }
 
     void updateAltitude(LocationData location) {
-
       _numberOfAltitudeUpdates++;
 
       altitude = _smoothAltitude(location.altitude!);
@@ -159,7 +159,7 @@ class ActivityLocation extends ActivityUtils {
         if (calculatedDistance > 200) {
           calculatedDistance = 0.0;
         }
-        totalDistance += calculatedDistance;
+        distance += calculatedDistance;
         _tempDistance += calculatedDistance;
         _lastLocation = location;
       }
@@ -169,27 +169,35 @@ class ActivityLocation extends ActivityUtils {
         if (altitude - _currentExtrema > 5) {
           _statusUphill = true;
           _statusDownhill = false;
+          currentRunLength = 0.0;
         } else if (altitude - _currentExtrema < -5) {
           _statusUphill = false;
           _statusDownhill = true;
+          currentRunLength = 0.0;
+          totalRuns++;
         }
       } else {
-        if (altitude - _currentExtrema > 25) {
+        if (altitude - _currentExtrema > 20) {
           _statusUphill = true;
           _statusDownhill = false;
-        } else if (altitude - _currentExtrema < -25) {
+          currentRunLength = 0.0;
+        } else if (altitude - _currentExtrema < -20) {
           _statusUphill = false;
           _statusDownhill = true;
+          currentRunLength = 0.0;
+          totalRuns++;
         }
       }
 
       if (_statusUphill && altitude - _currentExtrema > 0) {
         _currentExtrema = altitude;
-        uphillDistance += _tempDistance;
+        distanceUphill += _tempDistance;
         _tempDistance = 0.0;
       } else if (_statusDownhill && altitude - _currentExtrema < 0) {
         _currentExtrema = altitude;
-        downhillDistance += _tempDistance;
+        distanceDownhill += _tempDistance;
+        currentRunLength += _tempDistance;
+        longestRun = currentRunLength > longestRun ? currentRunLength : longestRun;
         _tempDistance = 0.0;
       }
     }
@@ -210,7 +218,7 @@ class ActivityLocation extends ActivityUtils {
           }
           if (_tempAltitude - altitude > 0) {
             double horizontalDistance =
-            _calculateHaversineDistance(_tempLocation, location);
+                _calculateHaversineDistance(_tempLocation, location);
 
             double verticalDistance = _tempAltitude - altitude;
 
@@ -238,7 +246,6 @@ class ActivityLocation extends ActivityUtils {
 
     _locationSubscription =
         location.onLocationChanged.listen((LocationData location) {
-      _numberOfLocationUpdates++;
       if (_running) {
         if (location.accuracy! < 10) {
           gpsAccuracy = GpsAccuracy.high;
@@ -278,14 +285,17 @@ class ActivityLocation extends ActivityUtils {
 
       currentLatitude = location.latitude!;
       currentLongitude = location.longitude!;
-      if(!initializedMap) {
-        _activityMap = ActivityMap();
+      if (!initializedMap) {
+        _activityMap = const ActivityMap();
         _updateAddress();
         initializedMap = true;
       }
-      if(_numberOfLocationUpdates % 100 == 0) {
+      /*
+        _numberOfLocationUpdates++;
+       if(_numberOfLocationUpdates % 100 == 0) {
         _updateAddress();
       }
+       */
     });
   }
 
@@ -294,9 +304,9 @@ class ActivityLocation extends ActivityUtils {
       print('Updating address');
     }
     try {
-      var address = await GeoCode().reverseGeocoding(latitude: currentLatitude, longitude: currentLongitude);
-      city = address.city!;
-      country = address.countryName!;
+      var address = await GeoCode().reverseGeocoding(
+          latitude: currentLatitude, longitude: currentLongitude);
+      areaName = '${address.countryName!}, ${address.city!}';
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -339,40 +349,40 @@ class ActivityTimer extends ActivityStatus {
   Duration _elapsedPauseTime = Duration.zero;
   Duration _elapsedDownhillTime = Duration.zero;
   Duration _elapsedUphillTime = Duration.zero;
-  
+
   late Timer _timer;
 
   void _startStopwatch({required Function() callback}) {
     _stopwatch.start();
     Duration pauseTime = const Duration(seconds: 0);
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        _elapsedTime = _stopwatch.elapsed;
-        if(_statusDownhill && !_statusPause) {
-          _elapsedDownhillTime += const Duration(seconds: 1);
-        } else if(_statusUphill && !_statusPause) {
-          _elapsedUphillTime += const Duration(seconds: 1);
+      _elapsedTime = _stopwatch.elapsed;
+      if (_statusDownhill && !_statusPause) {
+        _elapsedDownhillTime += const Duration(seconds: 1);
+      } else if (_statusUphill && !_statusPause) {
+        _elapsedUphillTime += const Duration(seconds: 1);
+      } else {
+        _elapsedPauseTime += const Duration(seconds: 1);
+      }
+      if (!_statusPause) {
+        if (speed == 0.0) {
+          pauseTime += const Duration(seconds: 1);
         } else {
-          _elapsedPauseTime += const Duration(seconds: 1);
+          pauseTime = const Duration(seconds: 0);
         }
-        if(!_statusPause) {
-          if(speed == 0.0) {
-            pauseTime += const Duration(seconds: 1);
-          } else {
-            pauseTime = const Duration(seconds: 0);
+        if (pauseTime > const Duration(seconds: 5)) {
+          _statusPause = true;
+          if (_statusDownhill) {
+            _elapsedDownhillTime -= pauseTime;
+          } else if (_statusUphill) {
+            _elapsedUphillTime -= pauseTime;
           }
-          if(pauseTime > const Duration(seconds: 5)) {
-            _statusPause = true;
-            if(_statusDownhill) {
-              _elapsedDownhillTime -= pauseTime;
-            } else if(_statusUphill) {
-              _elapsedUphillTime -= pauseTime;
-            }
-            pauseTime = const Duration(seconds: 0);
-          }
+          pauseTime = const Duration(seconds: 0);
         }
-        callback();
-        // Update UI periodically
-        updateData();
+      }
+      callback();
+      // Update UI periodically
+      updateData();
     });
   }
 
@@ -451,15 +461,9 @@ class ActivityUtils extends ActivityTimer {
 }
 
 class ActivityData extends ActivityDataTemp {
-
   // Map
   late final ActivityMap _activityMap;
-
-  // Current city
-  String city = 'Unknown';
-
-  // Current country
-  String country = 'Unknown';
+  String areaName = 'Unknown';
 
   // Speed
   double speed = 0.0;
@@ -468,9 +472,13 @@ class ActivityData extends ActivityDataTemp {
   double totalSpeed = 0.0;
 
   // Distance
-  double totalDistance = 0.0;
-  double uphillDistance = 0.0;
-  double downhillDistance = 0.0;
+  double distance = 0.0;
+  double distanceUphill = 0.0;
+  double distanceDownhill = 0.0;
+
+  // Runs
+  int totalRuns = 0;
+  double longestRun = 0.0;
 
   // Altitude
   double altitude = 0.0;
@@ -501,9 +509,9 @@ class ActivityData extends ActivityDataTemp {
       newSpeed: speed,
       newMaxSpeed: maxSpeed,
       newAvgSpeed: avgSpeed,
-      newTotalDistance: totalDistance,
-      newUphillDistance: uphillDistance,
-      newDownhillDistance: downhillDistance,
+      newDistance: distance,
+      newDistanceUphill: distanceUphill,
+      newDistanceDownhill: distanceDownhill,
       newAltitude: altitude,
       newMaxAltitude: maxAltitude,
       newMinAltitude: minAltitude,
@@ -519,12 +527,13 @@ class ActivityData extends ActivityDataTemp {
       newCurrentLongitude: currentLongitude,
       newGpsAccuracy: gpsAccuracy,
       newLocationLoaded: initializedMap,
+      newTotalRuns: totalRuns,
+      newLongestRun: longestRun,
     );
   }
 }
 
 class ActivityDataTemp {
-
   bool _locationInitialized = false;
 
   bool infoMounted = false;
