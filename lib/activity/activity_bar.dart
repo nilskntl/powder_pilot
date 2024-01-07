@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../main.dart';
-import '../utils.dart';
+import '../utils/general_utils.dart';
 import 'activity_data_provider.dart';
 
 class ActivityBar extends StatefulWidget {

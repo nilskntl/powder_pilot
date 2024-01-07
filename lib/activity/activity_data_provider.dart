@@ -39,11 +39,27 @@ class ActivityDataProvider extends ChangeNotifier {
   double currentLatitude = 0.0;
   double currentLongitude = 0.0;
 
+  // Current address
+  String area = '';
+
   // GPS accuracy
   GpsAccuracy gpsAccuracy = GpsAccuracy.none;
 
   // Location loaded
   bool locationLoaded = false;
+
+  // Full route
+  FullRoute fullRoute = FullRoute(routes: []);
+
+  // Current route
+  SingleRoute currentRoute = SingleRoute(type: 'Unknown', coordinates: []);
+
+  // Status
+  ActivityStatus status = ActivityStatus.inactive;
+  bool initializedMap = false;
+
+  // Internet status
+  bool internetStatus = false;
 
   void updateData({
     required double newSpeed,
@@ -69,6 +85,11 @@ class ActivityDataProvider extends ChangeNotifier {
     required bool newLocationLoaded,
     required int newTotalRuns,
     required double newLongestRun,
+    required FullRoute newFullRoute,
+    required SingleRoute newCurrentRoute,
+    required ActivityStatus newStatus,
+    required String newArea,
+    required bool newInitializedMap,
   }) {
     speed = newSpeed;
     maxSpeed = newMaxSpeed;
@@ -93,7 +114,17 @@ class ActivityDataProvider extends ChangeNotifier {
     locationLoaded = newLocationLoaded;
     totalRuns = newTotalRuns;
     longestRun = newLongestRun;
+    fullRoute = newFullRoute;
+    currentRoute = newCurrentRoute;
+    status = newStatus;
+    area = newArea;
+    initializedMap = newInitializedMap;
 
+    notifyListeners();
+  }
+
+  void updateInternetStatus({required bool newInternetStatus}) {
+    internetStatus = newInternetStatus;
     notifyListeners();
   }
 }

@@ -7,7 +7,7 @@ import 'package:sqflite/sqflite.dart';
 class ActivityDatabaseHelper {
 
   // This is the actual database filename that is saved in the docs directory.
-  static const _databaseName = "activity_database.db";
+  static const _databaseName = "activity_databasee.db";
   // Table name
   static const _tableName = "activity";
   // Increment this version when you need to change the schema.
@@ -21,7 +21,7 @@ class ActivityDatabaseHelper {
   static late Database _database;
   static bool _initialized = false;
 
-  Future<Database> _initDatabase() async {
+  static Future<Database> _initDatabase() async {
     // Avoid errors caused by flutter upgrade.
     // Importing 'package:flutter/widgets.dart' is required.
     WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +41,7 @@ class ActivityDatabaseHelper {
     return db;
   }
 
-  Future _onCreate(Database db, int version) async {
+  static Future _onCreate(Database db, int version) async {
     await db.execute('''
               CREATE TABLE activity(
                 id INTEGER PRIMARY KEY,
@@ -61,21 +61,35 @@ class ActivityDatabaseHelper {
                 elapsedTime TEXT,
                 elapsedDownhillTime TEXT,
                 elapsedUphillTime TEXT,
-                elapsedPauseTime TEXT
+                elapsedPauseTime TEXT,
+                route TEXT,
+                startTime TEXT,
+                endTime TEXT
               )
               ''');
   }
 
-  Future<Database> get database async {
+  static Future<Database> get database async {
     if (_initialized) return _database;
     _database = await _initDatabase();
     return _database;
   }
 
   // Define a function that inserts activities into the database
-  Future<void> insertActivity(ActivityDatabase activityDatabase) async {
+  static Future<void> insertActivity(ActivityDatabase activityDatabase) async {
     // Get a reference to the database.
     Database db = await database;
+
+    // Check if the id is -1, if so, generate a new unique id.
+    if (activityDatabase.id == -1) {
+      // Query the maximum existing id in the database.
+      List<Map<String, dynamic>> result =
+      await db.rawQuery('SELECT MAX(id) as maxId FROM $_tableName');
+      int maxId = (result.first['maxId'] ?? 0) as int;
+
+      // Generate a new unique id.
+      activityDatabase = activityDatabase.copyWith(newId: maxId + 1);
+    }
 
     // Insert the Activity
     await db.insert(
@@ -86,7 +100,7 @@ class ActivityDatabaseHelper {
   }
 
   // A method that retrieves all the activities from the activity table.
-  Future<List<ActivityDatabase>> activities() async {
+  static Future<List<ActivityDatabase>> activities() async {
     // Get a reference to the database.
     final db = await database;
 
@@ -114,11 +128,14 @@ class ActivityDatabaseHelper {
         elapsedDownhillTime: maps[i]['elapsedDownhillTime'] as String,
         elapsedUphillTime: maps[i]['elapsedUphillTime'] as String,
         elapsedPauseTime: maps[i]['elapsedPauseTime'] as String,
+        route: maps[i]['route'] as String,
+        startTime: maps[i]['startTime'] as String,
+        endTime: maps[i]['endTime'] as String,
       );
     });
   }
 
-  Future<void> updateActivity(ActivityDatabase activityDatabase) async {
+  static Future<void> updateActivity(ActivityDatabase activityDatabase) async {
     // Get a reference to the database.
     final db = await database;
 
@@ -133,7 +150,7 @@ class ActivityDatabaseHelper {
     );
   }
 
-  Future<void> deleteActivity(int id) async {
+  static Future<void> deleteActivity(int id) async {
     // Get a reference to the database.
     final db = await database;
 
@@ -147,27 +164,10 @@ class ActivityDatabaseHelper {
     );
   }
 
-  // Create a Activity and add it to the Activity table
-  var fido = const ActivityDatabase(
-    id: 0,
-    areaName: 'Fido',
-    maxSpeed: 0.0,
-    averageSpeed: 0.0,
-    totalRuns: 0,
-    longestRun: 0.0,
-    maxAltitude: 0.0,
-    minAltitude: 0.0,
-    avgAltitude: 0.0,
-    maxSlope: 0.0,
-    avgSlope: 0.0,
-    distance: 0.0,
-    distanceDownhill: 0.0,
-    distanceUphill: 0.0,
-    elapsedTime: '',
-    elapsedDownhillTime: '',
-    elapsedUphillTime: '',
-    elapsedPauseTime: '',
-  );
+  static deleteDatabase() async {
+    final db = await database;
+    await db.delete(_tableName);
+  }
 }
 
 class ActivityDatabase {
@@ -205,9 +205,15 @@ class ActivityDatabase {
   final String elapsedUphillTime;
   final String elapsedPauseTime;
 
+  // Route
+  final String route;
+
+  // Start time
+  final String startTime;
+  final String endTime;
+
   const ActivityDatabase(
-      {required this.id,
-        required this.areaName,
+      {required this.areaName,
       required this.maxSpeed,
       required this.averageSpeed,
       required this.totalRuns,
@@ -223,7 +229,8 @@ class ActivityDatabase {
       required this.elapsedTime,
       required this.elapsedDownhillTime,
       required this.elapsedUphillTime,
-      required this.elapsedPauseTime});
+      required this.elapsedPauseTime,
+      required this.route, required this.startTime, required this.endTime, this.id=-1});
 
   // Convert a Activity into a Map. The keys must correspond to the names of the
   // columns in the database.
@@ -247,6 +254,9 @@ class ActivityDatabase {
       'elapsedDownhillTime': elapsedDownhillTime,
       'elapsedUphillTime': elapsedUphillTime,
       'elapsedPauseTime': elapsedPauseTime,
+      'route': route,
+      'startTime': startTime,
+      'endTime': endTime,
     };
   }
 
@@ -255,5 +265,31 @@ class ActivityDatabase {
   @override
   String toString() {
     return 'Activity{id: $id, areaName: $areaName, maxSpeed: $maxSpeed, averageSpeed: $averageSpeed, totalRuns: $totalRuns, longestRun: $longestRun, maxAltitude: $maxAltitude, minAltitude: $minAltitude, avgAltitude: $avgAltitude, maxSlope: $maxSlope, avgSlope: $avgSlope, distance: $distance, distanceDownhill: $distanceDownhill, distanceUphill: $distanceUphill, elapsedTime: $elapsedTime, elapsedDownhillTime: $elapsedDownhillTime, elapsedUphillTime: $elapsedUphillTime, elapsedPauseTime: $elapsedPauseTime}';
+  }
+
+  ActivityDatabase copyWith({required int newId}) {
+    return ActivityDatabase(
+      id: newId,
+      areaName: areaName,
+      maxSpeed: maxSpeed,
+      averageSpeed: averageSpeed,
+      totalRuns: totalRuns,
+      longestRun: longestRun,
+      maxAltitude: maxAltitude,
+      minAltitude: minAltitude,
+      avgAltitude: avgAltitude,
+      maxSlope: maxSlope,
+      avgSlope: avgSlope,
+      distance: distance,
+      distanceDownhill: distanceDownhill,
+      distanceUphill: distanceUphill,
+      elapsedTime: elapsedTime,
+      elapsedDownhillTime: elapsedDownhillTime,
+      elapsedUphillTime: elapsedUphillTime,
+      elapsedPauseTime: elapsedPauseTime,
+      route: route,
+      startTime: startTime,
+      endTime: endTime,
+    );
   }
 }
