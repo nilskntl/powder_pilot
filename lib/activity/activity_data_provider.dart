@@ -61,6 +61,9 @@ class ActivityDataProvider extends ChangeNotifier {
   // Internet status
   bool internetStatus = false;
 
+  // List of altitudes
+  List<int> altitudes = [];
+
   void updateData({
     required double newSpeed,
     required double newMaxSpeed,
@@ -90,6 +93,7 @@ class ActivityDataProvider extends ChangeNotifier {
     required ActivityStatus newStatus,
     required String newArea,
     required bool newInitializedMap,
+    required List<int> newAltitudes,
   }) {
     speed = newSpeed;
     maxSpeed = newMaxSpeed;
@@ -119,6 +123,7 @@ class ActivityDataProvider extends ChangeNotifier {
     status = newStatus;
     area = newArea;
     initializedMap = newInitializedMap;
+    altitudes = newAltitudes;
 
     notifyListeners();
   }

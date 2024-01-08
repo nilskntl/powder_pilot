@@ -9,22 +9,59 @@ class Utils {
   static Widget buildText(
       {required String text,
       double fontSize = FontTheme.size,
-      Color color = ColorTheme.contrastColor,
+      Color color = ColorTheme.contrast,
       bool softWrap = false,
       FontWeight fontWeight = FontWeight.normal,
-      bool caps = true}) {
+      bool caps = true, TextAlign align = TextAlign.center}) {
     return Text(
       caps ? text.toUpperCase() : text,
-      softWrap: softWrap,
-      overflow: TextOverflow.clip,
+      overflow: TextOverflow.visible,
+      textAlign: align,
       style: TextStyle(
         fontSize: fontSize,
         color: color,
-        overflow: TextOverflow.ellipsis,
         fontFamily: FontTheme.fontFamily,
         fontWeight: fontWeight,
       ),
     );
+  }
+
+  static double calculateFontSizeByContext({required String text, double paddingLeftRight = 0.0, double standardFontSize = FontTheme.size, required BuildContext context, fontWeight = FontWeight.normal}) {
+    // Berechnung der maximalen verfügbaren Breite unter Berücksichtigung des linken und rechten Randes
+    double maxWidth = MediaQuery
+        .of(context)
+        .size
+        .width - paddingLeftRight;
+
+    if(maxWidth < 0) {
+      maxWidth = 0;
+    }
+
+    double fontSize = standardFontSize + 0.5;
+
+    while (fontSize > 1) {
+      fontSize = fontSize - 0.5;
+      // Hier können Sie je nach Bedarf die Textelemente anpassen, um die optimale Größe zu finden
+      TextPainter textPainter = TextPainter(
+        text: TextSpan(
+          text: text,
+          style: TextStyle(
+            fontSize: fontSize,
+            fontWeight: fontWeight,
+          ),
+        ),
+        maxLines: 1,
+        textDirection: TextDirection.ltr,
+      )
+        ..layout(maxWidth: maxWidth);
+
+      // Überprüfen, ob der Text zu breit ist und die Schriftgröße anpassen
+      if (textPainter.width < maxWidth) {
+        print(textPainter.width);
+        break;
+      }
+    }
+    return fontSize;
   }
 
   static double calculateHaversineDistance(

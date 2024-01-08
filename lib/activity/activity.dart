@@ -286,6 +286,8 @@ class ActivityLocation extends ActivityUtils {
       minAltitude = altitude < minAltitude ? altitude : minAltitude;
       totalAltitude += altitude;
       avgAltitude = totalAltitude / _numberOfAltitudeUpdates;
+
+      altitudes.add(altitude.round());
     }
 
     void updateDistance(LocationData location) {
@@ -507,7 +509,7 @@ class ActivityLocation extends ActivityUtils {
       title: 'Activity is running',
       subtitle: elapsedTime.toString().substring(0, 7),
       onTapBringToFront: true,
-      color: ColorTheme.primaryColor,
+      color: ColorTheme.primary,
       iconName: 'assets/images/icon_256.png',
     );
   }
@@ -737,6 +739,9 @@ class ActivityData extends ActivityDataTemp {
   // Nearest slope
   late Slope nearestSlope = Slope(slope: null);
 
+  // List of altitudes
+  List<int> altitudes = [];
+
   void saveActivity() {
     ActivityDatabase activityDatabase = ActivityDatabase(
       areaName: areaName,
@@ -759,6 +764,7 @@ class ActivityData extends ActivityDataTemp {
       route: fullRoute.toString(),
       startTime: startTime.toString(),
       endTime: endTime.toString(),
+      altitudes: altitudes.toString(),
     );
 
     ActivityDatabaseHelper.insertActivity(activityDatabase);
@@ -795,6 +801,7 @@ class ActivityData extends ActivityDataTemp {
       newStatus: _running && _active ? ActivityStatus.running : _active ?  ActivityStatus.paused : ActivityStatus.inactive,
       newArea: areaName,
       newInitializedMap: initializedMap,
+      newAltitudes: altitudes,
     );
   }
 }

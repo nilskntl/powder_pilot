@@ -27,7 +27,7 @@ class _ActivityBarState extends State<ActivityBar> {
                 ? MediaQuery.sizeOf(context).width
                 : 0,
             decoration: BoxDecoration(
-              color: ColorTheme.primaryColor,
+              color: ColorTheme.primary,
               borderRadius: BorderRadius.circular(16.0),
             ),
             child: _running()),
@@ -36,7 +36,7 @@ class _ActivityBarState extends State<ActivityBar> {
           height: 80,
           width: 80,
           decoration: BoxDecoration(
-            color: ColorTheme.primaryColor,
+            color: ColorTheme.primary,
             borderRadius: BorderRadius.circular(40.0),
           ),
           child: GestureDetector(
@@ -56,13 +56,13 @@ class _ActivityBarState extends State<ActivityBar> {
                     const Icon(
                       Icons.pause_rounded,
                       size: 64,
-                      color: ColorTheme.contrastColor,
+                      color: ColorTheme.contrast,
                     ),
                   if (!SkiTracker.getActivity().isRunning)
                     const Icon(
                       Icons.play_arrow_rounded,
                       size: 64,
-                      color: ColorTheme.contrastColor,
+                      color: ColorTheme.contrast,
                     ),
                 ],
               )),

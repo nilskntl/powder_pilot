@@ -31,7 +31,7 @@ dependencies:
   connectivity_plus: ^5.0.2
   http: ^1.1.2
   flutter_polyline_points: ^2.0.0
-  dotted_separator: ^1.0.6
+  app_settings: ^5.1.1
 
 dev_dependencies:
   flutter_test:
@@ -71,6 +71,8 @@ flutter:
     - assets/images/icon_256_shadow.png
     - assets/images/background_image.png
     - assets/images/background.png
+    - assets/images/welcome_pages/finish.png
+    - assets/images/welcome_pages/location.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

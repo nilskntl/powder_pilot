@@ -1,4 +1,3 @@
-import 'package:dotted_separator/dotted_separator.dart';
 import 'package:flutter/material.dart';
 import 'package:ski_tracker/utils/activity_database.dart';
 import 'package:ski_tracker/utils/general_utils.dart';
@@ -54,7 +53,7 @@ class _HistoryState extends State<History> {
                     height: 650,
                     decoration:
                     const BoxDecoration(
-                      color: ColorTheme.secondaryBackgroundColor,
+                      color: ColorTheme.background,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(Status.heightBarContainer),
                         topRight: Radius.circular(Status.heightBarContainer),
@@ -66,7 +65,7 @@ class _HistoryState extends State<History> {
                       Container(
                         height: Status.heightBarContainer,
                         decoration: const BoxDecoration(
-                          color: ColorTheme.secondaryBackgroundColor,
+                          color: ColorTheme.background,
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(Status.heightBarContainer),
                             topRight: Radius.circular(Status.heightBarContainer),
@@ -83,7 +82,7 @@ class _HistoryState extends State<History> {
                         ),
                       ),
                       Container(
-                        color: ColorTheme.secondaryBackgroundColor,
+                        color: ColorTheme.background,
                         padding: const EdgeInsets.all(8.0),
                         child: FutureBuilder<List<ActivityDatabase>>(
                           // Assuming your activities() method returns a Future<List<ActivityDatabase>>
@@ -126,7 +125,7 @@ class _HistoryState extends State<History> {
         // Fill remaining space
         SliverFillRemaining(
           hasScrollBody: false,
-          child: Container(color: ColorTheme.secondaryBackgroundColor),
+          child: Container(color: ColorTheme.background),
         ),
       ],
     );
@@ -146,7 +145,7 @@ class _HistoryState extends State<History> {
         Container(
             padding: const EdgeInsets.all(8.0),
             decoration: const BoxDecoration(
-              color: ColorTheme.secondaryColor,
+              color: ColorTheme.secondary,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,7 +154,7 @@ class _HistoryState extends State<History> {
                   children: [
                     const Icon(
                       Icons.location_on_rounded,
-                      color: ColorTheme.primaryColor,
+                      color: ColorTheme.primary,
                       size: History.iconHeight / 4,
                     ),
                     const SizedBox(width: 4.0),
@@ -163,7 +162,7 @@ class _HistoryState extends State<History> {
                         text: activity.areaName != '' ? activity.areaName : 'Unknown',
                         fontSize: FontTheme.size,
                         fontWeight: FontWeight.bold,
-                        color: ColorTheme.primaryColor),
+                        color: ColorTheme.primary),
                   ],
                 ),
                 Row(
@@ -191,7 +190,7 @@ class _HistoryState extends State<History> {
                               text: startTime,
                               fontSize: FontTheme.sizeSubHeader,
                               fontWeight: FontWeight.bold,
-                              color: ColorTheme.contrastColor),
+                              color: ColorTheme.contrast),
                           Row(
                             children: [
                               Utils.buildText(
@@ -245,7 +244,7 @@ class _HistoryState extends State<History> {
             text: value,
             fontSize: FontTheme.size + 4,
             fontWeight: FontWeight.bold,
-            color: ColorTheme.contrastColor,
+            color: ColorTheme.contrast,
             caps: false),
         Utils.buildText(
             text: text,

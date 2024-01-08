@@ -1,11 +1,7 @@
-import 'package:dotted_separator/dotted_separator.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ski_tracker/activity/activity.dart';
 
-import '../app_bar.dart';
-import '../fetch_data.dart';
 import '../main.dart';
 import '../utils/general_utils.dart';
 import 'activity_data_provider.dart';
@@ -69,7 +65,7 @@ class _ActivityDisplayState extends State<ActivityDisplay> {
                             ? 650
                             : 0,
                     decoration: const BoxDecoration(
-                      color: ColorTheme.secondaryBackgroundColor,
+                      color: ColorTheme.background,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(Status.heightBarContainer),
                         topRight: Radius.circular(Status.heightBarContainer),
@@ -94,7 +90,7 @@ class _ActivityDisplayState extends State<ActivityDisplay> {
         ),
         SliverFillRemaining(
           hasScrollBody: false,
-          child: Container(color: ColorTheme.secondaryBackgroundColor),
+          child: Container(color: ColorTheme.background),
         ),
       ],
     );
@@ -104,6 +100,95 @@ class _ActivityDisplayState extends State<ActivityDisplay> {
   void dispose() {
     //_scrollController.dispose();
     super.dispose();
+  }
+}
+
+class BlinkingGps extends StatefulWidget {
+  const BlinkingGps({super.key, required this.activityDataProvider});
+
+  final ActivityDataProvider activityDataProvider;
+
+  @override
+  State<BlinkingGps> createState() => _BlinkingGpsState();
+}
+
+class _BlinkingGpsState extends State<BlinkingGps> {
+  bool transparent = false;
+
+  void update() {
+    setState(() {
+      widget.activityDataProvider.status != ActivityStatus.inactive
+          ? transparent = !transparent
+          : transparent = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    GpsAccuracy accuracy = widget.activityDataProvider.gpsAccuracy;
+
+    return Stack(
+      children: [
+        Positioned(
+          // Position in center
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: Icon(
+            accuracy == GpsAccuracy.medium
+                ? Icons.signal_cellular_alt_2_bar_rounded
+                : accuracy == GpsAccuracy.low
+                    ? Icons.signal_cellular_alt_1_bar_rounded
+                    : Icons.signal_cellular_alt_rounded,
+            size: Info.iconSize + 8,
+            color: accuracy == GpsAccuracy.medium
+                ? ColorTheme.yellow
+                : accuracy == GpsAccuracy.low
+                    ? ColorTheme.red
+                    : accuracy == GpsAccuracy.high
+                        ? ColorTheme.green
+                        : Colors.grey,
+          ),
+        ),
+        AnimatedContainer(
+            duration: const Duration(milliseconds: 2000),
+            width: Info.iconSize + 16,
+            height: Info.iconSize + 16,
+            decoration: BoxDecoration(
+              color: transparent
+                  ? ColorTheme.secondary.withOpacity(0.3)
+                  : ColorTheme.secondary,
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            onEnd: () {
+              update();
+            },
+            alignment: Alignment.center,
+            child: Stack(
+              children: [
+                const Icon(
+                  Icons.signal_cellular_alt_rounded,
+                  size: Info.iconSize,
+                  color: Colors.grey,
+                ),
+                if (accuracy != GpsAccuracy.none)
+                  Icon(
+                      accuracy == GpsAccuracy.medium
+                          ? Icons.signal_cellular_alt_2_bar_rounded
+                          : accuracy == GpsAccuracy.low
+                              ? Icons.signal_cellular_alt_1_bar_rounded
+                              : Icons.signal_cellular_alt_rounded,
+                      size: Info.iconSize,
+                      color: accuracy == GpsAccuracy.medium
+                          ? ColorTheme.yellow
+                          : accuracy == GpsAccuracy.low
+                              ? ColorTheme.red
+                              : ColorTheme.green),
+              ],
+            )),
+      ],
+    );
   }
 }
 
@@ -220,7 +305,7 @@ class _StatusState extends State<Status> {
         Container(
           height: Status.heightBarContainer,
           decoration: const BoxDecoration(
-            color: ColorTheme.secondaryBackgroundColor,
+            color: ColorTheme.background,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(Status.heightBarContainer),
               topRight: Radius.circular(Status.heightBarContainer),
@@ -238,7 +323,7 @@ class _StatusState extends State<Status> {
         ),
         Container(
           decoration: const BoxDecoration(
-            color: ColorTheme.secondaryBackgroundColor,
+            color: ColorTheme.background,
             // Linear gradient
           ),
           child: Row(
@@ -255,7 +340,6 @@ class _StatusState extends State<Status> {
       child: GestureDetector(
         onTap: () {
           if (widget.activityDataProvider.initializedMap) {
-            SlopeFetcher.fetchData(widget.activityDataProvider.currentLatitude, widget.activityDataProvider.currentLongitude);
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -295,7 +379,7 @@ class _StatusState extends State<Status> {
                     gradient: RadialGradient(
                       colors: [
                         Colors.transparent,
-                        ColorTheme.secondaryColor.withOpacity(0.9)
+                        ColorTheme.secondary.withOpacity(0.9)
                       ],
                       center: Alignment.center,
                       radius: 1.5, // Radius steuert die Größe des Gradients
@@ -352,23 +436,23 @@ class _StatusState extends State<Status> {
               : Icons.location_on_rounded,
           size: FontTheme.sizeSubHeader,
           color: widget.activityDataProvider.area != ''
-              ? ColorTheme.primaryColor
+              ? ColorTheme.primary
               : ColorTheme.grey,
         ),
         const SizedBox(width: 4),
         Flexible(
-              child: Utils.buildText(
-                  text: widget.activityDataProvider.area != ''
-                      ? widget.activityDataProvider.area
-                      : 'Unknown',
-                  fontSize: widget.activityDataProvider.area != ''
-                      ? FontTheme.size
-                      : FontTheme.size - 4,
-                  color: widget.activityDataProvider.area != ''
-                      ? ColorTheme.primaryColor
-                      : ColorTheme.grey,
-                  fontWeight: FontWeight.bold),
-            ),
+          child: Utils.buildText(
+              text: widget.activityDataProvider.area != ''
+                  ? widget.activityDataProvider.area
+                  : 'Unknown',
+              fontSize: widget.activityDataProvider.area != ''
+                  ? FontTheme.size
+                  : FontTheme.size - 4,
+              color: widget.activityDataProvider.area != ''
+                  ? ColorTheme.primary
+                  : ColorTheme.grey,
+              fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
@@ -384,7 +468,7 @@ class _StatusState extends State<Status> {
             color: widget.activityDataProvider.status ==
                         ActivityStatus.running ||
                     widget.activityDataProvider.status == ActivityStatus.paused
-                ? ColorTheme.primaryColor
+                ? ColorTheme.primary
                 : ColorTheme.grey,
             fontWeight: FontWeight.bold,
             caps: false),
@@ -396,7 +480,7 @@ class _StatusState extends State<Status> {
     return Container(
       height: 24,
       decoration: const BoxDecoration(
-        color: ColorTheme.primaryColor,
+        color: ColorTheme.primary,
         borderRadius: BorderRadius.all(Radius.circular(12.0)),
       ),
       alignment: Alignment.center,
@@ -409,7 +493,7 @@ class _StatusState extends State<Status> {
                       ? Status.paused
                       : '',
           fontWeight: FontWeight.bold,
-          color: ColorTheme.secondaryColor),
+          color: ColorTheme.secondary),
     );
   }
 
@@ -434,21 +518,12 @@ class _StatusState extends State<Status> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        /*buildIconButton(
-            Icons.location_searching_rounded,
-            widget.activityDataProvider.gpsAccuracy == GpsAccuracy.none
-                ? ColorTheme.grey
-                : ColorTheme.primaryColor, () {
-          if (widget.activityDataProvider.gpsAccuracy == GpsAccuracy.none) {
-            SkiTracker.getActivity().startLocationService();
-          }
-        }),*/
         BlinkingDot(activityDataProvider: widget.activityDataProvider),
         buildIconButton(
             widget.activityDataProvider.status == ActivityStatus.running
                 ? Icons.pause_rounded
                 : Icons.play_arrow_rounded,
-            ColorTheme.contrastColor, () {
+            ColorTheme.contrast, () {
           if (widget.activityDataProvider.status == ActivityStatus.inactive) {
             SkiTracker.getActivity().startActivity();
             double targetPosition = MediaQuery.of(context).size.height - 420;
@@ -497,7 +572,7 @@ class _InfoState extends State<Info> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: ColorTheme.secondaryBackgroundColor,
+        color: ColorTheme.background,
         // Linear gradient
         gradient: LinearGradient(
           // Where the linear gradient begins and ends
@@ -506,14 +581,25 @@ class _InfoState extends State<Info> {
           // Add one stop for each color. Stops should increase from 0 to 1
           stops: [0.0, 0.5, 1.0],
           colors: [
-            ColorTheme.secondaryBackgroundColor,
-            ColorTheme.secondaryBackgroundColor,
-            ColorTheme.secondaryBackgroundColor,
+            ColorTheme.background,
+            ColorTheme.background,
+            ColorTheme.background,
           ],
         ),
       ),
       child: Column(
         children: [
+          Container(
+            padding: Info.padding / 2,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                BlinkingGps(activityDataProvider: widget.activityDataProvider),
+                const SizedBox(width: 8),
+                ElapsedTime(activityDataProvider: widget.activityDataProvider),
+              ],
+            ),
+          ),
           _buildActivityDisplay(
               icon: Icons.speed_rounded,
               title: 'Speed',
@@ -540,18 +626,35 @@ class _InfoState extends State<Info> {
               titleValue1: 'Total',
               titleValue2: 'Downhill',
               titleValue3: 'Uphill'),
-          _buildActivityDisplay(
-              icon: Icons.terrain_rounded,
-              title: 'Altitude',
-              unit: Info.unitAltitude,
-              value1: widget.activityDataProvider.altitude.round().toString(),
-              value2:
-                  widget.activityDataProvider.maxAltitude.round().toString(),
-              value3:
-                  widget.activityDataProvider.minAltitude.round().toString(),
-              titleValue1: 'Current',
-              titleValue2: 'Max',
-              titleValue3: 'Min'),
+          Container(
+            color: ColorTheme.secondary,
+            child: Column(
+              children: [
+                _buildActivityDisplay(
+                    icon: Icons.terrain_rounded,
+                    title: 'Altitude',
+                    unit: Info.unitAltitude,
+                    value1:
+                        widget.activityDataProvider.altitude.round().toString(),
+                    value2: widget.activityDataProvider.maxAltitude
+                        .round()
+                        .toString(),
+                    value3: widget.activityDataProvider.minAltitude
+                        .round()
+                        .toString(),
+                    titleValue1: 'Current',
+                    titleValue2: 'Max',
+                    titleValue3: 'Min'),
+                SizedBox(
+                  height: 100,
+                  child: CustomPaint(
+                    painter:
+                        GraphPainter(widget.activityDataProvider.altitudes),
+                  ),
+                )
+              ],
+            ),
+          ),
           _buildActivityDisplay(
               icon: Icons.line_axis_rounded,
               title: 'Slope',
@@ -562,7 +665,7 @@ class _InfoState extends State<Info> {
               titleValue1: 'Current',
               titleValue2: 'Max',
               titleValue3: 'Avg'),
-          _buildActivityDisplay(
+          /*_buildActivityDisplay(
               icon: Icons.timer_rounded,
               title: 'Time',
               unit: Info.unitTime,
@@ -577,7 +680,7 @@ class _InfoState extends State<Info> {
                   .substring(0, 7),
               titleValue1: 'Total',
               titleValue2: 'Downhill',
-              titleValue3: 'Uphill'),
+              titleValue3: 'Uphill'),*/
         ],
       ),
     );
@@ -592,20 +695,21 @@ class _InfoState extends State<Info> {
       String value3 = '',
       String titleValue1 = '',
       String titleValue2 = '',
-      String titleValue3 = ''}) {
+      String titleValue3 = '',
+      mirrored = false}) {
     Widget buildValue({required String value, required String title}) {
       return Row(
         children: [
           Utils.buildText(
               text: value,
               fontSize: FontTheme.size,
-              color: ColorTheme.contrastColor,
+              color: ColorTheme.contrast,
               fontWeight: FontWeight.bold),
           const SizedBox(width: 4),
           Utils.buildText(
               text: unit,
               fontSize: FontTheme.size,
-              color: ColorTheme.contrastColor,
+              color: ColorTheme.contrast,
               fontWeight: FontWeight.bold,
               caps: false),
           const SizedBox(width: 4),
@@ -619,72 +723,346 @@ class _InfoState extends State<Info> {
       );
     }
 
-    return Container(
-      padding: Info.padding / 2,
+    Widget buildMirroredValue({required String value, required String title}) {
+      return Row(
+        children: [
+          Container(
+            width: 80,
+            alignment: Alignment.centerLeft,
+            child: Utils.buildText(
+                text: title, fontSize: FontTheme.size, color: ColorTheme.grey),
+          ),
+          const SizedBox(width: 4),
+          Utils.buildText(
+              text: value,
+              fontSize: FontTheme.size,
+              color: ColorTheme.contrast,
+              fontWeight: FontWeight.bold),
+          const SizedBox(width: 4),
+          Utils.buildText(
+              text: unit,
+              fontSize: FontTheme.size,
+              color: ColorTheme.contrast,
+              fontWeight: FontWeight.bold,
+              caps: false),
+        ],
+      );
+    }
+
+    Widget activityContainer() {
+      return Container(
+        padding: Info.padding / 2,
+        child: Container(
+          color: ColorTheme.secondary,
+          padding: Info.padding,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: Info.iconSize + 16,
+                    height: Info.iconSize + 16,
+                    decoration: BoxDecoration(
+                      color: ColorTheme.primary,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Icon(
+                      icon,
+                      size: Info.iconSize,
+                      color: ColorTheme.secondary,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    height: Info.iconSize + 16,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Utils.buildText(
+                            text: title,
+                            fontSize: FontTheme.size,
+                            color: ColorTheme.grey,
+                            fontWeight: FontWeight.bold),
+                        if (value1 != '')
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Utils.buildText(
+                                  text: value1,
+                                  fontSize: FontTheme.sizeSubHeader,
+                                  color: ColorTheme.contrast,
+                                  fontWeight: FontWeight.bold),
+                              const SizedBox(width: 4),
+                              Utils.buildText(
+                                  text: unit,
+                                  fontSize: FontTheme.size,
+                                  color: ColorTheme.contrast,
+                                  fontWeight: FontWeight.bold,
+                                  caps: false),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  if (value2 != '')
+                    buildValue(value: value2, title: titleValue2),
+                  if (value3 != '')
+                    buildValue(value: value3, title: titleValue3),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    Widget mirroredActivityContainer() {
+      return Container(
+        padding: Info.padding / 2,
+        child: Container(
+          color: ColorTheme.secondary,
+          padding: Info.padding,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Column(
+                children: [
+                  if (value2 != '')
+                    buildMirroredValue(value: value2, title: titleValue2),
+                  if (value3 != '')
+                    buildMirroredValue(value: value3, title: titleValue3),
+                ],
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: Info.iconSize + 16,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Utils.buildText(
+                            text: title,
+                            fontSize: FontTheme.size,
+                            color: ColorTheme.grey,
+                            fontWeight: FontWeight.bold),
+                        if (value1 != '')
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Utils.buildText(
+                                  text: value1,
+                                  fontSize: FontTheme.sizeSubHeader,
+                                  color: ColorTheme.contrast,
+                                  fontWeight: FontWeight.bold),
+                              const SizedBox(width: 4),
+                              Utils.buildText(
+                                  text: unit,
+                                  fontSize: FontTheme.size,
+                                  color: ColorTheme.contrast,
+                                  fontWeight: FontWeight.bold,
+                                  caps: false),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: Info.iconSize + 16,
+                    height: Info.iconSize + 16,
+                    decoration: BoxDecoration(
+                      color: ColorTheme.primary,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Icon(
+                      icon,
+                      size: Info.iconSize,
+                      color: ColorTheme.secondary,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (mirrored) {
+      return mirroredActivityContainer();
+    } else {
+      return activityContainer();
+    }
+  }
+}
+
+class GraphPainter extends CustomPainter {
+  final List<int> data;
+
+  GraphPainter(this.data);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()
+      ..color = ColorTheme.primary
+      ..strokeWidth = 3.0
+      ..strokeCap = StrokeCap.round;
+
+    int maxData =
+        data.reduce((value, element) => value > element ? value : element);
+    int minData =
+        data.reduce((value, element) => value < element ? value : element);
+
+    double width = size.width / (data.length - 1);
+
+    for (int i = 0; i < data.length - 1; i++) {
+      double x1 = i * width;
+      if (maxData - minData == 0) {
+        maxData = 1;
+      }
+      double y1 = size.height -
+          (size.height * (data[i] - minData) / (maxData - minData));
+      double x2 = (i + 1) * width;
+      double y2 = size.height -
+          (size.height * (data[i + 1] - minData) / (maxData - minData));
+
+      canvas.drawLine(Offset(x1, y1), Offset(x2, y2), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
+  }
+}
+
+class ElapsedTime extends StatefulWidget {
+  const ElapsedTime({super.key, required this.activityDataProvider});
+
+  final ActivityDataProvider activityDataProvider;
+
+  @override
+  State<ElapsedTime> createState() => _ElapsedTimeState();
+}
+
+class _ElapsedTimeState extends State<ElapsedTime> {
+  Widget _buildTimeBar(Duration downhill, Duration uphill) {
+    int flexDownhill =
+        downhill.inSeconds;
+    int flexUphill = uphill.inSeconds;
+
+    return Row(
+      children: [
+        Expanded(
+            flex: flexDownhill,
+            child: Container(
+              height: 16,
+              decoration: const BoxDecoration(
+                color: ColorTheme.primary,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8.0),
+                  bottomLeft: Radius.circular(8.0),
+                ),
+              ),
+            )),
+        Expanded(
+            flex: flexUphill,
+            child: Container(
+              height: 16,
+              decoration: const BoxDecoration(
+                color: ColorTheme.contrast,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(8.0),
+                  bottomRight: Radius.circular(8.0),
+                ),
+              ),
+            )),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
       child: Container(
-        color: ColorTheme.secondaryColor,
-        padding: Info.padding,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
+        padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
+        height: Info.iconSize + 16,
+        decoration: const BoxDecoration(
+          color: ColorTheme.secondary,
+        ),
+        child: Column(
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  width: Info.iconSize + 16,
-                  height: Info.iconSize + 16,
-                  decoration: BoxDecoration(
-                    color: ColorTheme.primaryColor,
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Icon(
-                    icon,
-                    size: Info.iconSize,
-                    color: ColorTheme.secondaryColor,
-                  ),
+                Row(
+                  children: [
+                    const SizedBox(width: 4),
+                    Utils.buildText(
+                        text: 'Downhill',
+                        fontSize: FontTheme.size,
+                        color: ColorTheme.contrast,
+                        caps: false,
+                        fontWeight: FontWeight.bold),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                SizedBox(
-                  height: Info.iconSize + 16,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Utils.buildText(
-                          text: title,
-                          fontSize: FontTheme.size,
-                          color: ColorTheme.grey,
-                          fontWeight: FontWeight.bold),
-                      if (value1 != '')
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Utils.buildText(
-                                text: value1,
-                                fontSize: FontTheme.sizeSubHeader,
-                                color: ColorTheme.contrastColor,
-                                fontWeight: FontWeight.bold),
-                            const SizedBox(width: 4),
-                            Utils.buildText(
-                                text: unit,
-                                fontSize: FontTheme.size,
-                                color: ColorTheme.contrastColor,
-                                fontWeight: FontWeight.bold,
-                                caps: false),
-                          ],
-                        ),
-                    ],
-                  ),
-                ),
+                Row(
+                  children: [
+                    Utils.buildText(
+                        text: 'Uphill',
+                        fontSize: FontTheme.size,
+                        color: ColorTheme.contrast,
+                        fontWeight: FontWeight.bold,
+                        caps: false),
+                    const SizedBox(width: 4),
+                  ],
+                )
               ],
             ),
-            Column(
+            const SizedBox(height: 4),
+            _buildTimeBar(widget.activityDataProvider.elapsedDownhillTime,
+                widget.activityDataProvider.elapsedUphillTime),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (value2 != '') buildValue(value: value2, title: titleValue2),
-                if (value3 != '') buildValue(value: value3, title: titleValue3),
+                Row(
+                  children: [
+                    const SizedBox(width: 4),
+                    Utils.buildText(
+                        text:
+                            '${widget.activityDataProvider.elapsedDownhillTime.toString().substring(0, 7)} ${Info.unitTime}',
+                        fontSize: FontTheme.size,
+                        color: ColorTheme.contrast,
+                        caps: false,
+                        fontWeight: FontWeight.bold),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Utils.buildText(
+                        text:
+                            '${widget.activityDataProvider.elapsedUphillTime.toString().substring(0, 7)} ${Info.unitTime}',
+                        fontSize: FontTheme.size,
+                        color: ColorTheme.contrast,
+                        fontWeight: FontWeight.bold,
+                        caps: false),
+                    const SizedBox(width: 4),
+                  ],
+                )
               ],
-            ),
+            )
           ],
         ),
       ),

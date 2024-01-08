@@ -12,13 +12,14 @@ class SharedPref {
     }
   }
 
-  static Future<void> readInt(String keyName) async {
+  static Future<int> readInt(String keyName) async {
     final prefs = await SharedPreferences.getInstance();
     final key = keyName;
     final value = prefs.getInt(key) ?? 0;
     if (kDebugMode) {
       print('read: $value');
     }
+    return value;
   }
 
   static Future<void> saveDouble(String keyName, double doubleValue) async {
@@ -31,13 +32,14 @@ class SharedPref {
     }
   }
 
-  static Future<void> readDouble(String keyName) async {
+  static Future<double> readDouble(String keyName) async {
     final prefs = await SharedPreferences.getInstance();
     final key = keyName;
     final value = prefs.getDouble(key) ?? 0.0;
     if (kDebugMode) {
       print('read: $value');
     }
+    return value;
   }
 
   static Future<void> saveString(String keyName, String stringValue) async {
@@ -50,13 +52,14 @@ class SharedPref {
     }
   }
 
-  static Future<void> readString(String keyName) async {
+  static Future<String> readString(String keyName) async {
     final prefs = await SharedPreferences.getInstance();
     final key = keyName;
     final value = prefs.getString(key) ?? '';
     if (kDebugMode) {
       print('read: $value');
     }
+    return value;
   }
 
   static Future<void> saveBool(String keyName, bool boolValue) async {
@@ -69,13 +72,14 @@ class SharedPref {
     }
   }
 
-  static Future<void> readBool(String keyName) async {
+  static Future<bool> readBool(String keyName) async {
     final prefs = await SharedPreferences.getInstance();
     final key = keyName;
     final value = prefs.getBool(key) ?? false;
     if (kDebugMode) {
       print('read: $value');
     }
+    return value;
   }
 
   static Future<void> saveStringList(String keyName, List<String> stringListValue) async {
@@ -88,12 +92,13 @@ class SharedPref {
     }
   }
 
-  static Future<void> readStringList(String keyName) async {
+  static Future<List<String>> readStringList(String keyName) async {
     final prefs = await SharedPreferences.getInstance();
     final key = keyName;
     final value = prefs.getStringList(key) ?? <String>[];
     if (kDebugMode) {
       print('read: $value');
     }
+    return value;
   }
 }

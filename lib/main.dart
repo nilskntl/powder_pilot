@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:ski_tracker/utils/activity_database.dart';
 import 'package:ski_tracker/utils/connectivity_controller.dart';
-import 'package:ski_tracker/utils/general_utils.dart';
+import 'package:ski_tracker/utils/shared_preferences.dart';
+import 'package:ski_tracker/welcome_pages/welcome_pages.dart';
 
 import 'activity/activity.dart';
 import 'activity/activity_data_provider.dart';
@@ -12,22 +12,31 @@ import 'app_bar.dart';
 import 'history.dart';
 
 void main() {
+
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  init();
+}
+
+void init() async {
+  bool welcome = await SharedPref.readBool('welcome');
   runApp(
     ChangeNotifierProvider(
       create: (context) => ActivityDataProvider(),
-      child: const SkiTracker(),
+      child: Start(welcome: welcome,),
     ),
   );
 }
 
 class ColorTheme {
-  static const Color primaryColor = Color(0xff019bbd);
-  static const Color secondaryColor = Color(0xfffefefd);
-  static const Color secondaryBackgroundColor = Color(0xfff7f8fa);
-  static const Color contrastColor = Color(0xff2f436b);
-  static const Color backgroundColor = Color(0xffb8d2f5);
+  static const Color primary = Color(0xff019bbd);
+  static const Color secondary = Color(0xfffefefd);
+  static const Color background = Color(0xfff7f8fa);
+  static const Color contrast = Color(0xff2f436b);
   static const Color grey = Color(0xffb8b8b8);
   static const Color red = Color(0xffe74c3c);
+  static const Color green = Color(0xff2ecc71);
+  static const Color yellow = Color(0xfff1c40f);
 }
 
 class FontTheme {
@@ -37,8 +46,31 @@ class FontTheme {
   static const String fontFamily = 'Roboto';
 }
 
+class Start extends StatelessWidget {
+  const Start({required this.welcome, super.key});
+
+  final bool welcome;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Ski Tracker',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: ColorTheme.primary,
+            background: ColorTheme.background),
+        useMaterial3: true,
+      ),
+      home: welcome ? const SkiTracker() : const WelcomePages(),
+    );
+  }
+
+}
+
 class SkiTracker extends StatelessWidget {
   const SkiTracker({super.key});
+
+  static const String appName = 'Ski Tracker';
 
   static int _activityId = 0;
   static Activity _activity = Activity(_activityId);
@@ -48,28 +80,15 @@ class SkiTracker extends StatelessWidget {
   static final ConnectivityController _connectivityController =
       ConnectivityController();
 
-  // static final WeatherManager _weatherManager = WeatherManager();
-
   @override
   Widget build(BuildContext context) {
     _activity.init();
-    return MaterialApp(
-      title: 'Ski Tracker',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: ColorTheme.primaryColor,
-            background: ColorTheme.backgroundColor),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+    return const MyHomePage(title: 'Flutter Demo Home Page');
   }
 
   static Activity getActivity() {
     return _activity;
   }
-
-  // static WeatherManager get weatherManager => _weatherManager;
 
   static ConnectivityController get connectivityController =>
       _connectivityController;
@@ -95,7 +114,7 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
-  static const double bottomBarHeight = 75.0;
+  static const double bottomBarHeight = 50.0;
   static const Duration animationDuration = Duration(milliseconds: 200);
 
   @override
@@ -110,6 +129,10 @@ class _MyHomePageState extends State<MyHomePage> {
   final PageController _pageController = PageController();
   final int _numberOfPages = 2;
   int _pageIndex = 0;
+
+  double getBottomBarHeight() {
+    return MyHomePage.bottomBarHeight + MediaQuery.of(context).padding.bottom;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -162,12 +185,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildBottomBar() {
-    return SizedBox(
-      height: MyHomePage.bottomBarHeight,
+    return Container(
+      height: getBottomBarHeight(),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+      decoration: const BoxDecoration(
+        color: ColorTheme.background,
+      ),
       child: Stack(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Expanded(
                 child: GestureDetector(
@@ -208,7 +234,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Container(
               width: MediaQuery.of(context).size.width / _numberOfPages,
               height: 4,
-              color: ColorTheme.primaryColor,
+              color: ColorTheme.primary,
             ),
           ),
         ],
@@ -219,17 +245,15 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildBottomBarContainer(
       {required IconData iconData, required String text, required int page}) {
     return Container(
-      padding: const EdgeInsets.all(8.0),
-      color: ColorTheme.secondaryBackgroundColor,
+      padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Icon(
             iconData,
             size: 32,
-            color: _pageIndex == page ? ColorTheme.primaryColor : ColorTheme.grey,
+            color: _pageIndex == page ? ColorTheme.primary : ColorTheme.grey,
           ),
-          Utils.buildText(text: text, color: _pageIndex == page ? ColorTheme.primaryColor : ColorTheme.grey),
         ],
       ),
     );

@@ -131,6 +131,7 @@ class ActivityDatabaseHelper {
         route: maps[i]['route'] as String,
         startTime: maps[i]['startTime'] as String,
         endTime: maps[i]['endTime'] as String,
+        altitudes: maps[i]['altitudes'] as String,
       );
     });
   }
@@ -212,6 +213,9 @@ class ActivityDatabase {
   final String startTime;
   final String endTime;
 
+  // List of altitudes
+  final String altitudes;
+
   const ActivityDatabase(
       {required this.areaName,
       required this.maxSpeed,
@@ -230,7 +234,7 @@ class ActivityDatabase {
       required this.elapsedDownhillTime,
       required this.elapsedUphillTime,
       required this.elapsedPauseTime,
-      required this.route, required this.startTime, required this.endTime, this.id=-1});
+      required this.route, required this.startTime, required this.endTime, this.id=-1, required this.altitudes});
 
   // Convert a Activity into a Map. The keys must correspond to the names of the
   // columns in the database.
@@ -290,6 +294,7 @@ class ActivityDatabase {
       route: route,
       startTime: startTime,
       endTime: endTime,
+      altitudes: altitudes,
     );
   }
 }

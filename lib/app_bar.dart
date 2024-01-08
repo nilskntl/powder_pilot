@@ -52,7 +52,7 @@ class CustomAppBar extends StatelessWidget {
                       height: itemsSize,
                       child: Icon(
                         Icons.person_rounded,
-                        color: ColorTheme.contrastColor,
+                        color: ColorTheme.contrast,
                       ),
                     ),
                   ),
@@ -63,7 +63,7 @@ class CustomAppBar extends StatelessWidget {
                       height: itemsSize,
                       child: Icon(
                         Icons.settings_rounded,
-                        color: ColorTheme.contrastColor,
+                        color: ColorTheme.contrast,
                       ),
                     ),
                   ),
