@@ -11,6 +11,17 @@ import 'activity/activity_display.dart';
 import 'app_bar.dart';
 import 'history.dart';
 
+/*
+Key names
+
+Number of total activities
+'numActivities' (int)
+
+Already did welcome screen
+'welcome' (bool)
+
+ */
+
 void main() {
 
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,6 +48,10 @@ class ColorTheme {
   static const Color red = Color(0xffe74c3c);
   static const Color green = Color(0xff2ecc71);
   static const Color yellow = Color(0xfff1c40f);
+  static const Color blue = Color(0xff3498db);
+  static const Color black = Color(0xff000000);
+  static const Color darkGrey = Color(0xff2f2f2f);
+
 }
 
 class FontTheme {

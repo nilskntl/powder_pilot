@@ -6,7 +6,7 @@ class SlopeMap {
   static final List<Slope> _slopes = [];
 
   static void addSlope(Slope slope) {
-    if(_slopes.contains(slope)) {
+    if (_slopes.contains(slope)) {
       // Add coordinates to slope
       _slopes[_slopes.indexOf(slope)].coordinates.addAll(slope.coordinates);
       _slopes[_slopes.indexOf(slope)].removeDuplicates();
@@ -16,7 +16,8 @@ class SlopeMap {
   }
 
   static List<Slope> getSlopesWithSameName(String slopeName) {
-    List<Slope> slopesWithSameName = _slopes.where((slope) => slope.name == slopeName).toList();
+    List<Slope> slopesWithSameName =
+        _slopes.where((slope) => slope.name == slopeName).toList();
     return slopesWithSameName;
   }
 
@@ -24,25 +25,92 @@ class SlopeMap {
     _slopes.clear();
   }
 
-  static String findNearestSlope(double latitude, double longitude) {
-    if(_slopes.isEmpty) {
-      return 'Unknown';
+  // Get a list of possible near Slopes
+  static double distanceBuffer = 35;
+
+  static List<Slope> findPossibleSlopes(double latitude, double longitude) {
+    List<Slope> possibleSlopes = [];
+    if (_slopes.isEmpty) {
+      return possibleSlopes;
+    }
+    for (Slope slope in _slopes) {
+      if (!slope.lift) {
+        double slopeDistance =
+            calculateSlopeDistance(slope, longitude, latitude);
+        if (slopeDistance < distanceBuffer) {
+          possibleSlopes.add(slope);
+        }
+      }
+    }
+    return possibleSlopes;
+  }
+
+  // Get a list of possible near lifts
+  static List<Slope> findPossibleLifts(double latitude, double longitude) {
+    List<Slope> possibleLifts = [];
+    if (_slopes.isEmpty) {
+      return possibleLifts;
+    }
+    for (Slope slope in _slopes) {
+      if (slope.lift) {
+        double slopeDistance =
+            calculateSlopeDistance(slope, longitude, latitude);
+        if (slopeDistance < distanceBuffer) {
+          possibleLifts.add(slope);
+        }
+      }
+    }
+    return possibleLifts;
+  }
+
+  static Slope findNearestLift(double latitude, double longitude) {
+    if (_slopes.isEmpty) {
+      return Slope(slope: {}, lift: true);
+    } else {
+      Slope nearestLift = _slopes[0];
+      double minDistance = double.infinity;
+
+      for (Slope slope in _slopes) {
+        if (slope.lift) {
+          double slopeDistance =
+              calculateSlopeDistance(slope, longitude, latitude);
+          if (slopeDistance < minDistance) {
+            minDistance = slopeDistance;
+            nearestLift = slope;
+          }
+        }
+      }
+      return nearestLift;
+    }
+  }
+
+  static Slope findNearestSlope(double latitude, double longitude) {
+    if (_slopes.isEmpty) {
+      return Slope(empty: true);
     } else {
       Slope nearestSlope = _slopes[0];
       double minDistance = double.infinity;
 
       for (Slope slope in _slopes) {
-        double slopeDistance = calculateSlopeDistance(slope, longitude, latitude);
-        if (slopeDistance < minDistance) {
-          minDistance = slopeDistance;
-          nearestSlope = slope;
+        if (!slope.lift) {
+          double slopeDistance =
+              calculateSlopeDistance(slope, longitude, latitude);
+          if (slopeDistance < minDistance) {
+            minDistance = slopeDistance;
+            nearestSlope = slope;
+          }
         }
       }
-      return nearestSlope.name;
+
+      if(minDistance > distanceBuffer) {
+        return Slope(empty: true);
+      }
+      return nearestSlope;
     }
   }
 
-  static double calculateSlopeDistance(Slope slope, double longitude, double latitude) {
+  static double calculateSlopeDistance(
+      Slope slope, double longitude, double latitude) {
     double minPointDistance = double.infinity;
 
     for (List<double> point in slope.coordinates) {
@@ -61,20 +129,27 @@ class SlopeMap {
 }
 
 class Slope {
-
   late final String _name;
   late final String _difficulty;
   late final String _type;
   final List<List<double>> _coordinates = [];
 
-  late final dynamic _slope;
+  late final bool _lift;
 
-  Slope({required dynamic slope}) {
-    _slope = slope;
-    _difficulty = slope['tags']['piste:difficulty'] ?? 'Unknown';
-    _name = slope['tags']['ref'] ?? 'Unknown';
-    _type = slope['tags']['piste:type'] ?? 'Unknown';
-    _initData();
+  late final Map<String, dynamic> _slope;
+
+  late final bool _empty;
+
+  Slope({Map<String, dynamic> slope = const {}, bool lift = false, bool empty = false}) {
+    _empty = empty;
+    _lift = lift;
+    if(!empty) {
+      _slope = slope;
+      _difficulty = slope['tags']['piste:difficulty'] ?? 'Unknown';
+      _type = slope['tags']['piste:type'] ?? 'Unknown';
+      _name = slope['tags']['ref'] ?? slope['tags']['name'] ?? 'Unknown';
+      _initData();
+    }
   }
 
   void addCoordinate({required double lat, required double lon}) {
@@ -116,16 +191,17 @@ class Slope {
   }
 
   /* Getter methods */
-  String get name => _name;
+  String get name => !_empty ? _name : 'Unknown';
 
-  String get difficulty => _difficulty;
+  String get difficulty => !_empty ? _difficulty : 'Unknown';
 
-  String get pisteType => _type;
+  String get pisteType => !_empty ? _type : 'Unknown';
 
-  List<List<double>> get coordinates => _coordinates;
+  List<List<double>> get coordinates => !_empty ? _coordinates : [];
 
-  Map<String, dynamic> get slope => _slope;
+  Map<String, dynamic> get slope => !_empty ? _slope : {};
 
+  bool get lift => _lift;
 
   @override
   // TODO: implement hashCode

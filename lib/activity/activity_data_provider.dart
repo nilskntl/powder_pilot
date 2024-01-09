@@ -2,6 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ski_tracker/activity/activity.dart';
 
+import '../route.dart';
+import '../slopes.dart';
+
 class ActivityDataProvider extends ChangeNotifier {
 
   // Speed
@@ -62,7 +65,13 @@ class ActivityDataProvider extends ChangeNotifier {
   bool internetStatus = false;
 
   // List of altitudes
-  List<int> altitudes = [];
+  List<List<int>> altitudes = [];
+
+  // List of speeds
+  List<List<double>> speeds = [];
+
+  // Nearest Slope
+  Slope nearestSlope = Slope(empty: true);
 
   void updateData({
     required double newSpeed,
@@ -93,7 +102,9 @@ class ActivityDataProvider extends ChangeNotifier {
     required ActivityStatus newStatus,
     required String newArea,
     required bool newInitializedMap,
-    required List<int> newAltitudes,
+    required List<List<int>> newAltitudes,
+    required Slope newNearestSlope,
+    required List<List<double>> newSpeeds,
   }) {
     speed = newSpeed;
     maxSpeed = newMaxSpeed;
@@ -124,6 +135,8 @@ class ActivityDataProvider extends ChangeNotifier {
     area = newArea;
     initializedMap = newInitializedMap;
     altitudes = newAltitudes;
+    speeds = newSpeeds;
+    nearestSlope = newNearestSlope;
 
     notifyListeners();
   }

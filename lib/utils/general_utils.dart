@@ -12,10 +12,10 @@ class Utils {
       Color color = ColorTheme.contrast,
       bool softWrap = false,
       FontWeight fontWeight = FontWeight.normal,
-      bool caps = true, TextAlign align = TextAlign.center}) {
+      bool caps = true, TextAlign align = TextAlign.center, TextOverflow overflow = TextOverflow.visible}) {
     return Text(
       caps ? text.toUpperCase() : text,
-      overflow: TextOverflow.visible,
+      overflow: overflow,
       textAlign: align,
       style: TextStyle(
         fontSize: fontSize,
@@ -57,7 +57,6 @@ class Utils {
 
       // Überprüfen, ob der Text zu breit ist und die Schriftgröße anpassen
       if (textPainter.width < maxWidth) {
-        print(textPainter.width);
         break;
       }
     }
@@ -89,6 +88,47 @@ class Utils {
 
     return R * c;
   }
+
+  static List<String> durationStringToString(String activity) {
+    String year = DateTime.parse(
+        activity)
+        .year
+        .toString();
+    String month = DateTime.parse(
+        activity)
+        .month
+        .toString();
+    if(month.length == 1) {
+      month = '0$month';
+    }
+    String day = DateTime.parse(
+        activity).day.toString();
+    if(day.length == 1) {
+      day = '0$day';
+    }
+
+    String hour = DateTime.parse(
+        activity).hour.toString();
+    if(hour.length == 1) {
+      hour = '0$hour';
+    }
+
+    String minute = DateTime.parse(
+        activity).minute.toString();
+    if(minute.length == 1) {
+      minute = '0$minute';
+    }
+
+    String date =
+        '$month/$day/$year';
+
+    String time =
+        '$hour:$minute';
+
+    return [date, time];
+
+  }
+
 }
 
 class DrawDottedHorizontalLine extends CustomPainter {

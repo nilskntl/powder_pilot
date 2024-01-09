@@ -2,16 +2,19 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:ski_tracker/activity/activity.dart';
 import 'package:ski_tracker/main.dart';
-import 'package:ski_tracker/utils/general_utils.dart';
 
+import '../route.dart';
 import '../slopes.dart';
-import 'activity.dart';
+import '../utils/custom_app_bar.dart';
+import '../utils/general_utils.dart';
+import 'activity_data_provider.dart';
+import 'activity_display.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -24,6 +27,7 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppBarDesign.appBar(title: 'Map'),
       body: SkiTracker.getActivity().activityMap,
     );
   }
@@ -49,13 +53,22 @@ class _ActivityMapState extends State<ActivityMap>
 
   late Timer _timer;
 
+  late final ActivityDataProvider activityDataProvider;
+  bool _initializedDataProvider = false;
+
   bool _previewMode = true;
 
   List<Polyline> _fullRoute = [];
   List<Polyline> _currentRoute = [];
 
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
+    if (!_initializedDataProvider) {
+      activityDataProvider = SkiTracker.getActivityDataProvider();
+      _initializedDataProvider = true;
+    }
     super.initState();
     mapController = AnimatedMapController(
       vsync: this,
@@ -71,7 +84,8 @@ class _ActivityMapState extends State<ActivityMap>
     setState(() {
       if (!_previewMode) {
         _fullRoute = _buildFullPolylines(SkiTracker.getActivity().fullRoute);
-        _currentRoute = _buildSinglePolyline(SkiTracker.getActivity().currentRoute);
+        _currentRoute =
+            _buildSinglePolyline(SkiTracker.getActivity().currentRoute);
       }
     });
   }
@@ -115,7 +129,6 @@ class _ActivityMapState extends State<ActivityMap>
     );
   }
 
-
   TileLayer _pisteLayer() {
     String pistesOnlyOverlayUrl = "https://tiles.opensnowmap.org/pistes/";
     return TileLayer(
@@ -125,29 +138,188 @@ class _ActivityMapState extends State<ActivityMap>
 
   @override
   Widget build(BuildContext context) {
-    return FlutterMap(
-      mapController: mapController.mapController,
-      options: MapOptions(
-        backgroundColor: backgroundColor,
-        initialCenter: LatLng(SkiTracker.getActivity().currentLatitude,
-            SkiTracker.getActivity().currentLongitude),
-        initialZoom: zoomLevel,
-        interactionOptions: const InteractionOptions(
-          flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+    return Stack(children: [
+      FlutterMap(
+        mapController: mapController.mapController,
+        options: MapOptions(
+          backgroundColor: backgroundColor,
+          initialCenter: LatLng(SkiTracker.getActivity().currentLatitude,
+              SkiTracker.getActivity().currentLongitude),
+          initialZoom: zoomLevel,
+          interactionOptions: const InteractionOptions(
+            flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+          ),
+          maxZoom: maxZoom,
+          minZoom: minZoom,
         ),
-        maxZoom: maxZoom,
-        minZoom: minZoom,
+        // Layers are drawn in the order they are defined
+        children: [
+          _tileLayer(),
+          _pisteLayer(),
+          if (!_previewMode) _markerLayer(),
+          if (!_previewMode) PolylineLayer(polylines: _fullRoute),
+          if (!_previewMode) PolylineLayer(polylines: _currentRoute),
+          // if(!_previewMode) PolylineLayer(polylines: SlopeMap.slopeMap),
+        ],
       ),
-      // Layers are drawn in the order they are defined
-      children: [
-        _tileLayer(),
-        _pisteLayer(),
-        if(!_previewMode) _markerLayer(),
-        if(!_previewMode) PolylineLayer(polylines: _fullRoute),
-        if(!_previewMode) PolylineLayer(polylines: _currentRoute),
-        // if(!_previewMode) PolylineLayer(polylines: SlopeMap.slopeMap),
-      ],
-    );
+      if (!_previewMode && activityDataProvider.status != ActivityStatus.inactive && SlopeMap.slopes.isNotEmpty)
+        CustomScrollView(
+        controller: _scrollController,
+        slivers: [
+          SliverAppBar(
+            backgroundColor: Colors.transparent,
+            foregroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+            forceMaterialTransparency: true,
+            collapsedHeight: MediaQuery.of(context).size.height -
+                172 - MediaQuery.of(context).padding.bottom,
+            pinned: true,
+          ),
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  Column(
+                    children: [
+                      Container(
+                        height: Status.heightBarContainer,
+                        decoration: const BoxDecoration(
+                          color: ColorTheme.background,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(Status.heightBarContainer),
+                            topRight:
+                                Radius.circular(Status.heightBarContainer),
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Container(
+                          height: Status.heightBar,
+                          width: Status.widthBar,
+                          decoration: BoxDecoration(
+                            color: ColorTheme.grey,
+                            borderRadius:
+                                BorderRadius.circular(Status.heightBar / 2),
+                          ),
+                        ),
+                      ),
+                      Container(
+                          padding: const EdgeInsets.only(
+                            left: 16,
+                            right: 16,
+                            top: 16,
+                            bottom: 16,
+                          ),
+                          decoration: const BoxDecoration(
+                            color: ColorTheme.background,
+                          ),
+                          // Make an entry for every route in the full route of widget.activityDataProvider.route except the last one
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: ColorTheme.secondary,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Row(
+                                  children: [
+                                    CurrentSlope(
+                                        slope:
+                                            activityDataProvider.nearestSlope),
+                                    const SizedBox(width: 16),
+                                    if(activityDataProvider.nearestSlope.name != 'Unknown')
+                                    Utils.buildText(
+                                        text:
+                                            'Slope: ${activityDataProvider.nearestSlope.name}',
+                                        color: ColorTheme.contrast,
+                                        fontSize: FontTheme.sizeSubHeader,
+                                        caps: false,
+                                        fontWeight: FontWeight.bold),
+                                    if(activityDataProvider.nearestSlope.name == 'Unknown')
+                                      Utils.buildText(
+                                          text:
+                                          'Free Ride',
+                                          color: ColorTheme.contrast,
+                                          fontSize: FontTheme.sizeSubHeader,
+                                          caps: false,
+                                          fontWeight: FontWeight.bold),
+                                    const Spacer(),
+                                    Container(
+                                      height: 24,
+                                      width: 96,
+                                      decoration: BoxDecoration(
+                                        color: ColorTheme.green,
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Utils.buildText(
+                                          text: 'Current',
+                                          fontSize: FontTheme.size - 4,
+                                          color: ColorTheme.secondary),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              ListView.builder(
+                                controller: _scrollController,
+                                shrinkWrap: true,
+                                itemCount: activityDataProvider
+                                    .fullRoute.routes.length,
+                                itemBuilder: (context, index) {
+                                  if (index <
+                                      activityDataProvider
+                                              .fullRoute.routes.length -
+                                          2) {
+                                    return ListView.builder(
+                                        itemBuilder: (context, index2) {
+                                      return Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: ColorTheme.secondary,
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            CurrentSlope(
+                                                slope: activityDataProvider
+                                                    .fullRoute
+                                                    .routes[index]
+                                                    .slopes[index2]),
+                                            const SizedBox(width: 16),
+                                            Utils.buildText(
+                                                text:
+                                                    'Slope: ${activityDataProvider.fullRoute.routes[index].slopes[index2].name}',
+                                                color: ColorTheme.contrast,
+                                                fontSize:
+                                                    FontTheme.sizeSubHeader,
+                                                caps: false,
+                                                fontWeight: FontWeight.bold),
+                                          ],
+                                        ),
+                                      );
+                                    });
+                                  } else {
+                                    return Container();
+                                  }
+                                },
+                              ),
+                            ],
+                          )),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Container(
+              color: ColorTheme.background,
+            ),
+          ),
+        ],
+      ),
+    ]);
   }
 
   List<Polyline> _buildFullPolylines(FullRoute fullRoute) {
@@ -209,8 +381,9 @@ class _ActivityMapState extends State<ActivityMap>
 
   @override
   void dispose() {
-    super.dispose();
     _timer.cancel();
+    mapController.dispose();
+    super.dispose();
   }
 }
 

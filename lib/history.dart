@@ -3,6 +3,7 @@ import 'package:ski_tracker/utils/activity_database.dart';
 import 'package:ski_tracker/utils/general_utils.dart';
 
 import 'activity/activity_display.dart';
+import 'activity/activity_summary.dart';
 import 'main.dart';
 
 class History extends StatefulWidget {
@@ -18,7 +19,6 @@ class History extends StatefulWidget {
 }
 
 class _HistoryState extends State<History> {
-
   late final ScrollController _scrollController = ScrollController(
       initialScrollOffset: MediaQuery.sizeOf(context).height - 420);
 
@@ -34,14 +34,11 @@ class _HistoryState extends State<History> {
           surfaceTintColor: Colors.transparent,
           forceMaterialTransparency: true,
           collapsedHeight: MediaQuery.of(context).size.height -
-              235,
+              255 -
+              MediaQuery.of(context).padding.bottom,
           pinned: true,
           flexibleSpace: const Stack(
-            children: [
-              FlexibleSpaceBar(
-                title: Text(History.historyTitle),
-              ),
-            ],
+            children: [],
           ),
         ),
         SliverList(
@@ -51,8 +48,7 @@ class _HistoryState extends State<History> {
                 children: [
                   Container(
                     height: 650,
-                    decoration:
-                    const BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: ColorTheme.background,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(Status.heightBarContainer),
@@ -68,7 +64,8 @@ class _HistoryState extends State<History> {
                           color: ColorTheme.background,
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(Status.heightBarContainer),
-                            topRight: Radius.circular(Status.heightBarContainer),
+                            topRight:
+                                Radius.circular(Status.heightBarContainer),
                           ),
                         ),
                         alignment: Alignment.center,
@@ -77,10 +74,12 @@ class _HistoryState extends State<History> {
                           width: Status.widthBar,
                           decoration: BoxDecoration(
                             color: ColorTheme.grey,
-                            borderRadius: BorderRadius.circular(Status.heightBar / 2),
+                            borderRadius:
+                                BorderRadius.circular(Status.heightBar / 2),
                           ),
                         ),
                       ),
+                      const SizedBox(height: 8.0),
                       Container(
                         color: ColorTheme.background,
                         padding: const EdgeInsets.all(8.0),
@@ -88,27 +87,196 @@ class _HistoryState extends State<History> {
                           // Assuming your activities() method returns a Future<List<ActivityDatabase>>
                           future: ActivityDatabaseHelper.activities(),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
                               // While data is being fetched, display a loading indicator
-                              return const Center(child: CircularProgressIndicator());
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             } else if (snapshot.hasError) {
                               // If there's an error, display an error message
-                              return Center(child: Text('Error: ${snapshot.error}'));
+                              return Center(
+                                  child: Text('Error: ${snapshot.error}'));
                             } else {
                               // If data is successfully fetched, build the Column
-                              List<ActivityDatabase>? activities = snapshot.data;
+                              List<ActivityDatabase>? activities =
+                                  snapshot.data;
 
                               if (activities == null || activities.isEmpty) {
-                                return const Center(
-                                    child: Text('No activities found.'));
+                                return Column(
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        const SizedBox(width: 8.0),
+                                        Container(
+                                          width: History.iconHeight,
+                                          height: History.iconHeight,
+                                          decoration: const BoxDecoration(
+                                            color: ColorTheme.primary,
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(
+                                                  History.iconHeight / 4),
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.calendar_month_rounded,
+                                            color: ColorTheme.secondary,
+                                            size: History.iconHeight - 24,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 24.0),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Utils.buildText(
+                                                  text: '0',
+                                                  fontSize: FontTheme.size + 4,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: ColorTheme.contrast),
+                                              Utils.buildText(
+                                                  text: 'Activitys',
+                                                  fontSize: FontTheme.size,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: ColorTheme.grey),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 32.0),
+                                    const Center(
+                                        child: Text('No activities found.')),
+                                  ],
+                                );
                               } else {
                                 // Sort activities based on startTime in descending order
-                                activities.sort((a, b) => b.startTime.compareTo(a.startTime));
+                                activities.sort((a, b) =>
+                                    b.startTime.compareTo(a.startTime));
 
                                 return Column(
-                                  children: activities
-                                      .map((activity) => _buildItem(activity))
-                                      .toList(),
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        const SizedBox(width: 8.0),
+                                        Container(
+                                          width: History.iconHeight,
+                                          height: History.iconHeight,
+                                          decoration: const BoxDecoration(
+                                            color: ColorTheme.primary,
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(
+                                                  History.iconHeight / 4),
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.calendar_month_rounded,
+                                            color: ColorTheme.secondary,
+                                            size: History.iconHeight - 24,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 16.0),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    children: [
+                                                      Utils.buildText(
+                                                          text: activities
+                                                              .length
+                                                              .toString(),
+                                                          fontSize:
+                                                              FontTheme.size +
+                                                                  4,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: ColorTheme
+                                                              .contrast),
+                                                      Utils.buildText(
+                                                          text: 'Activitys',
+                                                          fontSize:
+                                                              FontTheme.size,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              ColorTheme.grey),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    children: [
+                                                      Utils.buildText(
+                                                          text: Utils.durationStringToString(activities.first.startTime)[0],
+                                                          fontSize:
+                                                              FontTheme.size +
+                                                                  4,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: ColorTheme
+                                                              .contrast),
+                                                      Utils.buildText(
+                                                          text: 'Latest',
+                                                          fontSize:
+                                                              FontTheme.size,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              ColorTheme.grey),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    children: [
+                                                      Utils.buildText(
+                                                          text: Utils.durationStringToString(activities.last.startTime)[0],
+                                                          fontSize:
+                                                              FontTheme.size +
+                                                                  4,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: ColorTheme
+                                                              .contrast),
+                                                      Utils.buildText(
+                                                          text: 'Earliest',
+                                                          fontSize:
+                                                              FontTheme.size,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              ColorTheme.grey),
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 16.0),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16.0),
+                                    Column(
+                                      children: activities
+                                          .map((activity) =>
+                                              _buildItem(activity))
+                                          .toList(),
+                                    ),
+                                  ],
                                 );
                               }
                             }
@@ -132,106 +300,118 @@ class _HistoryState extends State<History> {
   }
 
   Widget _buildItem(ActivityDatabase activity) {
-    String startTime =
-        '${DateTime.parse(activity.startTime).month}/${DateTime.parse(activity.startTime).day}/${DateTime.parse(activity.startTime).year}';
-    String startTimeMinutes =
-        '${DateTime.parse(activity.startTime).hour}:${DateTime.parse(activity.startTime).minute}';
-    String endTimeMinutes =
-        '${DateTime.parse(activity.endTime).hour}:${DateTime.parse(activity.endTime).minute}';
 
-    return Column(
-      children: [
-        const SizedBox(height: 8.0),
-        Container(
-            padding: const EdgeInsets.all(8.0),
-            decoration: const BoxDecoration(
-              color: ColorTheme.secondary,
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ActivitySummaryPage(
+              activityDatabase: activity,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on_rounded,
-                      color: ColorTheme.primary,
-                      size: History.iconHeight / 4,
-                    ),
-                    const SizedBox(width: 4.0),
-                    Utils.buildText(
-                        text: activity.areaName != '' ? activity.areaName : 'Unknown',
-                        fontSize: FontTheme.size,
-                        fontWeight: FontWeight.bold,
-                        color: ColorTheme.primary),
-                  ],
+          ),
+        );
+      },
+      child: Column(
+        children: [
+          const SizedBox(height: 8.0),
+          Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: const BoxDecoration(
+                color: ColorTheme.secondary,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(16.0),
                 ),
-                Row(
-                  children: [
-                    Container(
-                      width: History.iconHeight,
-                      height: History.iconHeight / 3 * 2,
-                      decoration: const BoxDecoration(
-                        color: Colors.transparent,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on_rounded,
+                        color: ColorTheme.primary,
+                        size: History.iconHeight / 4,
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16.0),
-                        child: Image.asset(
-                          'assets/images/background.png',
-                          fit: BoxFit.cover,
+                      const SizedBox(width: 4.0),
+                      Utils.buildText(
+                          text: activity.areaName != ''
+                              ? activity.areaName
+                              : 'Unknown',
+                          fontSize: FontTheme.size,
+                          fontWeight: FontWeight.bold,
+                          color: ColorTheme.primary),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        width: History.iconHeight,
+                        height: History.iconHeight / 3 * 2,
+                        decoration: const BoxDecoration(
+                          color: Colors.transparent,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16.0),
+                          child: Image.asset(
+                            'assets/images/background.png',
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8.0),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Utils.buildText(
-                              text: startTime,
-                              fontSize: FontTheme.sizeSubHeader,
-                              fontWeight: FontWeight.bold,
-                              color: ColorTheme.contrast),
-                          Row(
-                            children: [
-                              Utils.buildText(
-                                  text: startTimeMinutes,
-                                  fontSize: FontTheme.size,
-                                  fontWeight: FontWeight.bold,
-                                  color: ColorTheme.grey),
-                              const SizedBox(width: 4.0),
-                              Utils.buildText(
-                                  text: '-',
-                                  fontSize: FontTheme.size,
-                                  fontWeight: FontWeight.bold,
-                                  color: ColorTheme.grey),
-                              const SizedBox(width: 4.0),
-                              Utils.buildText(
-                                  text: endTimeMinutes,
-                                  fontSize: FontTheme.size,
-                                  fontWeight: FontWeight.bold,
-                                  color: ColorTheme.grey),
-                            ],
-                          ),
-                        ],
+                      const SizedBox(width: 8.0),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Utils.buildText(
+                                text: Utils.durationStringToString(activity.startTime)[0],
+                                fontSize: FontTheme.sizeSubHeader,
+                                fontWeight: FontWeight.bold,
+                                color: ColorTheme.contrast),
+                            Row(
+                              children: [
+                                Utils.buildText(
+                                    text: Utils.durationStringToString(activity.startTime)[1],
+                                    fontSize: FontTheme.size,
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorTheme.grey),
+                                const SizedBox(width: 4.0),
+                                Utils.buildText(
+                                    text: '-',
+                                    fontSize: FontTheme.size,
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorTheme.grey),
+                                const SizedBox(width: 4.0),
+                                Utils.buildText(
+                                    text: Utils.durationStringToString(activity.endTime)[1],
+                                    fontSize: FontTheme.size,
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorTheme.grey),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16.0),
-                Row(
-                  children: [
-                    _buildHighlight('Distance',
-                        '${(activity.distance / 1000).toStringAsFixed(2)} ${Info.unitDistance}'),
-                    _buildHighlight('Duration',
-                        '${activity.elapsedTime.substring(0, 4)} h'),
-                    _buildHighlight('Speed',
-                        '${activity.averageSpeed.toStringAsFixed(2)} ${Info.unitSpeed}'),
-                  ],
-                ),
-              ],
-            )),
-        const SizedBox(height: 8.0),
-      ],
+                    ],
+                  ),
+                  const SizedBox(height: 16.0),
+                  Row(
+                    children: [
+                      _buildHighlight('Distance',
+                          '${(activity.distance / 1000).toStringAsFixed(2)} ${Info.unitDistance}'),
+                      _buildHighlight('Duration',
+                          '${activity.elapsedTime.substring(0, 4)} h'),
+                      _buildHighlight('Speed',
+                          '${activity.averageSpeed.toStringAsFixed(2)} ${Info.unitSpeed}'),
+                    ],
+                  ),
+                ],
+              )),
+          const SizedBox(height: 8.0),
+        ],
+      ),
     );
   }
 
@@ -259,5 +439,4 @@ class _HistoryState extends State<History> {
   void dispose() {
     super.dispose();
   }
-
 }

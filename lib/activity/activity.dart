@@ -7,8 +7,10 @@ import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 import 'package:ski_tracker/fetch_data.dart';
 import 'package:ski_tracker/utils/activity_database.dart';
+import 'package:ski_tracker/utils/shared_preferences.dart';
 
 import '../main.dart';
+import '../route.dart';
 import '../slopes.dart';
 import '../utils/general_utils.dart';
 import 'activity_map.dart';
@@ -37,82 +39,6 @@ enum GpsAccuracy {
   high,
 }
 
-class SingleRoute {
-  String type;
-  List<List<double>> coordinates;
-  DateTime startTime;
-  DateTime endTime;
-
-  SingleRoute({
-    required this.type,
-    required this.coordinates,
-    DateTime? startTime,
-    DateTime? endTime,
-  })  : startTime = startTime ?? DateTime.now(),
-        endTime = endTime ?? DateTime.now();
-
-  // Factory-Methode zum Erstellen eines Objekts aus einer Map
-  factory SingleRoute.fromJson(Map<String, dynamic> json) {
-    return SingleRoute(
-      type: json['type'],
-      coordinates: List<List<double>>.from(
-        json['coordinates'].map((coord) => List<double>.from(coord)),
-      ),
-    );
-  }
-
-  // Methode zum Konvertieren des Objekts in eine Map
-  Map<String, dynamic> toJson() {
-    return {
-      'type': type,
-      'coordinates': coordinates.map((coord) => coord.toList()).toList(),
-    };
-  }
-
-  void addCoordinates(List<double> newCoordinate) {
-    if (coordinates.isEmpty) {
-      startTime = DateTime
-          .now(); // Setze startTime beim Hinzufügen des ersten Koordinaten
-    }
-    coordinates.add(newCoordinate);
-  }
-}
-
-class FullRoute {
-  List<SingleRoute> routes;
-
-  FullRoute({required this.routes});
-
-  factory FullRoute.fromString(String jsonString) {
-    return FullRoute.fromJson(jsonDecode(jsonString));
-  }
-
-  @override
-  String toString() {
-    return jsonEncode(toJson());
-  }
-
-  // Factory-Methode zum Erstellen eines Objekts aus einer Map
-  factory FullRoute.fromJson(Map<String, dynamic> json) {
-    return FullRoute(
-      routes: List<SingleRoute>.from(
-        json['routes'].map((route) => SingleRoute.fromJson(route)),
-      ),
-    );
-  }
-
-  // Methode zum Konvertieren des Objekts in eine Map
-  Map<String, List<Map<String, dynamic>>> toJson() {
-    return {
-      'routes': routes.map((route) => route.toJson()).toList(),
-    };
-  }
-
-  void addRoute(SingleRoute newRoute) {
-    routes.add(newRoute);
-  }
-}
-
 class Activity extends ActivityLocation {
   final int id;
 
@@ -133,7 +59,7 @@ class Activity extends ActivityLocation {
   }
 
   void startActivity() {
-    if(_active) {
+    if (_active) {
       return;
     }
     _running = true;
@@ -142,7 +68,10 @@ class Activity extends ActivityLocation {
     _startStopwatch(callback: () {
       _setNotification();
     });
-    if(Utils.calculateHaversineDistance(LatLng(currentLatitude, currentLongitude), LatLng(_latitudeWhenDownloaded, _longitudeWhenDownloaded)) > 4000) {
+    if (Utils.calculateHaversineDistance(
+            LatLng(currentLatitude, currentLongitude),
+            LatLng(_latitudeWhenDownloaded, _longitudeWhenDownloaded)) >
+        4000) {
       _mapDownloaded = false;
       _downloadMap();
     }
@@ -151,7 +80,7 @@ class Activity extends ActivityLocation {
   }
 
   void stopActivity() {
-    if(!_active) {
+    if (!_active) {
       return;
     }
     speed = 0.0;
@@ -159,6 +88,11 @@ class Activity extends ActivityLocation {
     _running = false;
     endTime = DateTime.now();
     _active = false;
+    if (_statusDownhill) {
+      _addCurrentRoute('Downhill');
+    } else if (_statusUphill) {
+      _addCurrentRoute('Uphill');
+    }
     _statusDownhill = false;
     _statusUphill = false;
     _statusPause = true;
@@ -167,14 +101,22 @@ class Activity extends ActivityLocation {
     _locationInitialized = false;
     _activityInitialized = false;
     initializedMap = false;
+    // Async problem
+    fullRoute.finishActivity();
     saveActivity();
+    _addActivityToList();
     _elapsedTime = Duration.zero;
     updateData();
     SkiTracker.createNewActivity();
   }
 
+  void _addActivityToList() async {
+    int numActivities = await SharedPref.readInt('numActivities');
+    SharedPref.saveInt('numActivities', numActivities + 1);
+  }
+
   void pauseActivity() {
-    if(!_active) {
+    if (!_active) {
       return;
     }
     speed = 0.0;
@@ -193,11 +135,14 @@ class Activity extends ActivityLocation {
   }
 
   void resumeActivity() {
-    if(!_active) {
+    if (!_active) {
       return;
     }
     _running = true;
-    if(Utils.calculateHaversineDistance(LatLng(currentLatitude, currentLongitude), LatLng(_latitudeWhenDownloaded, _longitudeWhenDownloaded)) > 4000) {
+    if (Utils.calculateHaversineDistance(
+            LatLng(currentLatitude, currentLongitude),
+            LatLng(_latitudeWhenDownloaded, _longitudeWhenDownloaded)) >
+        4000) {
       _mapDownloaded = false;
       _downloadMap();
     }
@@ -267,6 +212,8 @@ class ActivityLocation extends ActivityUtils {
         speed = location.speed!;
         maxSpeed = speed > maxSpeed ? speed : maxSpeed;
 
+        speeds.add([elapsedTime.inSeconds.toDouble(), double.parse(speed.toStringAsFixed(1))]);
+
         if (speed < 0.6) {
           speed = 0.0;
         } else {
@@ -287,13 +234,14 @@ class ActivityLocation extends ActivityUtils {
       totalAltitude += altitude;
       avgAltitude = totalAltitude / _numberOfAltitudeUpdates;
 
-      altitudes.add(altitude.round());
+      altitudes.add([elapsedTime.inSeconds, altitude.round()]);
     }
 
     void updateDistance(LocationData location) {
       // Update distance
-      double calculatedDistance =
-          Utils.calculateHaversineDistance(LatLng(_lastLocation.latitude!, _lastLocation.longitude!), LatLng(location.latitude!, location.longitude!));
+      double calculatedDistance = Utils.calculateHaversineDistance(
+          LatLng(_lastLocation.latitude!, _lastLocation.longitude!),
+          LatLng(location.latitude!, location.longitude!));
 
       _numberOfDistanceUpdates++;
 
@@ -330,6 +278,10 @@ class ActivityLocation extends ActivityUtils {
         } else if (altitude - _currentExtrema < -20) {
           _statusUphill = false;
           _statusDownhill = true;
+          if (_mapDownloaded == true) {
+            nearestSlope =
+                SlopeMap.findNearestSlope(currentLatitude, currentLongitude);
+          }
           _addCurrentRoute('Downhill');
           currentRunLength = 0.0;
           totalRuns++;
@@ -367,8 +319,9 @@ class ActivityLocation extends ActivityUtils {
             return;
           }
           if (_tempAltitude - altitude > 0) {
-            double horizontalDistance =
-                Utils.calculateHaversineDistance(LatLng(_tempLocation.latitude!, _tempLocation.longitude!), LatLng(location.latitude!, location.longitude!));
+            double horizontalDistance = Utils.calculateHaversineDistance(
+                LatLng(_tempLocation.latitude!, _tempLocation.longitude!),
+                LatLng(location.latitude!, location.longitude!));
 
             double verticalDistance = _tempAltitude - altitude;
 
@@ -392,6 +345,10 @@ class ActivityLocation extends ActivityUtils {
       _currentExtrema = altitude;
       _tempAltitude = altitude;
       _tempLocation = location;
+      if (nearestSlope.name == 'Unknown' && _mapDownloaded == true) {
+        nearestSlope =
+            SlopeMap.findNearestSlope(currentLatitude, currentLongitude);
+      }
     }
 
     _locationSubscription =
@@ -425,35 +382,42 @@ class ActivityLocation extends ActivityUtils {
 
           // Update slope
           updateSlope(location);
-          
-          if(_numberOfLocationUpdates % 20 == 0) {
+
+          if (_numberOfLocationUpdates % 20 == 0) {
             _updateNearestSlope();
           }
 
           if (!_locationInitialized) {
             _locationInitialized = true;
           }
+
+          if (_numberOfLocationUpdates % 30 == 0) {
+            if (_mapDownloaded == true) {
+              nearestSlope =
+                  SlopeMap.findNearestSlope(currentLatitude, currentLongitude);
+            }
+          }
         } else {
           // Set values to 0 if GPS accuracy is low
           speed = 0.0;
           slope = 0.0;
         }
-        if(_numberOfLocationUpdates % 30 == 0) {
-          SlopeMap.findNearestSlope(currentLatitude, currentLongitude);
+        if (_numberOfLocationUpdates % 20 == 0) {
+          nearestSlope = SlopeMap.findNearestSlope(currentLatitude, currentLongitude);
         }
       }
       if (!initializedMap && _activityInitialized) {
         _activityMap = const ActivityMap();
         _updateAddress();
         initializedMap = true;
-        if(SkiTracker.connectionStatus == true) {
+        if (SkiTracker.connectionStatus == true) {
           _downloadMap();
         }
         updateData();
       }
       _numberOfLocationUpdates++;
-      if(_numberOfLocationUpdates % 5 == 0) {
-        if(!_mapDownloaded) {
+      if (_numberOfLocationUpdates % 5 == 0) {
+        if (!_mapDownloaded) {
           _downloadMap();
         }
       }
@@ -464,23 +428,23 @@ class ActivityLocation extends ActivityUtils {
        */
     });
   }
-  
+
   Future<void> _updateNearestSlope() async {
     if (_mapDownloaded == true) {
       SlopeMap.findNearestSlope(currentLatitude, currentLongitude);
     }
   }
-  
+
   static bool _isDownloadRunning = false;
+
   Future<void> _downloadMap() async {
-    if(_isDownloadRunning) {
+    if (_isDownloadRunning) {
       return;
     }
     _isDownloadRunning = true;
-    if(SkiTracker.connectionStatus == true) {
+    if (SkiTracker.connectionStatus == true) {
       bool b = await SlopeFetcher.fetchData(currentLatitude, currentLongitude);
-      print(b);
-      if(b) {
+      if (b) {
         _latitudeWhenDownloaded = currentLatitude;
         _longitudeWhenDownloaded = currentLongitude;
         _mapDownloaded = true;
@@ -490,8 +454,7 @@ class ActivityLocation extends ActivityUtils {
   }
 
   Future<void> _updateAddress() async {
-    if (kDebugMode) {
-    }
+    if (kDebugMode) {}
     try {
       var address = await GeoCode().reverseGeocoding(
           latitude: currentLatitude, longitude: currentLongitude);
@@ -626,8 +589,11 @@ class SlopeInfo {
   }
 
   String get name => _name;
+
   String get difficulty => _difficulty;
+
   DateTime get startTime => _startTime;
+
   DateTime get endTime => _isFinished ? _endTime : DateTime.now();
 
   set endTime(DateTime endTime) {
@@ -665,7 +631,6 @@ class SlopeInfo {
   static String listToString(List<SlopeInfo> list) {
     return jsonEncode(list.map((slopeInfo) => slopeInfo.toJson()).toList());
   }
-
 
   // toString Method
   @override
@@ -735,14 +700,18 @@ class ActivityData extends ActivityDataTemp {
 
   // Routes info
   List<SlopeInfo> routesInfo = [];
-  
+
   // Nearest slope
-  late Slope nearestSlope = Slope(slope: null);
+  Slope nearestSlope = Slope(empty: true);
 
   // List of altitudes
-  List<int> altitudes = [];
+  List<List<int>> altitudes = [];
+
+  // List of speeds
+  List<List<double>> speeds = [];
 
   void saveActivity() {
+
     ActivityDatabase activityDatabase = ActivityDatabase(
       areaName: areaName,
       maxSpeed: maxSpeed,
@@ -765,6 +734,7 @@ class ActivityData extends ActivityDataTemp {
       startTime: startTime.toString(),
       endTime: endTime.toString(),
       altitudes: altitudes.toString(),
+      speeds: speeds.toString(),
     );
 
     ActivityDatabaseHelper.insertActivity(activityDatabase);
@@ -798,17 +768,23 @@ class ActivityData extends ActivityDataTemp {
       newLongestRun: longestRun,
       newFullRoute: fullRoute,
       newCurrentRoute: currentRoute,
-      newStatus: _running && _active ? ActivityStatus.running : _active ?  ActivityStatus.paused : ActivityStatus.inactive,
+      newStatus: _running && _active
+          ? ActivityStatus.running
+          : _active
+              ? ActivityStatus.paused
+              : ActivityStatus.inactive,
       newArea: areaName,
       newInitializedMap: initializedMap,
       newAltitudes: altitudes,
+      newSpeeds: speeds,
+      newNearestSlope: nearestSlope,
     );
   }
 }
 
 class ActivityDataTemp {
   bool _locationInitialized = false;
-  
+
   double _latitudeWhenDownloaded = 0.0;
   double _longitudeWhenDownloaded = 0.0;
 

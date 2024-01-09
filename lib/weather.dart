@@ -37,7 +37,6 @@ class WeatherManager {
   late final Timer _timer;
 
   Future<void> init() async {
-    print('Init ma1');
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!locationLoaded) {
         if (SkiTracker.getActivity().initializedMap) {
@@ -54,7 +53,6 @@ class WeatherManager {
         }
       }
     });
-    print('Init ma2');
     Timer(const Duration(minutes: 5), () {
       updateCurrentTemperature();
     });

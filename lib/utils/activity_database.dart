@@ -7,7 +7,7 @@ import 'package:sqflite/sqflite.dart';
 class ActivityDatabaseHelper {
 
   // This is the actual database filename that is saved in the docs directory.
-  static const _databaseName = "activity_databasee.db";
+  static const _databaseName = "activity_databasen.db";
   // Table name
   static const _tableName = "activity";
   // Increment this version when you need to change the schema.
@@ -64,7 +64,9 @@ class ActivityDatabaseHelper {
                 elapsedPauseTime TEXT,
                 route TEXT,
                 startTime TEXT,
-                endTime TEXT
+                endTime TEXT,
+                altitudes TEXT,
+                speeds TEXT
               )
               ''');
   }
@@ -132,8 +134,10 @@ class ActivityDatabaseHelper {
         startTime: maps[i]['startTime'] as String,
         endTime: maps[i]['endTime'] as String,
         altitudes: maps[i]['altitudes'] as String,
+        speeds: maps[i]['speeds'] as String,
       );
     });
+
   }
 
   static Future<void> updateActivity(ActivityDatabase activityDatabase) async {
@@ -216,6 +220,9 @@ class ActivityDatabase {
   // List of altitudes
   final String altitudes;
 
+  // List of speeds
+  final String speeds;
+
   const ActivityDatabase(
       {required this.areaName,
       required this.maxSpeed,
@@ -234,7 +241,7 @@ class ActivityDatabase {
       required this.elapsedDownhillTime,
       required this.elapsedUphillTime,
       required this.elapsedPauseTime,
-      required this.route, required this.startTime, required this.endTime, this.id=-1, required this.altitudes});
+      required this.route, required this.startTime, required this.endTime, this.id=-1, required this.altitudes, required this.speeds});
 
   // Convert a Activity into a Map. The keys must correspond to the names of the
   // columns in the database.
@@ -261,6 +268,8 @@ class ActivityDatabase {
       'route': route,
       'startTime': startTime,
       'endTime': endTime,
+      'altitudes': altitudes,
+      'speeds': speeds,
     };
   }
 
@@ -268,7 +277,7 @@ class ActivityDatabase {
   // each Activity when using the print statement.
   @override
   String toString() {
-    return 'Activity{id: $id, areaName: $areaName, maxSpeed: $maxSpeed, averageSpeed: $averageSpeed, totalRuns: $totalRuns, longestRun: $longestRun, maxAltitude: $maxAltitude, minAltitude: $minAltitude, avgAltitude: $avgAltitude, maxSlope: $maxSlope, avgSlope: $avgSlope, distance: $distance, distanceDownhill: $distanceDownhill, distanceUphill: $distanceUphill, elapsedTime: $elapsedTime, elapsedDownhillTime: $elapsedDownhillTime, elapsedUphillTime: $elapsedUphillTime, elapsedPauseTime: $elapsedPauseTime}';
+    return 'Activity{id: $id, areaName: $areaName, maxSpeed: $maxSpeed, averageSpeed: $averageSpeed, totalRuns: $totalRuns, longestRun: $longestRun, maxAltitude: $maxAltitude, minAltitude: $minAltitude, avgAltitude: $avgAltitude, maxSlope: $maxSlope, avgSlope: $avgSlope, distance: $distance, distanceDownhill: $distanceDownhill, distanceUphill: $distanceUphill, elapsedTime: $elapsedTime, elapsedDownhillTime: $elapsedDownhillTime, elapsedUphillTime: $elapsedUphillTime, elapsedPauseTime: $elapsedPauseTime, route: $route, startTime: $startTime, endTime: $endTime, altitudes: $altitudes}';
   }
 
   ActivityDatabase copyWith({required int newId}) {
@@ -295,6 +304,7 @@ class ActivityDatabase {
       startTime: startTime,
       endTime: endTime,
       altitudes: altitudes,
+      speeds: speeds,
     );
   }
 }
