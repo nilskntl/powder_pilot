@@ -43,7 +43,7 @@ class _WelcomePagesState extends State<WelcomePages> {
           ),
           WelcomePage(
             title: 'Enable Background Mode',
-            subtitle: 'In order for ${SkiTracker.appName} to work properly when the screen is switched off, the background restriction must be disabled.',
+            subtitle: 'In order for ${SkiTracker.appName} to work properly when the screen is switched off, the background restrictions must be disabled.',
             image: 'assets/images/welcome_pages/battery_optimization.png',
             buttonText: 'Open Settings',
             pageController: _pageController,
