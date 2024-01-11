@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ski_tracker/settings_page.dart';
 import 'package:ski_tracker/utils/general_utils.dart';
 
 import 'main.dart';
@@ -45,6 +46,7 @@ class CustomAppBar extends StatelessWidget {
               ),
               Row(
                 children: [
+                  /*
                   GestureDetector(
                     onTap: () {},
                     child: const SizedBox(
@@ -55,9 +57,14 @@ class CustomAppBar extends StatelessWidget {
                         color: ColorTheme.contrast,
                       ),
                     ),
-                  ),
+                  ),*/
+                  const SizedBox(width: itemsSize),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      // Open Settings page
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage()));
+
+                    },
                     child: const SizedBox(
                       width: itemsSize,
                       height: itemsSize,

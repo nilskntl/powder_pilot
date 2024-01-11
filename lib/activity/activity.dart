@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:geocode/geocode.dart';
@@ -13,7 +12,7 @@ import '../main.dart';
 import '../route.dart';
 import '../slopes.dart';
 import '../utils/general_utils.dart';
-import 'activity_map.dart';
+import 'activity_display.dart';
 
 enum ActivityType {
   ski,
@@ -42,7 +41,11 @@ enum GpsAccuracy {
 class Activity extends ActivityLocation {
   final int id;
 
-  Activity(this.id);
+  Activity({required this.id, String areaName = ''}) {
+    if(areaName != '' || areaName != 'Unknown') {
+      this.areaName = areaName;
+    }
+  }
 
   void init() {
     if (kDebugMode) {
@@ -88,11 +91,6 @@ class Activity extends ActivityLocation {
     _running = false;
     endTime = DateTime.now();
     _active = false;
-    if (_statusDownhill) {
-      _addCurrentRoute('Downhill');
-    } else if (_statusUphill) {
-      _addCurrentRoute('Uphill');
-    }
     _statusDownhill = false;
     _statusUphill = false;
     _statusPause = true;
@@ -100,14 +98,16 @@ class Activity extends ActivityLocation {
     _locationSubscription?.cancel();
     _locationInitialized = false;
     _activityInitialized = false;
-    initializedMap = false;
-    // Async problem
-    fullRoute.finishActivity();
-    saveActivity();
-    _addActivityToList();
+    if(route.slopes.isNotEmpty) {
+      route.slopes.last.endTime = DateTime.now();
+    }
+    if(_locationInitialized) {
+      saveActivity();
+      _addActivityToList();
+    }
     _elapsedTime = Duration.zero;
     updateData();
-    SkiTracker.createNewActivity();
+    SkiTracker.createNewActivity(areaName: areaName);
   }
 
   void _addActivityToList() async {
@@ -122,11 +122,6 @@ class Activity extends ActivityLocation {
     speed = 0.0;
     slope = 0.0;
     _running = false;
-    if (_statusDownhill) {
-      _addCurrentRoute('Downhill');
-    } else if (_statusUphill) {
-      _addCurrentRoute('Uphill');
-    }
     _statusDownhill = false;
     _statusUphill = false;
     _statusPause = true;
@@ -151,8 +146,6 @@ class Activity extends ActivityLocation {
     });
     updateData();
   }
-
-  ActivityMap get activityMap => _activityMap;
 }
 
 class ActivityLocation extends ActivityUtils {
@@ -187,23 +180,6 @@ class ActivityLocation extends ActivityUtils {
     return permissionGranted == PermissionStatus.granted;
   }
 
-  void _addCurrentRoute(String type) {
-    currentRoute.type = type;
-    if (currentRoute.coordinates.isNotEmpty) {
-      if (fullRoute.routes.isEmpty) {
-        fullRoute.addRoute(currentRoute);
-      } else {
-        if (fullRoute.routes.last.type == currentRoute.type) {
-          fullRoute.routes.last.coordinates.addAll(currentRoute.coordinates);
-        } else {
-          fullRoute.routes.last.endTime = DateTime.now();
-          fullRoute.addRoute(currentRoute);
-        }
-      }
-      currentRoute = SingleRoute(type: 'Unknown', coordinates: []);
-    }
-  }
-
   void _locationStream() {
     double currentRunLength = 0.0;
 
@@ -230,6 +206,9 @@ class ActivityLocation extends ActivityUtils {
 
       altitude = _smoothAltitude(location.altitude!);
       maxAltitude = altitude > maxAltitude ? altitude : maxAltitude;
+      if(minAltitude == 0.0) {
+        minAltitude = altitude;
+      }
       minAltitude = altitude < minAltitude ? altitude : minAltitude;
       totalAltitude += altitude;
       avgAltitude = totalAltitude / _numberOfAltitudeUpdates;
@@ -249,7 +228,7 @@ class ActivityLocation extends ActivityUtils {
         if (calculatedDistance > 400) {
           calculatedDistance = 0.0;
         }
-        currentRoute.addCoordinates([currentLongitude, currentLatitude]);
+        route.addCoordinates([currentLongitude, currentLatitude]);
         distance += calculatedDistance;
         _tempDistance += calculatedDistance;
         _lastLocation = location;
@@ -260,12 +239,10 @@ class ActivityLocation extends ActivityUtils {
         if (altitude - _currentExtrema > 5) {
           _statusUphill = true;
           _statusDownhill = false;
-          _addCurrentRoute('Uphill');
           currentRunLength = 0.0;
         } else if (altitude - _currentExtrema < -5) {
           _statusUphill = false;
           _statusDownhill = true;
-          _addCurrentRoute('Downhill');
           currentRunLength = 0.0;
           totalRuns++;
         }
@@ -273,16 +250,10 @@ class ActivityLocation extends ActivityUtils {
         if (altitude - _currentExtrema > 20) {
           _statusUphill = true;
           _statusDownhill = false;
-          _addCurrentRoute('Uphill');
           currentRunLength = 0.0;
         } else if (altitude - _currentExtrema < -20) {
           _statusUphill = false;
           _statusDownhill = true;
-          if (_mapDownloaded == true) {
-            nearestSlope =
-                SlopeMap.findNearestSlope(currentLatitude, currentLongitude);
-          }
-          _addCurrentRoute('Downhill');
           currentRunLength = 0.0;
           totalRuns++;
         }
@@ -291,12 +262,10 @@ class ActivityLocation extends ActivityUtils {
       if (_statusUphill && altitude - _currentExtrema > 0) {
         _currentExtrema = altitude;
         distanceUphill += _tempDistance;
-        _addCurrentRoute('Uphill');
         _tempDistance = 0.0;
       } else if (_statusDownhill && altitude - _currentExtrema < 0) {
         _currentExtrema = altitude;
         distanceDownhill += _tempDistance;
-        _addCurrentRoute('Downhill');
         currentRunLength += _tempDistance;
         longestRun =
             currentRunLength > longestRun ? currentRunLength : longestRun;
@@ -305,6 +274,7 @@ class ActivityLocation extends ActivityUtils {
     }
 
     void updateSlope(LocationData location) {
+
       // Update slope
       if (!_statusPause) {
         double difference = (_tempAltitude - altitude).abs();
@@ -325,7 +295,7 @@ class ActivityLocation extends ActivityUtils {
 
             double verticalDistance = _tempAltitude - altitude;
 
-            slope = verticalDistance / horizontalDistance;
+            slope = verticalDistance / horizontalDistance * 100;
             _numberOfSlopeUpdates++;
             maxSlope = slope > maxSlope ? slope : maxSlope;
             totalSlope += slope;
@@ -345,9 +315,8 @@ class ActivityLocation extends ActivityUtils {
       _currentExtrema = altitude;
       _tempAltitude = altitude;
       _tempLocation = location;
-      if (nearestSlope.name == 'Unknown' && _mapDownloaded == true) {
-        nearestSlope =
-            SlopeMap.findNearestSlope(currentLatitude, currentLongitude);
+      if ((route.slopes.isEmpty || route.slopes.last.name == 'Unknown') && _mapDownloaded == true) {
+        _updateNearestSlope();
       }
     }
 
@@ -368,7 +337,7 @@ class ActivityLocation extends ActivityUtils {
             gpsAccuracy == GpsAccuracy.medium) {
           if (!_locationInitialized) {
             initializeLocation(location);
-            currentRoute.addCoordinates([currentLongitude, currentLatitude]);
+            route.addCoordinates([currentLongitude, currentLatitude]);
           }
 
           // Update speed
@@ -383,7 +352,7 @@ class ActivityLocation extends ActivityUtils {
           // Update slope
           updateSlope(location);
 
-          if (_numberOfLocationUpdates % 20 == 0) {
+          if (_numberOfLocationUpdates % 5 == 0) {
             _updateNearestSlope();
           }
 
@@ -391,36 +360,34 @@ class ActivityLocation extends ActivityUtils {
             _locationInitialized = true;
           }
 
-          if (_numberOfLocationUpdates % 30 == 0) {
-            if (_mapDownloaded == true) {
-              nearestSlope =
-                  SlopeMap.findNearestSlope(currentLatitude, currentLongitude);
-            }
-          }
         } else {
           // Set values to 0 if GPS accuracy is low
           speed = 0.0;
           slope = 0.0;
         }
-        if (_numberOfLocationUpdates % 20 == 0) {
-          nearestSlope = SlopeMap.findNearestSlope(currentLatitude, currentLongitude);
-        }
       }
-      if (!initializedMap && _activityInitialized) {
-        _activityMap = const ActivityMap();
-        _updateAddress();
-        initializedMap = true;
-        if (SkiTracker.connectionStatus == true) {
+      if (_activityInitialized) {
+        if (SkiTracker.connectionStatus == true && !_mapDownloaded) {
           _downloadMap();
         }
+
         updateData();
       }
       _numberOfLocationUpdates++;
-      if (_numberOfLocationUpdates % 5 == 0) {
-        if (!_mapDownloaded) {
-          _downloadMap();
+      if (_numberOfLocationUpdates % 15 == 0) {
+        if(SkiTracker.connectionStatus == true) {
+          if(areaName == '' || areaName == 'Unknown') {
+            _updateAddress();
+          }
+          if(_numberOfLocationUpdates % 120 == 0) {
+            _updateAddress();
+          }
+          if (!_mapDownloaded) {
+            _downloadMap();
+          }
         }
       }
+
       /*
        if(_numberOfLocationUpdates % 100 == 0) {
         _updateAddress();
@@ -430,8 +397,9 @@ class ActivityLocation extends ActivityUtils {
   }
 
   Future<void> _updateNearestSlope() async {
+
     if (_mapDownloaded == true) {
-      SlopeMap.findNearestSlope(currentLatitude, currentLongitude);
+      route.addSlope(SlopeMap.findNearestSlope(currentLatitude, currentLongitude));
     }
   }
 
@@ -462,7 +430,7 @@ class ActivityLocation extends ActivityUtils {
       updateData();
     } catch (e) {
       if (kDebugMode) {
-        print(e);
+        print('Error while trying to fetch Adress Data $e');
       }
     }
   }
@@ -472,7 +440,11 @@ class ActivityLocation extends ActivityUtils {
       title: 'Activity is running',
       subtitle: elapsedTime.toString().substring(0, 7),
       onTapBringToFront: true,
-      color: ColorTheme.primary,
+      color: ColorTheme.secondary,
+      description: 'Distance: ${(distance / 1000).toStringAsFixed(1)} km\n'
+          'Speed: ${(maxSpeed * Info.speedFactor ).toStringAsFixed(1) } km/h\n'
+          'Altitude: ${altitude.toStringAsFixed(0)} m\n'
+          'Runs: $totalRuns\n',
       iconName: 'assets/images/icon_256.png',
     );
   }
@@ -571,77 +543,7 @@ class ActivityUtils extends ActivityTimer {
   }
 }
 
-class SlopeInfo {
-  late String _name;
-  late String _difficulty;
-  late DateTime _startTime;
-  late DateTime _endTime;
-  bool _isFinished = false;
-
-  SlopeInfo({
-    required String name,
-    required String difficulty,
-    required DateTime startTime,
-  }) {
-    _name = name;
-    _difficulty = difficulty;
-    _startTime = startTime;
-  }
-
-  String get name => _name;
-
-  String get difficulty => _difficulty;
-
-  DateTime get startTime => _startTime;
-
-  DateTime get endTime => _isFinished ? _endTime : DateTime.now();
-
-  set endTime(DateTime endTime) {
-    _endTime = endTime;
-    _isFinished = true;
-  }
-
-  // from Json
-  factory SlopeInfo.fromString(String jsonString) {
-    return SlopeInfo.fromJson(jsonDecode(jsonString));
-  }
-
-  // Factory-Methode zum Erstellen eines Objekts aus einer Map
-  factory SlopeInfo.fromJson(Map<String, dynamic> json) {
-    SlopeInfo slopeInfo = SlopeInfo(
-      name: json['name'],
-      difficulty: json['difficulty'],
-      startTime: DateTime.parse(json['endTime']),
-    );
-    slopeInfo.endTime = DateTime.parse(json['endTime']);
-    return slopeInfo;
-  }
-
-  // Methode zum Konvertieren des Objekts in eine Map
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'difficulty': difficulty,
-      'startTime': startTime.toString(),
-      'endTime': endTime.toString(),
-    };
-  }
-
-  // Convert List of SlopeInfo to String
-  static String listToString(List<SlopeInfo> list) {
-    return jsonEncode(list.map((slopeInfo) => slopeInfo.toJson()).toList());
-  }
-
-  // toString Method
-  @override
-  String toString() {
-    return jsonEncode(toJson());
-  }
-}
-
 class ActivityData extends ActivityDataTemp {
-  // Map
-  late final ActivityMap _activityMap;
   String areaName = '';
 
   // Timestamp
@@ -689,20 +591,8 @@ class ActivityData extends ActivityDataTemp {
   // GPS Accuracy
   GpsAccuracy gpsAccuracy = GpsAccuracy.none;
 
-  // Location loaded
-  bool initializedMap = false;
-
-  // Full routes
-  FullRoute fullRoute = FullRoute(routes: []);
-
-  // Current single route
-  SingleRoute currentRoute = SingleRoute(type: 'Unknown', coordinates: []);
-
-  // Routes info
-  List<SlopeInfo> routesInfo = [];
-
-  // Nearest slope
-  Slope nearestSlope = Slope(empty: true);
+  // Route
+  ActivityRoute route = ActivityRoute(slopes: [], coordinates: []);
 
   // List of altitudes
   List<List<int>> altitudes = [];
@@ -730,7 +620,7 @@ class ActivityData extends ActivityDataTemp {
       elapsedDownhillTime: _elapsedDownhillTime.toString(),
       elapsedUphillTime: _elapsedUphillTime.toString(),
       elapsedPauseTime: _elapsedPauseTime.toString(),
-      route: fullRoute.toString(),
+      route: route.toString(),
       startTime: startTime.toString(),
       endTime: endTime.toString(),
       altitudes: altitudes.toString(),
@@ -763,21 +653,17 @@ class ActivityData extends ActivityDataTemp {
       newCurrentLatitude: currentLatitude,
       newCurrentLongitude: currentLongitude,
       newGpsAccuracy: gpsAccuracy,
-      newLocationLoaded: initializedMap,
       newTotalRuns: totalRuns,
       newLongestRun: longestRun,
-      newFullRoute: fullRoute,
-      newCurrentRoute: currentRoute,
+      newRoute: route,
       newStatus: _running && _active
           ? ActivityStatus.running
           : _active
               ? ActivityStatus.paused
               : ActivityStatus.inactive,
       newArea: areaName,
-      newInitializedMap: initializedMap,
       newAltitudes: altitudes,
       newSpeeds: speeds,
-      newNearestSlope: nearestSlope,
     );
   }
 }

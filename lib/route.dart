@@ -1,178 +1,156 @@
 import 'dart:convert';
 
-import 'package:latlong2/latlong.dart';
 import 'package:ski_tracker/slopes.dart';
-import 'package:ski_tracker/utils/general_utils.dart';
 
-class SingleRoute {
-  String type;
-  List<List<double>> coordinates;
-  List<List<double>> simplifiedCoordinates = [];
-  DateTime startTime;
-  DateTime endTime;
-  List<Slope> slopes = [];
-
-  bool calculatedSlopes = false;
-
-  SingleRoute({
-    required this.type,
+class ActivityRoute {
+  final List<List<double>> coordinates;
+  final List<SlopeInfo> slopes;
+  
+  const ActivityRoute({
     required this.coordinates,
-    DateTime? startTime,
-    DateTime? endTime,
-  })  : startTime = startTime ?? DateTime.now(),
-        endTime = endTime ?? DateTime.now();
-
+    required this.slopes,
+  });
+  
+  // from Json
+  factory ActivityRoute.fromString(String jsonString) {
+    return ActivityRoute.fromJson(jsonDecode(jsonString));
+  }
+  
   // Factory-Methode zum Erstellen eines Objekts aus einer Map
-  factory SingleRoute.fromJson(Map<String, dynamic> json) {
-    return SingleRoute(
-      type: json['type'],
+  factory ActivityRoute.fromJson(Map<String, dynamic> json) {
+    return ActivityRoute(
       coordinates: List<List<double>>.from(
         json['coordinates'].map((coord) => List<double>.from(coord)),
       ),
+      slopes: List<SlopeInfo>.from(
+        json['slopes'].map((slope) => SlopeInfo.fromJson(slope)),
+      ),
     );
+  }
+  
+  // Methode zum Konvertieren des Objekts in eine Map
+  Map<String, dynamic> toJson() {
+    return {
+      'coordinates': coordinates.map((coord) => coord.toList()).toList(),
+      'slopes': slopes.map((slope) => slope.toJson()).toList(),
+    };
+  }
+  
+  // Convert List of SlopeInfo to String
+  static String listToString(List<ActivityRoute> list) {
+    return jsonEncode(list.map((route) => route.toJson()).toList());
+  }
+  
+  // toString Method
+  @override
+  String toString() {
+    return jsonEncode(toJson());
+  }
+  
+  // String to Route
+  static ActivityRoute stringToRoute(String jsonString) {
+    return ActivityRoute.fromJson(jsonDecode(jsonString));
+  }
+
+  void addSlope(Slope nearestSlope) {
+    if(slopes.isEmpty) {
+      slopes.add(SlopeInfo(
+        name: nearestSlope.name,
+        difficulty: nearestSlope.difficulty,
+        startTime: DateTime.now(),
+      ));
+    } else {
+      if(slopes.last.name == nearestSlope.name && slopes.last.difficulty == nearestSlope.difficulty) {
+        return;
+      }
+      slopes.last.endTime = DateTime.now();
+      // Check if last slope was longer then 30s otherwise delete the slope
+      if(slopes.last.endTime.difference(slopes.last.startTime).inSeconds < 5) {
+        slopes.removeLast();
+      }
+      // Check if its now the same slope
+      if(slopes.last.name == nearestSlope.name && slopes.last.difficulty == nearestSlope.difficulty) {
+        return;
+      }
+      slopes.last.endTime = DateTime.now();
+      slopes.add(SlopeInfo(
+        name: nearestSlope.name,
+        difficulty: nearestSlope.difficulty,
+        startTime: DateTime.now(),
+      ));
+    }
+  }
+
+  void addCoordinates(List<double> list) {
+    coordinates.add(list);
+  }
+  
+}
+
+class SlopeInfo {
+  late String _name;
+  late String _difficulty;
+  late DateTime _startTime;
+  late DateTime endTime;
+
+  SlopeInfo({
+    required String name,
+    required String difficulty,
+    required DateTime startTime,
+  }) {
+    _name = name;
+    _difficulty = difficulty;
+    _startTime = startTime;
+  }
+
+  String get name => _name;
+
+  String get difficulty => _difficulty;
+
+  DateTime get startTime => _startTime;
+
+  // from Json
+  factory SlopeInfo.fromString(String jsonString) {
+    return SlopeInfo.fromJson(jsonDecode(jsonString));
+  }
+
+  // Factory-Methode zum Erstellen eines Objekts aus einer Map
+  factory SlopeInfo.fromJson(Map<String, dynamic> json) {
+    SlopeInfo slopeInfo = SlopeInfo(
+      name: json['name'],
+      difficulty: json['difficulty'],
+      startTime: DateTime.parse(json['endTime']),
+    );
+    slopeInfo.endTime = DateTime.parse(json['endTime']);
+    return slopeInfo;
   }
 
   // Methode zum Konvertieren des Objekts in eine Map
   Map<String, dynamic> toJson() {
     return {
-      'type': type,
-      'coordinates': coordinates.map((coord) => coord.toList()).toList(),
+      'name': name,
+      'difficulty': difficulty,
+      'startTime': startTime.toString(),
+      'endTime': endTime.toString(),
     };
   }
 
-  void addCoordinates(List<double> newCoordinate) {
-    if (coordinates.isEmpty) {
-      startTime = DateTime
-          .now(); // Setze startTime beim Hinzufügen des ersten Koordinaten
-    }
-    coordinates.add(newCoordinate);
+  // Convert List of SlopeInfo to String
+  static String listToString(List<SlopeInfo> list) {
+    return jsonEncode(list.map((slopeInfo) => slopeInfo.toJson()).toList());
   }
 
-  void calculatePossibleSlopes() async {
-    if(!calculatedSlopes && SlopeMap.slopes.isNotEmpty) {
-      simplifyCoordinates();
-      List<List<Slope>> calculatePossibleSlopes = [];
-      List<Slope> actualSlope = [];
-      for (List<double> coordinate in simplifiedCoordinates) {
-        List<Slope> possibleSlopes = SlopeMap.findPossibleSlopes(coordinate[0], coordinate[1]);
-        calculatePossibleSlopes.add(possibleSlopes);
-        // Every 5th time check the most common Slope
-        if (calculatePossibleSlopes.length == 6) {
-          List<Slope> placeHolder = [];
-          for(List<Slope> slopes in calculatePossibleSlopes) {
-            if(slopes.isNotEmpty) {
-              placeHolder.add(slopes.first);
-            }
-          }
-          if(placeHolder.length <= 3) {
-            Slope freeRide = Slope(empty: true);
-            if(actualSlope.isNotEmpty && actualSlope.last != freeRide) {
-              actualSlope.add(freeRide);
-            } else if(actualSlope.isEmpty) {
-              actualSlope.add(freeRide);
-            }
-          } else {
-            // Find the Slope that is in the List of Placeholders the most
-            Map<Slope, int> occurrences = {};
-            for (Slope slope in placeHolder) {
-              if (occurrences.containsKey(slope)) {
-                occurrences[slope] = occurrences[slope]! + 1;
-              } else {
-                occurrences[slope] = 1;
-              }
-            }
-            Slope mostCommonSlope = occurrences.entries.reduce((l, r) => l.value > r.value ? l : r).key;
-            if(actualSlope.isNotEmpty && actualSlope.last != mostCommonSlope) {
-              actualSlope.add(mostCommonSlope);
-            } else if(actualSlope.isEmpty) {
-              actualSlope.add(mostCommonSlope);
-            }
-          }
-          calculatePossibleSlopes.removeAt(0);
-        }
-      }
-      slopes = actualSlope;
-      calculatedSlopes = true;
-    }
-  }
-
-  void simplifyCoordinates() {
-    simplifiedCoordinates = [];
-    // Get distance between first and last coordinate
-    if (coordinates.length > 1) {
-      double distance = 0.0;
-      double lat1 = coordinates.first[0];
-      double lon1 = coordinates.first[1];
-      double lat2 = coordinates.last[0];
-      double lon2 = coordinates.last[1];
-      distance = Utils.calculateHaversineDistance(LatLng(lat1, lon1), LatLng(lat2, lon2));
-      // You want one coordinate every 10 meters
-      double distanceBuffer = 5;
-      if (distance > distanceBuffer) {
-        // Calculate the number of coordinates to keep
-        int numberOfCoordinates = (distance / distanceBuffer).floor();
-        // Only keep every numberOfCoordinates coordinate (including first and last)
-        for (int i = 0; i < coordinates.length; i++) {
-          if (i % numberOfCoordinates == 0) {
-            simplifiedCoordinates.add(coordinates[i]);
-          } else if (i == coordinates.length - 1) {
-            simplifiedCoordinates.add(coordinates[i]);
-          }
-        }
-      }
-    } else {
-      simplifiedCoordinates = coordinates;
-    }
-  }
-
-}
-
-class FullRoute {
-  List<SingleRoute> routes;
-
-  FullRoute({required this.routes});
-
-  factory FullRoute.fromString(String jsonString) {
-    return FullRoute.fromJson(jsonDecode(jsonString));
-  }
-
-  @override
-  String toString() {
-    return jsonEncode(toJson());
-  }
-
-  // Factory-Methode zum Erstellen eines Objekts aus einer Map
-  factory FullRoute.fromJson(Map<String, dynamic> json) {
-    return FullRoute(
-      routes: List<SingleRoute>.from(
-        json['routes'].map((route) => SingleRoute.fromJson(route)),
-      ),
+  static SlopeInfo slopeToSlopeInfo(Slope slope) {
+    return SlopeInfo(
+      name: slope.name,
+      difficulty: slope.difficulty,
+      startTime: DateTime.now(),
     );
   }
 
-  // Methode zum Konvertieren des Objekts in eine Map
-  Map<String, List<Map<String, dynamic>>> toJson() {
-    return {
-      'routes': routes.map((route) => route.toJson()).toList(),
-    };
-  }
-
-  void finishActivity(){
-    for (int i = 0; i < routes.length; i++) {
-      routes[i].calculatePossibleSlopes();
-    }
-  }
-
-  void addRoute(SingleRoute newRoute) {
-    routes.add(newRoute);
-    // Check lenght of routes
-    if (routes.length > 1) {
-      // Calculate possible pists/lifts for the route before
-      routes[routes.length - 2].calculatePossibleSlopes();
-      // Try to calculate all routes before
-      for (int i = routes.length - 3; i >= 0; i--) {
-        routes[i].calculatePossibleSlopes();
-      }
-    }
+  // toString Method
+  @override
+  String toString() {
+    return jsonEncode(toJson());
   }
 }

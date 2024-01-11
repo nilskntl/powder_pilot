@@ -51,7 +51,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   fontSize: Utils.calculateFontSizeByContext(
                       text: widget.title.toUpperCase(),
                       context: context,
-                      paddingLeftRight: 32,
+                      paddingLeftRight: 40,
                       standardFontSize: FontTheme.sizeHeader,
                       fontWeight: FontWeight.bold),
                   fontWeight: FontWeight.bold,
@@ -61,7 +61,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   text: widget.subtitle,
                   fontSize: Utils.calculateFontSizeByContext(
                       text: widget.subtitle
-                          .substring(0, widget.subtitle.length ~/ 1.5),
+                          .substring(0, widget.subtitle.length ~/ 1.4),
                       context: context,
                       paddingLeftRight: 32,
                       standardFontSize: FontTheme.size,
@@ -100,7 +100,11 @@ class _WelcomePageState extends State<WelcomePage> {
                   LocationButton(
                       pageController: widget.pageController,
                       currentPage: widget.currentPage),
-                if (widget.currentPage != 1)
+                if (widget.currentPage == 2)
+                  BackgroundLocationButton(
+                      pageController: widget.pageController,
+                      currentPage: widget.currentPage),
+                if (widget.currentPage != 1 && widget.currentPage != 2)
                   Container(
                     width: double.infinity,
                     height: 64.0,
@@ -171,6 +175,81 @@ class _BatteryOptimizationButtonState extends State<BatteryOptimizationButton> {
     throw UnimplementedError();
   }
   
+}
+
+class BackgroundLocationButton extends StatefulWidget {
+  const BackgroundLocationButton(
+      {super.key, required this.pageController, required this.currentPage});
+
+  final PageController pageController;
+  final int currentPage;
+
+  @override
+  State<BackgroundLocationButton> createState() =>
+      _BackgroundLocationButtonState();
+}
+
+class _BackgroundLocationButtonState extends State<BackgroundLocationButton> {
+  String buttonText = 'Open Location Settings';
+
+  Future<void> _requestLocationPermission() async {
+    Location location = Location();
+    location.enableBackgroundMode(enable: true);
+    setState(() {
+      buttonText = 'Open Battery Settings';
+    });
+  }
+
+  void _openBatterySettings() {
+    AppSettings.openAppSettings(type: AppSettingsType.batteryOptimization);
+    setState(() {
+      buttonText = 'Next';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        if(buttonText != 'Next')
+          Utils.buildText(text: 'Step ${buttonText == 'Open Location Settings' ? '1' : '2'}', fontSize: FontTheme.size - 2, fontWeight: FontWeight.normal, color: ColorTheme.contrast),
+        Container(
+          width: double.infinity,
+          height: 64.0,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: ElevatedButton(
+            onPressed: () {
+              if(buttonText == 'Open Location Settings') {
+                _requestLocationPermission();
+              } else if (buttonText == 'Open Battery Settings') {
+                _openBatterySettings();
+              } else {
+                widget.pageController.animateToPage(
+                  widget.currentPage + 1,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.ease,
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              foregroundColor: ColorTheme.contrast,
+              backgroundColor:
+              buttonText == 'Next' ? ColorTheme.primary : ColorTheme.grey,
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: Utils.buildText(
+              text: buttonText,
+              fontSize: FontTheme.size,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class LocationButton extends StatefulWidget {
@@ -317,25 +396,26 @@ class _PageOneWidgetState extends State<PageOneWidget> {
       Stack(
         children: [
           Container(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+            padding: const EdgeInsets.only(left: 48.0, right: 48.0),
             height: height,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16.0),
               child: Image.asset(
                 image,
                 fit: BoxFit.cover,
+                alignment: Alignment.topCenter,
                 width: double.infinity,
               ),
             ),
           ),
           Positioned(
             top: height / 2 - 32,
-            left: 16,
+            left: 0,
             child: buildButton(page: pageBack),
           ),
           Positioned(
               top: height / 2 - 32,
-              right: 16,
+              right: 0,
               child: buildButton(page: pageForward)),
         ],
       ),
@@ -356,18 +436,18 @@ class _PageOneWidgetState extends State<PageOneWidget> {
           controller: _pageController,
           children: [
             _buildPageIcon(
-                image: 'assets/images/background.png',
+                image: 'assets/images/welcome_pages/activity.png',
                 text: 'Track your skiing activity with ${SkiTracker.appName}',
                 pageBack: 2,
                 pageForward: 1),
             _buildPageIcon(
-                image: 'assets/images/background.png',
+                image: 'assets/images/welcome_pages/stats.png',
                 text: 'See your stats and improve your skiing',
                 pageBack: 0,
                 pageForward: 2),
             _buildPageIcon(
-                image: 'assets/images/background.png',
-                text: 'Save your highlights and share it with friends',
+                image: 'assets/images/welcome_pages/slope_info.png',
+                text: 'Analyse your ski day',
                 pageBack: 1,
                 pageForward: 0),
           ],

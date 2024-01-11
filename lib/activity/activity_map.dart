@@ -17,24 +17,456 @@ import 'activity_data_provider.dart';
 import 'activity_display.dart';
 
 class MapPage extends StatefulWidget {
-  const MapPage({super.key});
+  const MapPage(
+      {super.key,
+      required this.activityDataProvider,
+      required this.activityMap});
+
+  final ActivityDataProvider activityDataProvider;
+
+  final ActivityMap activityMap;
 
   @override
   State<MapPage> createState() => _MapPageState();
 }
 
 class _MapPageState extends State<MapPage> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBarDesign.appBar(title: 'Map'),
-      body: SkiTracker.getActivity().activityMap,
+      body: Stack(
+        children: [
+          if (widget.activityDataProvider.status == ActivityStatus.inactive ||
+              SlopeMap.slopes.isEmpty)
+            widget.activityMap,
+          if (widget.activityDataProvider.status != ActivityStatus.inactive &&
+              SlopeMap.slopes.isNotEmpty)
+            CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverAppBar(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  forceMaterialTransparency: true,
+                  flexibleSpace: widget.activityMap,
+                  toolbarHeight: 125,
+                  expandedHeight: MediaQuery.of(context).size.height -
+                      172 -
+                      MediaQuery.of(context).padding.bottom,
+                  pinned: true,
+                ),
+                SliverList(
+                  delegate: SliverChildListDelegate(
+                    [
+                      Column(
+                        children: [
+                          Container(
+                            height: Status.heightBarContainer,
+                            decoration: const BoxDecoration(
+                              color: ColorTheme.background,
+                              borderRadius: BorderRadius.only(
+                                topLeft:
+                                    Radius.circular(Status.heightBarContainer),
+                                topRight:
+                                    Radius.circular(Status.heightBarContainer),
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Container(
+                              height: Status.heightBar,
+                              width: Status.widthBar,
+                              decoration: BoxDecoration(
+                                color: ColorTheme.grey,
+                                borderRadius:
+                                    BorderRadius.circular(Status.heightBar / 2),
+                              ),
+                            ),
+                          ),
+                          Container(
+                              padding: const EdgeInsets.only(
+                                left: 16,
+                                right: 16,
+                                top: 16,
+                                bottom: 16,
+                              ),
+                              decoration: const BoxDecoration(
+                                color: ColorTheme.background,
+                              ),
+                              // Make an entry for every route in the full route of widget.activityDataProvider.route except the last one
+                              child: Column(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: ColorTheme.secondary,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        if (widget.activityDataProvider.route
+                                            .slopes.isNotEmpty)
+                                          CurrentSlope(
+                                              slope: widget.activityDataProvider
+                                                  .route.slopes.last, animated: true,),
+                                        const SizedBox(width: 16),
+                                        if (widget.activityDataProvider.route
+                                            .slopes.isNotEmpty)
+                                          ActivityDisplay.buildSlopeName(widget
+                                              .activityDataProvider
+                                              .route
+                                              .slopes
+                                              .last),
+                                        const Spacer(),
+                                        Container(
+                                          height: 24,
+                                          width: 96,
+                                          decoration: BoxDecoration(
+                                            color: ColorTheme.green,
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: Utils.buildText(
+                                              text: 'Current',
+                                              fontSize: FontTheme.size - 4,
+                                              color: ColorTheme.secondary),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  ListView.builder(
+                                    controller: _scrollController,
+                                    shrinkWrap: true,
+                                    reverse: true,
+                                    itemCount: widget.activityDataProvider.route
+                                        .slopes.length,
+                                    itemBuilder: (context, index) {
+                                      if (index !=
+                                          widget.activityDataProvider.route
+                                                  .slopes.length -
+                                              1) {
+                                        return Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: ColorTheme.secondary,
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                          ),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              CurrentSlope(
+                                                  slope: widget
+                                                      .activityDataProvider
+                                                      .route
+                                                      .slopes[index]),
+                                              const SizedBox(width: 16),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Utils.buildText(
+                                                          text: 'Start: ',
+                                                          fontSize:
+                                                              FontTheme.size -
+                                                                  4,
+                                                          color:
+                                                              ColorTheme.grey,
+                                                          caps: false),
+                                                      const SizedBox(width: 4),
+                                                      Utils.buildText(
+                                                          text: Utils.durationStringToString(widget
+                                                              .activityDataProvider
+                                                              .route
+                                                              .slopes[index]
+                                                              .startTime
+                                                              .toString())[1],
+                                                          caps: false,
+                                                          fontSize:
+                                                              FontTheme.size -
+                                                                  4,
+                                                          color: ColorTheme
+                                                              .contrast),
+                                                    ],
+                                                  ),
+                                                  ActivityDisplay.buildSlopeName(widget
+                                                      .activityDataProvider
+                                                      .route
+                                                      .slopes[index]),
+                                                  Row(
+                                                    children: [
+                                                      Utils.buildText(
+                                                          text: 'Duration: ',
+                                                          fontSize:
+                                                              FontTheme.size -
+                                                                  4,
+                                                          color:
+                                                              ColorTheme.grey,
+                                                          caps: false),
+                                                      const SizedBox(width: 4),
+                                                      Utils.buildText(
+                                                          text: Utils.formatDuration(widget
+                                                                  .activityDataProvider
+                                                                  .route
+                                                                  .slopes[index]
+                                                                  .endTime
+                                                                  .difference(widget
+                                                                      .activityDataProvider
+                                                                      .route
+                                                                      .slopes[
+                                                                          index]
+                                                                      .startTime)) +
+                                                              ' min',
+                                                          caps: false,
+                                                          fontSize:
+                                                              FontTheme.size -
+                                                                  4,
+                                                          color: ColorTheme
+                                                              .contrast),
+                                                    ],
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        );
+                                      } else {
+                                        return Container();
+                                      }
+                                    },
+                                  ),
+                                ],
+                              )),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Container(
+                    color: ColorTheme.background,
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class MapPageSummary extends StatefulWidget {
+  const MapPageSummary(
+      {super.key,
+        required this.route,
+        required this.activityMap});
+
+  final ActivityRoute route;
+
+  final ActivityMap activityMap;
+
+  @override
+  State<MapPageSummary> createState() => _MapPageSummaryState();
+}
+
+class _MapPageSummaryState extends State<MapPageSummary> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CustomAppBarDesign.appBar(title: 'Map'),
+      body: Stack(
+        children: [
+          if (widget.route.slopes.isEmpty)
+            widget.activityMap,
+          if (widget.route.slopes.isNotEmpty)
+            CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverAppBar(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  forceMaterialTransparency: true,
+                  flexibleSpace: widget.activityMap,
+                  toolbarHeight: 125,
+                  expandedHeight: MediaQuery.of(context).size.height -
+                      172 -
+                      MediaQuery.of(context).padding.bottom,
+                  pinned: true,
+                ),
+                SliverList(
+                  delegate: SliverChildListDelegate(
+                    [
+                      Column(
+                        children: [
+                          Container(
+                            height: Status.heightBarContainer,
+                            decoration: const BoxDecoration(
+                              color: ColorTheme.background,
+                              borderRadius: BorderRadius.only(
+                                topLeft:
+                                Radius.circular(Status.heightBarContainer),
+                                topRight:
+                                Radius.circular(Status.heightBarContainer),
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Container(
+                              height: Status.heightBar,
+                              width: Status.widthBar,
+                              decoration: BoxDecoration(
+                                color: ColorTheme.grey,
+                                borderRadius:
+                                BorderRadius.circular(Status.heightBar / 2),
+                              ),
+                            ),
+                          ),
+                          Container(
+                              padding: const EdgeInsets.only(
+                                left: 16,
+                                right: 16,
+                                top: 16,
+                                bottom: 16,
+                              ),
+                              decoration: const BoxDecoration(
+                                color: ColorTheme.background,
+                              ),
+                              // Make an entry for every route in the full route of widget.activityDataProvider.route except the last one
+                              child: Column(
+                                children: [
+                                  ListView.builder(
+                                    controller: _scrollController,
+                                    shrinkWrap: true,
+                                    reverse: true,
+                                    itemCount: widget.route
+                                        .slopes.length,
+                                    itemBuilder: (context, index) {
+                                        return Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: ColorTheme.secondary,
+                                            borderRadius:
+                                            BorderRadius.circular(16),
+                                          ),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                            children: [
+                                              CurrentSlope(
+                                                  slope: widget
+                                                      .route
+                                                      .slopes[index]),
+                                              const SizedBox(width: 16),
+                                              Column(
+                                                crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Utils.buildText(
+                                                          text: 'Start: ',
+                                                          fontSize:
+                                                          FontTheme.size -
+                                                              4,
+                                                          color:
+                                                          ColorTheme.grey,
+                                                          caps: false),
+                                                      const SizedBox(width: 4),
+                                                      Utils.buildText(
+                                                          text: Utils.durationStringToString(widget
+                                                              .route
+                                                              .slopes[index]
+                                                              .startTime
+                                                              .toString())[1],
+                                                          caps: false,
+                                                          fontSize:
+                                                          FontTheme.size -
+                                                              4,
+                                                          color: ColorTheme
+                                                              .contrast),
+                                                    ],
+                                                  ),
+                                                  ActivityDisplay.buildSlopeName(widget
+                                                      .route
+                                                      .slopes[index]),
+                                                  Row(
+                                                    children: [
+                                                      Utils.buildText(
+                                                          text: 'Duration: ',
+                                                          fontSize:
+                                                          FontTheme.size -
+                                                              4,
+                                                          color:
+                                                          ColorTheme.grey,
+                                                          caps: false),
+                                                      const SizedBox(width: 4),
+                                                      Utils.buildText(
+                                                          text: Utils.formatDuration(widget
+                                                              .route
+                                                              .slopes[index]
+                                                              .endTime
+                                                              .difference(widget
+                                                              .route
+                                                              .slopes[
+                                                          index]
+                                                              .startTime)) +
+                                                              ' min',
+                                                          caps: false,
+                                                          fontSize:
+                                                          FontTheme.size -
+                                                              4,
+                                                          color: ColorTheme
+                                                              .contrast),
+                                                    ],
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                  ),
+                                ],
+                              )),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Container(
+                    color: ColorTheme.background,
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
     );
   }
 }
 
 class ActivityMap extends StatefulWidget {
-  const ActivityMap({super.key});
+  const ActivityMap(
+      {super.key,
+      this.staticMap = false,
+      this.route = const ActivityRoute(coordinates: [], slopes: [])});
+
+  final bool staticMap;
+  final ActivityRoute route;
 
   @override
   State<ActivityMap> createState() => _ActivityMapState();
@@ -43,6 +475,7 @@ class ActivityMap extends StatefulWidget {
 class _ActivityMapState extends State<ActivityMap>
     with TickerProviderStateMixin {
   static const double zoomLevel = 14.0;
+  static const double zoomOverview = 12.0;
   static const double maxZoom = 18.49;
   static const double minZoom = 4.0;
   static const Color backgroundColor = Color(0xFF777777);
@@ -53,28 +486,28 @@ class _ActivityMapState extends State<ActivityMap>
 
   late Timer _timer;
 
-  late final ActivityDataProvider activityDataProvider;
-  bool _initializedDataProvider = false;
-
   bool _previewMode = true;
 
-  List<Polyline> _fullRoute = [];
-  List<Polyline> _currentRoute = [];
+  List<Polyline> _route = [];
 
-  final ScrollController _scrollController = ScrollController();
+  LatLng _middlePoint = const LatLng(0.0, 0.0);
 
   @override
   void initState() {
-    if (!_initializedDataProvider) {
-      activityDataProvider = SkiTracker.getActivityDataProvider();
-      _initializedDataProvider = true;
-    }
     super.initState();
+    if(widget.route.coordinates.isNotEmpty) {
+      if(widget.staticMap) {
+        _middlePoint = _calculateMiddlePoint(widget.route.coordinates);
+        _route = _buildPolyline(widget.route);
+      }
+    }
     mapController = AnimatedMapController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
-    _startTimer();
+    if (!widget.staticMap) {
+      _startTimer();
+    }
   }
 
   @override
@@ -83,21 +516,21 @@ class _ActivityMapState extends State<ActivityMap>
     _isInPreviewMode();
     setState(() {
       if (!_previewMode) {
-        _fullRoute = _buildFullPolylines(SkiTracker.getActivity().fullRoute);
-        _currentRoute =
-            _buildSinglePolyline(SkiTracker.getActivity().currentRoute);
+        if (!widget.staticMap) {
+          _route = _buildPolyline(SkiTracker.getActivity().route);
+        }
       }
     });
   }
 
   void _isInPreviewMode() {
     final route = ModalRoute.of(context);
-    _previewMode = route?.settings.name != '/fullscreen';
+    _previewMode = route?.settings.name != '/fullscreen' && route?.settings.name != '/fullscreenSummary';
   }
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
-      if (_previewMode) {
+      if (_previewMode && SkiTracker.getActivity().currentLatitude != 0.0) {
         mapController.animateTo(
           dest: LatLng(SkiTracker.getActivity().currentLatitude,
               SkiTracker.getActivity().currentLongitude),
@@ -106,10 +539,34 @@ class _ActivityMapState extends State<ActivityMap>
     });
   }
 
+  LatLng _calculateMiddlePoint(List<List<double>> coordinates) {
+  double minLatitude = double.infinity;
+  double maxLatitude = -double.infinity;
+  double minLongitude = double.infinity;
+  double maxLongitude = -double.infinity;
+
+// Find the minimum and maximum latitude and longitude
+  for (List<double> coordinate in coordinates) {
+  double latitude = coordinate[0];
+  double longitude = coordinate[1];
+
+  minLatitude = latitude < minLatitude ? latitude : minLatitude;
+  maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
+  minLongitude = longitude < minLongitude ? longitude : minLongitude;
+  maxLongitude = longitude > maxLongitude ? longitude : maxLongitude;
+  }
+
+// Calculate the middle point
+  double middleLatitude = (maxLatitude + minLatitude) / 2;
+  double middleLongitude = (maxLongitude + minLongitude) / 2;
+
+// The middle point
+  return LatLng(middleLongitude, middleLatitude);
+  }
+
   TileLayer _tileLayer() {
     return TileLayer(
       urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      subdomains: const ['a', 'b', 'c'],
     );
   }
 
@@ -143,9 +600,11 @@ class _ActivityMapState extends State<ActivityMap>
         mapController: mapController.mapController,
         options: MapOptions(
           backgroundColor: backgroundColor,
-          initialCenter: LatLng(SkiTracker.getActivity().currentLatitude,
-              SkiTracker.getActivity().currentLongitude),
-          initialZoom: zoomLevel,
+          initialCenter: widget.staticMap
+              ? _middlePoint
+              : LatLng(SkiTracker.getActivity().currentLatitude,
+                  SkiTracker.getActivity().currentLongitude),
+          initialZoom: widget.staticMap ? zoomOverview : zoomLevel,
           interactionOptions: const InteractionOptions(
             flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
           ),
@@ -155,223 +614,31 @@ class _ActivityMapState extends State<ActivityMap>
         // Layers are drawn in the order they are defined
         children: [
           _tileLayer(),
-          _pisteLayer(),
-          if (!_previewMode) _markerLayer(),
-          if (!_previewMode) PolylineLayer(polylines: _fullRoute),
-          if (!_previewMode) PolylineLayer(polylines: _currentRoute),
-          // if(!_previewMode) PolylineLayer(polylines: SlopeMap.slopeMap),
-        ],
-      ),
-      if (!_previewMode && activityDataProvider.status != ActivityStatus.inactive && SlopeMap.slopes.isNotEmpty)
-        CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          SliverAppBar(
-            backgroundColor: Colors.transparent,
-            foregroundColor: Colors.transparent,
-            shadowColor: Colors.transparent,
-            surfaceTintColor: Colors.transparent,
-            forceMaterialTransparency: true,
-            collapsedHeight: MediaQuery.of(context).size.height -
-                172 - MediaQuery.of(context).padding.bottom,
-            pinned: true,
-          ),
-            SliverList(
-              delegate: SliverChildListDelegate(
-                [
-                  Column(
-                    children: [
-                      Container(
-                        height: Status.heightBarContainer,
-                        decoration: const BoxDecoration(
-                          color: ColorTheme.background,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(Status.heightBarContainer),
-                            topRight:
-                                Radius.circular(Status.heightBarContainer),
-                          ),
-                        ),
-                        alignment: Alignment.center,
-                        child: Container(
-                          height: Status.heightBar,
-                          width: Status.widthBar,
-                          decoration: BoxDecoration(
-                            color: ColorTheme.grey,
-                            borderRadius:
-                                BorderRadius.circular(Status.heightBar / 2),
-                          ),
-                        ),
-                      ),
-                      Container(
-                          padding: const EdgeInsets.only(
-                            left: 16,
-                            right: 16,
-                            top: 16,
-                            bottom: 16,
-                          ),
-                          decoration: const BoxDecoration(
-                            color: ColorTheme.background,
-                          ),
-                          // Make an entry for every route in the full route of widget.activityDataProvider.route except the last one
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: ColorTheme.secondary,
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: Row(
-                                  children: [
-                                    CurrentSlope(
-                                        slope:
-                                            activityDataProvider.nearestSlope),
-                                    const SizedBox(width: 16),
-                                    if(activityDataProvider.nearestSlope.name != 'Unknown')
-                                    Utils.buildText(
-                                        text:
-                                            'Slope: ${activityDataProvider.nearestSlope.name}',
-                                        color: ColorTheme.contrast,
-                                        fontSize: FontTheme.sizeSubHeader,
-                                        caps: false,
-                                        fontWeight: FontWeight.bold),
-                                    if(activityDataProvider.nearestSlope.name == 'Unknown')
-                                      Utils.buildText(
-                                          text:
-                                          'Free Ride',
-                                          color: ColorTheme.contrast,
-                                          fontSize: FontTheme.sizeSubHeader,
-                                          caps: false,
-                                          fontWeight: FontWeight.bold),
-                                    const Spacer(),
-                                    Container(
-                                      height: 24,
-                                      width: 96,
-                                      decoration: BoxDecoration(
-                                        color: ColorTheme.green,
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: Utils.buildText(
-                                          text: 'Current',
-                                          fontSize: FontTheme.size - 4,
-                                          color: ColorTheme.secondary),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              ListView.builder(
-                                controller: _scrollController,
-                                shrinkWrap: true,
-                                itemCount: activityDataProvider
-                                    .fullRoute.routes.length,
-                                itemBuilder: (context, index) {
-                                  if (index <
-                                      activityDataProvider
-                                              .fullRoute.routes.length -
-                                          2) {
-                                    return ListView.builder(
-                                        itemBuilder: (context, index2) {
-                                      return Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: ColorTheme.secondary,
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            CurrentSlope(
-                                                slope: activityDataProvider
-                                                    .fullRoute
-                                                    .routes[index]
-                                                    .slopes[index2]),
-                                            const SizedBox(width: 16),
-                                            Utils.buildText(
-                                                text:
-                                                    'Slope: ${activityDataProvider.fullRoute.routes[index].slopes[index2].name}',
-                                                color: ColorTheme.contrast,
-                                                fontSize:
-                                                    FontTheme.sizeSubHeader,
-                                                caps: false,
-                                                fontWeight: FontWeight.bold),
-                                          ],
-                                        ),
-                                      );
-                                    });
-                                  } else {
-                                    return Container();
-                                  }
-                                },
-                              ),
-                            ],
-                          )),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Container(
-              color: ColorTheme.background,
-            ),
-          ),
+          if(!widget.staticMap || (!_previewMode && widget.staticMap)) _pisteLayer(),
+          if (!_previewMode && !widget.staticMap) _markerLayer(),
+          if (!_previewMode  || widget.staticMap) PolylineLayer(polylines: _route),
         ],
       ),
     ]);
   }
 
-  List<Polyline> _buildFullPolylines(FullRoute fullRoute) {
-    List<Polyline> polylines = [];
-
-    for (SingleRoute singleRoute in fullRoute.routes) {
-      List<LatLng> polylinePoints = [];
-
-      for (List<double> coordinate in singleRoute.coordinates) {
-        polylinePoints.add(LatLng(coordinate[1], coordinate[0]));
-      }
-
-      Color polylineColor = Colors.blue; // Default color for type='Downhill'
-
-      if (singleRoute.type == 'Uphill') {
-        polylineColor = Colors.red;
-      }
-
-      Polyline polyline = Polyline(
-        points: polylinePoints,
-        color: polylineColor,
-        strokeWidth: 3.0, // Adjust this to your desired line width
-      );
-
-      polylines.add(polyline);
-    }
-
-    return polylines;
-  }
-
-  List<Polyline> _buildSinglePolyline(SingleRoute singleRoute) {
+  List<Polyline> _buildPolyline(ActivityRoute route) {
     List<Polyline> polylines = [];
     List<LatLng> polylinePoints = [];
 
-    for (List<double> coordinate in singleRoute.coordinates) {
+    print(route.coordinates);
+    print(_middlePoint);
+
+    for (List<double> coordinate in route.coordinates) {
       polylinePoints.add(LatLng(coordinate[1], coordinate[0]));
     }
 
-    Color polylineColor = Colors.blue; // Default color for type='Downhill'
-
-    if (singleRoute.type == 'Uphill') {
-      polylineColor = Colors.red;
-    }
-
-    if (singleRoute.type == 'Unknown') {
-      polylineColor = Colors.black;
-    }
+    Color polylineColor = ColorTheme.primary;
 
     Polyline polyline = Polyline(
       points: polylinePoints,
       color: polylineColor,
-      strokeWidth: 3.0, // Adjust this to your desired line width
+      strokeWidth: 5.0, // Adjust this to your desired line width
     );
 
     polylines.add(polyline);
@@ -381,7 +648,9 @@ class _ActivityMapState extends State<ActivityMap>
 
   @override
   void dispose() {
-    _timer.cancel();
+    if(!widget.staticMap) {
+      _timer.cancel();
+    }
     mapController.dispose();
     super.dispose();
   }

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:ski_tracker/activity/activity.dart';
 
 import '../route.dart';
-import '../slopes.dart';
 
 class ActivityDataProvider extends ChangeNotifier {
 
@@ -51,15 +50,8 @@ class ActivityDataProvider extends ChangeNotifier {
   // Location loaded
   bool locationLoaded = false;
 
-  // Full route
-  FullRoute fullRoute = FullRoute(routes: []);
-
-  // Current route
-  SingleRoute currentRoute = SingleRoute(type: 'Unknown', coordinates: []);
-
   // Status
   ActivityStatus status = ActivityStatus.inactive;
-  bool initializedMap = false;
 
   // Internet status
   bool internetStatus = false;
@@ -70,8 +62,8 @@ class ActivityDataProvider extends ChangeNotifier {
   // List of speeds
   List<List<double>> speeds = [];
 
-  // Nearest Slope
-  Slope nearestSlope = Slope(empty: true);
+  // Route
+  ActivityRoute route = ActivityRoute(coordinates: [], slopes: []);
 
   void updateData({
     required double newSpeed,
@@ -94,16 +86,12 @@ class ActivityDataProvider extends ChangeNotifier {
     required double newCurrentLatitude,
     required double newCurrentLongitude,
     required GpsAccuracy newGpsAccuracy,
-    required bool newLocationLoaded,
     required int newTotalRuns,
     required double newLongestRun,
-    required FullRoute newFullRoute,
-    required SingleRoute newCurrentRoute,
+    required ActivityRoute newRoute,
     required ActivityStatus newStatus,
     required String newArea,
-    required bool newInitializedMap,
     required List<List<int>> newAltitudes,
-    required Slope newNearestSlope,
     required List<List<double>> newSpeeds,
   }) {
     speed = newSpeed;
@@ -126,17 +114,13 @@ class ActivityDataProvider extends ChangeNotifier {
     currentLatitude = newCurrentLatitude;
     currentLongitude = newCurrentLongitude;
     gpsAccuracy = newGpsAccuracy;
-    locationLoaded = newLocationLoaded;
     totalRuns = newTotalRuns;
     longestRun = newLongestRun;
-    fullRoute = newFullRoute;
-    currentRoute = newCurrentRoute;
+    route = newRoute;
     status = newStatus;
     area = newArea;
-    initializedMap = newInitializedMap;
     altitudes = newAltitudes;
     speeds = newSpeeds;
-    nearestSlope = newNearestSlope;
 
     notifyListeners();
   }

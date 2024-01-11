@@ -129,6 +129,13 @@ class Utils {
 
   }
 
+  static formatDuration(Duration difference) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String twoDigitMinutes = difference.inMinutes.toString();
+    String twoDigitSeconds = twoDigits(difference.inSeconds.remainder(60));
+    return "$twoDigitMinutes:$twoDigitSeconds";
+  }
+
 }
 
 class DrawDottedHorizontalLine extends CustomPainter {

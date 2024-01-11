@@ -137,7 +137,7 @@ class _HistoryState extends State<History> {
                                                   fontWeight: FontWeight.bold,
                                                   color: ColorTheme.contrast),
                                               Utils.buildText(
-                                                  text: 'Activitys',
+                                                  text: 'Activities',
                                                   fontSize: FontTheme.size,
                                                   fontWeight: FontWeight.bold,
                                                   color: ColorTheme.grey),
@@ -199,16 +199,15 @@ class _HistoryState extends State<History> {
                                                               .length
                                                               .toString(),
                                                           fontSize:
-                                                              FontTheme.size +
-                                                                  4,
+                                                              FontTheme.size,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           color: ColorTheme
                                                               .contrast),
                                                       Utils.buildText(
-                                                          text: 'Activitys',
+                                                          text: 'Activities',
                                                           fontSize:
-                                                              FontTheme.size,
+                                                              FontTheme.size - 4,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           color:
@@ -222,8 +221,7 @@ class _HistoryState extends State<History> {
                                                       Utils.buildText(
                                                           text: Utils.durationStringToString(activities.first.startTime)[0],
                                                           fontSize:
-                                                              FontTheme.size +
-                                                                  4,
+                                                              FontTheme.size,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           color: ColorTheme
@@ -231,7 +229,7 @@ class _HistoryState extends State<History> {
                                                       Utils.buildText(
                                                           text: 'Latest',
                                                           fontSize:
-                                                              FontTheme.size,
+                                                              FontTheme.size - 4,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           color:
@@ -245,8 +243,7 @@ class _HistoryState extends State<History> {
                                                       Utils.buildText(
                                                           text: Utils.durationStringToString(activities.last.startTime)[0],
                                                           fontSize:
-                                                              FontTheme.size +
-                                                                  4,
+                                                              FontTheme.size,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           color: ColorTheme
@@ -254,7 +251,7 @@ class _HistoryState extends State<History> {
                                                       Utils.buildText(
                                                           text: 'Earliest',
                                                           fontSize:
-                                                              FontTheme.size,
+                                                              FontTheme.size - 4,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           color:
@@ -400,11 +397,11 @@ class _HistoryState extends State<History> {
                   Row(
                     children: [
                       _buildHighlight('Distance',
-                          '${(activity.distance / 1000).toStringAsFixed(2)} ${Info.unitDistance}'),
+                          '${(activity.distance * Info.distanceFactor / 1000).toStringAsFixed(1)} ${Info.unitDistance}'),
                       _buildHighlight('Duration',
                           '${activity.elapsedTime.substring(0, 4)} h'),
                       _buildHighlight('Speed',
-                          '${activity.averageSpeed.toStringAsFixed(2)} ${Info.unitSpeed}'),
+                          '${(activity.maxSpeed * Info.speedFactor).toStringAsFixed(1)} ${Info.unitSpeed}'),
                     ],
                   ),
                 ],

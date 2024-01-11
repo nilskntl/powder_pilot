@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
@@ -7,7 +8,7 @@ import 'package:sqflite/sqflite.dart';
 class ActivityDatabaseHelper {
 
   // This is the actual database filename that is saved in the docs directory.
-  static const _databaseName = "activity_databasen.db";
+  static const _databaseName = "activity_databasesn.db";
   // Table name
   static const _tableName = "activity";
   // Increment this version when you need to change the schema.
@@ -66,7 +67,8 @@ class ActivityDatabaseHelper {
                 startTime TEXT,
                 endTime TEXT,
                 altitudes TEXT,
-                speeds TEXT
+                speeds TEXT,
+                image BLOB
               )
               ''');
   }
@@ -96,7 +98,10 @@ class ActivityDatabaseHelper {
     // Insert the Activity
     await db.insert(
       _tableName,
-      activityDatabase.toMap(),
+      {
+        ...activityDatabase.toMap(),
+        if (activityDatabase.image != null) 'image': activityDatabase.image,
+      },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
@@ -135,6 +140,7 @@ class ActivityDatabaseHelper {
         endTime: maps[i]['endTime'] as String,
         altitudes: maps[i]['altitudes'] as String,
         speeds: maps[i]['speeds'] as String,
+        image: maps[i]['image'] as Uint8List?,
       );
     });
 
@@ -147,7 +153,10 @@ class ActivityDatabaseHelper {
     // Update the given Activity,
     await db.update(
       _tableName,
-      activityDatabase.toMap(),
+      {
+        ...activityDatabase.toMap(),
+        if (activityDatabase.image != null) 'image': activityDatabase.image,
+      },
       // Ensure that the Activity has a matching id.
       where: 'id = ?',
       // Pass the Activity's id as a whereArg to prevent SQL injection.
@@ -223,6 +232,9 @@ class ActivityDatabase {
   // List of speeds
   final String speeds;
 
+  // Image
+  final Uint8List? image;
+
   const ActivityDatabase(
       {required this.areaName,
       required this.maxSpeed,
@@ -241,12 +253,12 @@ class ActivityDatabase {
       required this.elapsedDownhillTime,
       required this.elapsedUphillTime,
       required this.elapsedPauseTime,
-      required this.route, required this.startTime, required this.endTime, this.id=-1, required this.altitudes, required this.speeds});
+      required this.route, required this.startTime, required this.endTime, this.image, this.id=-1, required this.altitudes, required this.speeds});
 
   // Convert a Activity into a Map. The keys must correspond to the names of the
   // columns in the database.
   Map<String, dynamic> toMap() {
-    return {
+    final map = {
       'id': id,
       'areaName': areaName,
       'maxSpeed': maxSpeed,
@@ -270,7 +282,9 @@ class ActivityDatabase {
       'endTime': endTime,
       'altitudes': altitudes,
       'speeds': speeds,
+      if (image != null) 'image': image,
     };
+    return map;
   }
 
   // Implement toString to make it easier to see information about
@@ -305,6 +319,7 @@ class ActivityDatabase {
       endTime: endTime,
       altitudes: altitudes,
       speeds: speeds,
+      image: image,
     );
   }
 }

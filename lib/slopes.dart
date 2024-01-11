@@ -26,7 +26,7 @@ class SlopeMap {
   }
 
   // Get a list of possible near Slopes
-  static double distanceBuffer = 35;
+  static double distanceBuffer = 85;
 
   static List<Slope> findPossibleSlopes(double latitude, double longitude) {
     List<Slope> possibleSlopes = [];
@@ -204,8 +204,7 @@ class Slope {
   bool get lift => _lift;
 
   @override
-  // TODO: implement hashCode
-  int get hashCode => name.hashCode;
+  int get hashCode => name.hashCode + difficulty.hashCode;
 
   @override
   bool operator ==(Object other) {

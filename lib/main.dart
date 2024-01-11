@@ -20,9 +20,16 @@ Number of total activities
 Already did welcome screen
 'welcome' (bool)
 
+Units
+'units' (String) ("metric" or "imperial")
+
  */
 
 void main() {
+
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.dumpErrorToConsole(details);
+  };
 
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -31,6 +38,16 @@ void main() {
 
 void init() async {
   bool welcome = await SharedPref.readBool('welcome');
+  String units = await SharedPref.readString('units');
+  if(units == '') {
+    units = 'metric';
+    SharedPref.saveString('units', units);
+  } else if(units == 'imperial'){
+    Info.setUnits(units);
+  } else if(units != 'metric') {
+    SharedPref.saveString('units', 'metric');
+  }
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => ActivityDataProvider(),
@@ -88,7 +105,7 @@ class SkiTracker extends StatelessWidget {
   static const String appName = 'Ski Tracker';
 
   static int _activityId = 0;
-  static Activity _activity = Activity(_activityId);
+  static Activity _activity = Activity(id: _activityId);
 
   static late ActivityDataProvider _activityData;
 
@@ -116,8 +133,8 @@ class SkiTracker extends StatelessWidget {
     _activityData = activityData;
   }
 
-  static void createNewActivity() {
-    _activity = Activity(++_activityId);
+  static void createNewActivity({String areaName = ''}) {
+    _activity = Activity(id: ++_activityId, areaName: areaName);
     _activity.init();
   }
 
@@ -180,7 +197,6 @@ class _MyHomePageState extends State<MyHomePage> {
             fit: BoxFit.cover,
             width: double.infinity,
           ),
-          const CustomAppBar(),
           PageView(
             controller: _pageController,
             scrollDirection: Axis.horizontal,
@@ -193,6 +209,7 @@ class _MyHomePageState extends State<MyHomePage> {
               _history,
             ],
           ),
+          const CustomAppBar(),
         ],
       ),
       bottomNavigationBar: _buildBottomBar(),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ski_tracker/activity/activity_map.dart';
 import 'package:ski_tracker/main.dart';
+import 'package:ski_tracker/route.dart';
 import 'package:ski_tracker/utils/custom_app_bar.dart';
 
 import '../utils/activity_database.dart';
@@ -42,16 +44,29 @@ class _ActivitySummaryState extends State<ActivitySummary> {
   late final List<List<int>> dataAltitudes;
   late final List<List<double>> dataSpeeds;
 
+  late final ActivityRoute route;
+
+  late final ActivityMap _activityMap;
+
   @override
   void initState() {
     super.initState();
     dataAltitudes = parseStringToListListInt(widget.activityDatabase.altitudes);
     dataSpeeds = parseStringToListListDouble(widget.activityDatabase.speeds);
+    route = ActivityRoute.stringToRoute(widget.activityDatabase.route);
+    _activityMap = ActivityMap(
+      route: route,
+      staticMap: true,
+    );
   }
 
   List<List<int>> parseStringToListListInt(String stringRepresentation) {
     // Remove square brackets at the beginning and end of the string
-    String cleanedString = stringRepresentation.substring(2, stringRepresentation.length - 2);
+    if(stringRepresentation.length < 6) {
+      return [];
+    }
+    String cleanedString =
+        stringRepresentation.substring(2, stringRepresentation.length - 2);
 
     // Split the string by '], [' to get individual lists
     List<String> listStrings = cleanedString.split('], [');
@@ -67,7 +82,8 @@ class _ActivitySummaryState extends State<ActivitySummary> {
 
   List<List<double>> parseStringToListListDouble(String stringRepresentation) {
     // Remove square brackets at the beginning and end of the string
-    String cleanedString = stringRepresentation.substring(2, stringRepresentation.length - 2);
+    String cleanedString =
+        stringRepresentation.substring(2, stringRepresentation.length - 2);
 
     // Split the string by '], [' to get individual lists
     List<String> listStrings = cleanedString.split('], [');
@@ -79,6 +95,129 @@ class _ActivitySummaryState extends State<ActivitySummary> {
     }).toList();
 
     return resultList;
+  }
+
+  Widget _map() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MapPageSummary(
+              route: route,
+              activityMap: _activityMap,
+            ),
+            settings: const RouteSettings(
+                name:
+                    '/fullscreenSummary'), // Setzen Sie hier den gewünschten Routennamen
+          ),
+        );
+      },
+      child: Container(
+        height: 160,
+        padding: Info.padding / 2,
+        child: Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: ColorTheme.secondary,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16.0),
+                      bottomLeft: Radius.circular(16.0)),
+                ),
+                alignment: Alignment.center,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16.0),
+                      bottomLeft: Radius.circular(16.0)),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      _activityMap,
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            colors: [
+                              Colors.transparent,
+                              ColorTheme.secondary.withOpacity(0.6),
+                              ColorTheme.secondary.withOpacity(0.9)
+                            ],
+                            stops: const [0.0, 0.8, 1.0],
+                            center: Alignment.center,
+                            radius:
+                                1.2, // Radius steuert die Größe des Gradients
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Container(
+                height: 160,
+                decoration: const BoxDecoration(
+                  color: ColorTheme.secondary,
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(16.0),
+                      bottomRight: Radius.circular(16.0)),
+                ),
+                alignment: Alignment.topLeft,
+                child: ListView.builder(
+                  controller: ScrollController(),
+                  shrinkWrap: true,
+                  itemCount: route
+                      .slopes.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: ColorTheme.secondary,
+                        borderRadius:
+                        BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        crossAxisAlignment:
+                        CrossAxisAlignment.center,
+                        children: [
+                          CurrentSlope(
+                              slope: route
+                                  .slopes[index], size: 32),
+                          const SizedBox(width: 8),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ActivityDisplay.buildSlopeName(route
+                                  .slopes[index], size: FontTheme.size),
+                              Utils.buildText(
+                                  text: Utils.durationStringToString(route
+                                      .slopes[index]
+                                      .startTime
+                                      .toString())[1],
+                                  caps: false,
+                                  fontSize:
+                                  FontTheme.size -
+                                      4,
+                                  color: ColorTheme
+                                      .grey),
+                            ],
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -118,40 +257,9 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
+                          const Expanded(
                             flex: 3,
-                            child: Container(
-                              height: 120,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: ColorTheme.grey,
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
-                                /*
-                        child: Image.asset(
-                          'assets/images/background.png',
-                          fit: BoxFit.cover,
-                        ),
-
-                         */
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.camera_alt_rounded,
-                                      color: ColorTheme.secondary,
-                                      size: 64,
-                                    ),
-                                    Utils.buildText(
-                                        text: 'Add a photo',
-                                        color: ColorTheme.secondary,
-                                        fontSize: FontTheme.size),
-                                  ],
-                                ),
-                              ),
-                            ),
+                            child: ImageFile(),
                           ),
                           Expanded(
                               flex: 4,
@@ -231,16 +339,20 @@ class _ActivitySummaryState extends State<ActivitySummary> {
           const SizedBox(
             height: 8.0,
           ),
+          _map(),
+          const SizedBox(
+            height: 8.0,
+          ),
           Row(
             children: [
               _buildActivityDisplay(
                   icon: Icons.speed_rounded,
                   title: 'Speed',
                   unit: Info.unitSpeed,
-                  value1: widget.activityDatabase.maxSpeed.toStringAsFixed(1),
+                  value1: (widget.activityDatabase.maxSpeed * Info.speedFactor).toStringAsFixed(1),
                   titleValue1: 'Max',
                   value2:
-                      widget.activityDatabase.averageSpeed.toStringAsFixed(1),
+                  (widget.activityDatabase.averageSpeed * Info.speedFactor).toStringAsFixed(1),
                   titleValue2: 'Avg'),
               _buildActivityDisplay(
                   icon: Icons.line_axis_rounded,
@@ -262,25 +374,25 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                   title: 'Altitude',
                   unit: Info.unitAltitude,
                   value1:
-                      widget.activityDatabase.maxAltitude.round().toString(),
+                  (widget.activityDatabase.maxAltitude * Info.altitudeFactor).round().toString(),
                   titleValue1: 'Max',
                   value2:
-                      widget.activityDatabase.minAltitude.round().toString(),
+                  (widget.activityDatabase.minAltitude * Info.altitudeFactor).round().toString(),
                   titleValue2: 'Min',
                   value3:
-                      widget.activityDatabase.avgAltitude.round().toString(),
+                  (widget.activityDatabase.avgAltitude * Info.altitudeFactor).round().toString(),
                   titleValue3: 'Avg'),
               _buildActivityDisplay(
                   icon: Icons.directions_walk_rounded,
                   title: 'Distance',
                   unit: Info.unitDistance,
-                  value1: widget.activityDatabase.distance.toStringAsFixed(1),
+                  value1: (widget.activityDatabase.distance * Info.distanceFactor / 1000).toStringAsFixed(1),
                   titleValue1: 'Total',
-                  value2: widget.activityDatabase.distanceDownhill
+                  value2: (widget.activityDatabase.distanceDownhill * Info.distanceFactor / 1000)
                       .toStringAsFixed(1),
                   titleValue2: 'Downhill',
                   value3:
-                      widget.activityDatabase.distanceUphill.toStringAsFixed(1),
+                  (widget.activityDatabase.distanceUphill * Info.distanceFactor / 1000).toStringAsFixed(1),
                   titleValue3: 'Uphill'),
             ],
           ),
@@ -312,26 +424,26 @@ class _ActivitySummaryState extends State<ActivitySummary> {
       EdgeInsets padding = Info.padding}) {
     Widget buildValue({required String value, required String title}) {
       return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            width: 80,
-            alignment: Alignment.centerLeft,
-            child: Utils.buildText(
-                text: title, fontSize: FontTheme.size, color: ColorTheme.grey),
-          ),
-          const SizedBox(width: 4),
           Utils.buildText(
-              text: value,
-              fontSize: FontTheme.size,
-              color: ColorTheme.contrast,
-              fontWeight: FontWeight.bold),
-          const SizedBox(width: 4),
-          Utils.buildText(
-              text: unit,
-              fontSize: FontTheme.size,
-              color: ColorTheme.contrast,
-              fontWeight: FontWeight.bold,
-              caps: false),
+              text: title, fontSize: FontTheme.size, color: ColorTheme.grey),
+          Row(
+            children: [
+              Utils.buildText(
+                  text: value,
+                  fontSize: FontTheme.size,
+                  color: ColorTheme.contrast,
+                  fontWeight: FontWeight.bold),
+              const SizedBox(width: 4),
+              Utils.buildText(
+                  text: unit,
+                  fontSize: FontTheme.size,
+                  color: ColorTheme.contrast,
+                  fontWeight: FontWeight.bold,
+                  caps: false),
+            ],
+          )
         ],
       );
     }
@@ -392,6 +504,51 @@ class _ActivitySummaryState extends State<ActivitySummary> {
           borderRadius: BorderRadius.all(Radius.circular(16.0)),
         ),
         child: child,
+      ),
+    );
+  }
+}
+
+class ImageFile extends StatefulWidget {
+  const ImageFile({super.key});
+
+  @override
+  State<ImageFile> createState() => _ImageFileState();
+}
+
+class _ImageFileState extends State<ImageFile> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 120,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: ColorTheme.grey,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8.0),
+        /*
+                        child: Image.asset(
+                          'assets/images/background.png',
+                          fit: BoxFit.cover,
+                        ),
+
+                         */
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.camera_alt_rounded,
+              color: ColorTheme.secondary,
+              size: 64,
+            ),
+            Utils.buildText(
+                text: 'Add a photo',
+                color: ColorTheme.secondary,
+                fontSize: FontTheme.size),
+          ],
+        ),
       ),
     );
   }

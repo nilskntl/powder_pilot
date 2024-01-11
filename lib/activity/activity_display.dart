@@ -1,12 +1,10 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ski_tracker/activity/activity.dart';
-import 'package:ski_tracker/utils/activity_database.dart';
 
 import '../main.dart';
+import '../route.dart';
 import '../slopes.dart';
 import '../utils/general_utils.dart';
 import 'activity_data_provider.dart';
@@ -17,6 +15,24 @@ class ActivityDisplay extends StatefulWidget {
 
   static const Duration animationDuration = Duration(milliseconds: 500);
   static const double expandedHeight = 200.0;
+
+  static Widget buildSlopeName(SlopeInfo slope, {double size = FontTheme.sizeSubHeader}) {
+    if (slope.name != 'Unknown' && slope.name != '') {
+      return Utils.buildText(
+          text: 'Slope: ${slope.name}',
+          color: ColorTheme.contrast,
+          fontSize: size,
+          caps: false,
+          fontWeight: FontWeight.bold);
+    } else {
+      return Utils.buildText(
+          text: 'Free Ride',
+          color: ColorTheme.contrast,
+          fontSize: size,
+          caps: false,
+          fontWeight: FontWeight.bold);
+    }
+  }
 
   @override
   State<ActivityDisplay> createState() => _ActivityDisplayState();
@@ -111,11 +127,13 @@ class _ActivityDisplayState extends State<ActivityDisplay> {
 }
 
 class CurrentSlope extends StatefulWidget {
-  const CurrentSlope({super.key, required this.slope});
+  const CurrentSlope({super.key, required this.slope, this.size = 48, this.animated = false});
 
-  final double size = 48;
+  final double size;
 
-  final Slope slope;
+  final bool animated;
+
+  final SlopeInfo slope;
 
   @override
   State<CurrentSlope> createState() => _CurrentSlopeState();
@@ -142,7 +160,7 @@ class _CurrentSlopeState extends State<CurrentSlope> {
     super.initState();
     // Schedule a callback after the first frame is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_initialized) {
+      if (!_initialized && widget.animated) {
         setState(() {
           transparent = !transparent;
           _initialized = true;
@@ -175,9 +193,11 @@ class _CurrentSlopeState extends State<CurrentSlope> {
                   borderRadius: BorderRadius.circular((widget.size + 8) / 2),
                 ),
           onEnd: () {
-            setState(() {
-              transparent = !transparent;
-            });
+            if(widget.animated) {
+              setState(() {
+                transparent = !transparent;
+              });
+            }
           },
         ),
         // Position Container in the center
@@ -199,14 +219,14 @@ class _CurrentSlopeState extends State<CurrentSlope> {
               child: (widget.slope.name != 'Unknown')
                   ? Utils.buildText(
                       text: widget.slope.name,
-                      fontSize: FontTheme.size,
+                      fontSize: widget.size / 3,
                       color: ColorTheme.secondary,
                       fontWeight: FontWeight.bold,
                       caps: false)
                   : Icon(
                       Icons.downhill_skiing_rounded,
                       color: ColorTheme.secondary,
-                      size: widget.size - 16,
+                      size: widget.size / 3 * 2,
                     ),
             ),
           ),
@@ -422,6 +442,8 @@ class Status extends StatefulWidget {
   static const String finished = 'Finished';
   static const String inactive = 'Inactive';
 
+  final activityMap = const ActivityMap(staticMap: false);
+
   @override
   State<StatefulWidget> createState() => _StatusState();
 }
@@ -468,12 +490,11 @@ class _StatusState extends State<Status> {
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          print(ActivityDatabaseHelper.activities());
-          if (widget.activityDataProvider.initializedMap) {
+          if (widget.activityDataProvider.currentLatitude != 0.0) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const MapPage(),
+                builder: (context) => MapPage(activityDataProvider: widget.activityDataProvider, activityMap: widget.activityMap,),
                 settings: const RouteSettings(
                     name:
                         '/fullscreen'), // Setzen Sie hier den gewünschten Routennamen
@@ -490,8 +511,8 @@ class _StatusState extends State<Status> {
             borderRadius: BorderRadius.circular(16.0),
             child: Stack(
               children: [
-                if (widget.activityDataProvider.initializedMap)
-                  SkiTracker.getActivity().activityMap,
+                if (widget.activityDataProvider.currentLatitude != 0.0)
+                  widget.activityMap,
                 Positioned(
                   top: 0,
                   left: 0,
@@ -518,7 +539,7 @@ class _StatusState extends State<Status> {
                     ),
                   ),
                 ),
-                if (widget.activityDataProvider.initializedMap)
+                if (widget.activityDataProvider.currentLatitude != 0.0)
                   AnimatedContainer(
                       duration: const Duration(milliseconds: 500),
                       height: widget.activityDataProvider.status ==
@@ -541,14 +562,15 @@ class _StatusState extends State<Status> {
                           fontWeight: FontWeight.bold)
                           : Container(),
                   ),
-                if (widget.activityDataProvider.initializedMap &&
+                if (widget.activityDataProvider.currentLatitude != 0.0 &&
                     widget.activityDataProvider.status ==
                         ActivityStatus.running && SlopeMap.slopes.isNotEmpty)
+                  if(widget.activityDataProvider.route.slopes.isNotEmpty)
                   Positioned(
                     right: 4,
                     bottom: 4,
                     child: CurrentSlope(
-                        slope: widget.activityDataProvider.nearestSlope),
+                        slope: widget.activityDataProvider.route.slopes.last, animated: true),
                   ),
               ],
             ),
@@ -630,7 +652,7 @@ class _StatusState extends State<Status> {
         const SizedBox(width: 4),
         Utils.buildText(
             text:
-                '${widget.activityDataProvider.elapsedTime.toString().substring(0, 7)}s',
+                widget.activityDataProvider.elapsedTime.toString().substring(0, 7),
             fontSize: FontTheme.sizeSubHeader,
             color: widget.activityDataProvider.status ==
                         ActivityStatus.running ||
@@ -720,19 +742,39 @@ class Info extends StatefulWidget {
 
   static const double height = 120.0;
 
-  static const String unitSpeed = 'km/h';
-  static const String unitDistance = 'km';
-  static const String unitAltitude = 'm';
-  static const String unitSlope = '%';
-  static const String unitTime = 's';
+  static String unitSpeed = 'km/h';
+  static String unitDistance = 'km';
+  static String unitAltitude = 'm';
+  static String unitSlope = '%';
+  static String unitTime = 'h';
 
-  static const double speedFactor = 3.6;
+  static double speedFactor = 3.6;
+  static double distanceFactor = 1;
+  static double altitudeFactor = 1;
 
   static const EdgeInsets padding = EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0);
   static const double iconSize = 40.0;
 
   @override
   State<Info> createState() => _InfoState();
+
+  static void setUnits(String units) {
+    if (units == 'imperial') {
+      unitSpeed = 'mph';
+      unitDistance = 'mi';
+      unitAltitude = 'ft';
+      speedFactor = 2.236936;
+      distanceFactor = 0.621371;
+      altitudeFactor = 3.28084;
+    } else {
+      unitSpeed = 'km/h';
+      unitDistance = 'km';
+      unitAltitude = 'm';
+      speedFactor = 3.6;
+      distanceFactor = 1;
+      altitudeFactor = 1;
+    }
+  }
 }
 
 class _InfoState extends State<Info> {
@@ -790,9 +832,9 @@ class _InfoState extends State<Info> {
             icon: Icons.terrain_rounded,
             title: 'Altitude',
             unit: Info.unitAltitude,
-            value1: widget.activityDataProvider.altitude.round().toString(),
-            value2: widget.activityDataProvider.maxAltitude.round().toString(),
-            value3: widget.activityDataProvider.minAltitude.round().toString(),
+            value1: (widget.activityDataProvider.altitude * Info.altitudeFactor).round().toString(),
+            value2: (widget.activityDataProvider.maxAltitude * Info.altitudeFactor).round().toString(),
+            value3: (widget.activityDataProvider.minAltitude * Info.altitudeFactor).round().toString(),
             titleValue1: 'Current',
             titleValue2: 'Max',
             titleValue3: 'Min',
@@ -801,11 +843,11 @@ class _InfoState extends State<Info> {
             icon: Icons.map_rounded,
             title: 'Distance',
             unit: Info.unitDistance,
-            value1: (widget.activityDataProvider.distance / 1000)
+            value1: (widget.activityDataProvider.distance * Info.distanceFactor / 1000)
                 .toStringAsFixed(1),
-            value2: (widget.activityDataProvider.distanceDownhill / 1000)
+            value2: (widget.activityDataProvider.distanceDownhill * Info.distanceFactor / 1000)
                 .toStringAsFixed(1),
-            value3: (widget.activityDataProvider.distanceUphill / 1000)
+            value3: (widget.activityDataProvider.distanceUphill * Info.distanceFactor / 1000)
                 .toStringAsFixed(1),
             titleValue1: 'Total',
             titleValue2: 'Downhill',
@@ -1422,7 +1464,7 @@ class _ElapsedTimeState extends State<ElapsedTime> {
                     const SizedBox(width: 4),
                     Utils.buildText(
                         text:
-                            '${widget.downhillTime.toString().substring(0, 7)} ${Info.unitTime}',
+                            widget.downhillTime.toString().substring(0, 7),
                         fontSize: FontTheme.size,
                         color: ColorTheme.contrast,
                         caps: false,
@@ -1431,7 +1473,7 @@ class _ElapsedTimeState extends State<ElapsedTime> {
                 ),
                 Utils.buildText(
                     text:
-                        '${widget.pauseTime.toString().substring(0, 7)} ${Info.unitTime}',
+                        widget.pauseTime.toString().substring(0, 7),
                     fontSize: FontTheme.size,
                     color: ColorTheme.contrast,
                     fontWeight: FontWeight.bold,
@@ -1440,7 +1482,7 @@ class _ElapsedTimeState extends State<ElapsedTime> {
                   children: [
                     Utils.buildText(
                         text:
-                            '${widget.uphillTime.toString().substring(0, 7)} ${Info.unitTime}',
+                            widget.uphillTime.toString().substring(0, 7),
                         fontSize: FontTheme.size,
                         color: ColorTheme.contrast,
                         fontWeight: FontWeight.bold,

@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:ski_tracker/main.dart';
-
 import 'package:http/http.dart' as http;
+import 'package:ski_tracker/main.dart';
 
 class WeatherManager {
   DateTime lastFetchTime = DateTime.now();
@@ -39,7 +37,8 @@ class WeatherManager {
   Future<void> init() async {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!locationLoaded) {
-        if (SkiTracker.getActivity().initializedMap) {
+        if (SkiTracker.getActivity().currentLatitude != 0.0 &&
+            SkiTracker.getActivity().currentLongitude != 0.0) {
           fetchData(SkiTracker.getActivity().currentLatitude, SkiTracker.getActivity().currentLongitude);
           locationLoaded = true;
         }
