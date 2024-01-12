@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:ski_tracker/utils/general_utils.dart';
+import 'dart:math' as math;
 
 class SlopeMap {
   static final List<Slope> _slopes = [];
@@ -15,103 +16,119 @@ class SlopeMap {
     }
   }
 
-  static List<Slope> getSlopesWithSameName(String slopeName) {
-    List<Slope> slopesWithSameName =
-        _slopes.where((slope) => slope.name == slopeName).toList();
-    return slopesWithSameName;
-  }
-
   static void clearSlopeMap() {
     _slopes.clear();
   }
 
   // Get a list of possible near Slopes
-  static double distanceBuffer = 85;
+  static double distanceBuffer = 60;
 
-  static List<Slope> findPossibleSlopes(double latitude, double longitude) {
-    List<Slope> possibleSlopes = [];
-    if (_slopes.isEmpty) {
-      return possibleSlopes;
-    }
-    for (Slope slope in _slopes) {
-      if (!slope.lift) {
-        double slopeDistance =
-            calculateSlopeDistance(slope, longitude, latitude);
-        if (slopeDistance < distanceBuffer) {
-          possibleSlopes.add(slope);
-        }
-      }
-    }
-    return possibleSlopes;
-  }
-
-  // Get a list of possible near lifts
-  static List<Slope> findPossibleLifts(double latitude, double longitude) {
-    List<Slope> possibleLifts = [];
-    if (_slopes.isEmpty) {
-      return possibleLifts;
-    }
-    for (Slope slope in _slopes) {
-      if (slope.lift) {
-        double slopeDistance =
-            calculateSlopeDistance(slope, longitude, latitude);
-        if (slopeDistance < distanceBuffer) {
-          possibleLifts.add(slope);
-        }
-      }
-    }
-    return possibleLifts;
-  }
-
-  static Slope findNearestLift(double latitude, double longitude) {
-    if (_slopes.isEmpty) {
-      return Slope(slope: {}, lift: true);
-    } else {
-      Slope nearestLift = _slopes[0];
-      double minDistance = double.infinity;
-
-      for (Slope slope in _slopes) {
-        if (slope.lift) {
-          double slopeDistance =
-              calculateSlopeDistance(slope, longitude, latitude);
-          if (slopeDistance < minDistance) {
-            minDistance = slopeDistance;
-            nearestLift = slope;
-          }
-        }
-      }
-      return nearestLift;
-    }
-  }
-
-  static Slope findNearestSlope(double latitude, double longitude) {
+  static Slope findNearestSlope({required double latitude, required double longitude, bool lift = false}) {
     if (_slopes.isEmpty) {
       return Slope(empty: true);
-    } else {
-      Slope nearestSlope = _slopes[0];
-      double minDistance = double.infinity;
+    }
 
-      for (Slope slope in _slopes) {
-        if (!slope.lift) {
-          double slopeDistance =
-              calculateSlopeDistance(slope, longitude, latitude);
-          if (slopeDistance < minDistance) {
-            minDistance = slopeDistance;
+    double calculateDistanceToLine(double latitude, double longitude,
+        double x1, double y1, double x2, double y2) {
+
+      double segmentLengthSquared = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+
+      if (segmentLengthSquared == 0) {
+        // Handle case where the line segment is just a point
+        return math.sqrt((longitude - x1) * (longitude - x1) + (latitude - y1) * (latitude - y1));
+      }
+
+      double t = math.max(0, math.min(1, ((longitude - x1) * (x2 - x1) + (latitude - y1) * (y2 - y1)) / segmentLengthSquared));
+      double projectedX = x1 + t * (x2 - x1);
+      double projectedY = y1 + t * (y2 - y1);
+
+      const double degreesToKilometers = 111.0;
+      const double metersConversionFactor = degreesToKilometers * 1000.0;
+
+      return math.sqrt((longitude - projectedX) * (longitude - projectedX) + (latitude - projectedY) * (latitude - projectedY)) * metersConversionFactor;
+    }
+
+    Slope nearestSlope = _slopes[0];
+    double minDistance = double.infinity;
+
+    Slope nearestSlopeAfterPoint = _slopes[0];
+    double minDistanceAfterPoint = double.infinity;
+
+    double betterDistance = double.infinity;
+
+    double getDistanceByIndex(
+        {required Slope slope,
+        required int firstIndex,
+        required int secondIndex, required double distanceToPoint}) {
+      if(distanceToPoint > 200) {
+        return distanceToPoint;
+      }
+      double x1 = slope.coordinates[firstIndex][1];
+      double y1 = slope.coordinates[firstIndex][0];
+      double x2 = slope.coordinates[secondIndex][1];
+      double y2 = slope.coordinates[secondIndex][0];
+
+      double distanceToLine =
+          calculateDistanceToLine(latitude, longitude, x1, y1, x2, y2);
+
+      if (distanceToLine < minDistance) {
+        minDistance = distanceToLine;
+        betterDistance = distanceToPoint;
+        nearestSlope = slope;
+      }
+
+      return distanceToLine;
+    }
+
+    for (Slope slope in _slopes) {
+      if (((!slope.lift && !lift) || (slope.lift && lift)) && slope.coordinates.isNotEmpty) {
+        List<double> distanceToSlope =
+            calculateSlopeDistance(slope, longitude, latitude);
+        int indexOfNearestPoint = distanceToSlope[1].toInt();
+        double slopeDistanceToPoint = distanceToSlope[0];
+
+        if(slopeDistanceToPoint < minDistanceAfterPoint) {
+          minDistanceAfterPoint = slopeDistanceToPoint;
+          nearestSlopeAfterPoint = slope;
+        }
+
+        if (slope.coordinates.length > 1) {
+          // Check if the nearest point is the first or last point in the slope
+          if (indexOfNearestPoint != 0) {
+            getDistanceByIndex(
+                slope: slope,
+                firstIndex: indexOfNearestPoint - 1,
+                secondIndex: indexOfNearestPoint, distanceToPoint: slopeDistanceToPoint);
+          }
+          if (indexOfNearestPoint != slope.coordinates.length - 1) {
+            getDistanceByIndex(
+                slope: slope,
+                firstIndex: indexOfNearestPoint,
+                secondIndex: indexOfNearestPoint + 1, distanceToPoint: slopeDistanceToPoint);
+          }
+        } else {
+          // Only one point in the slope, calculate distance directly
+          if (slopeDistanceToPoint < minDistance) {
+            minDistance = slopeDistanceToPoint;
             nearestSlope = slope;
           }
         }
       }
+    }
 
-      if(minDistance > distanceBuffer) {
+    if(!lift) {
+      if (minDistance > distanceBuffer) {
         return Slope(empty: true);
       }
-      return nearestSlope;
     }
+
+    return nearestSlope;
   }
 
-  static double calculateSlopeDistance(
+  static List<double> calculateSlopeDistance(
       Slope slope, double longitude, double latitude) {
     double minPointDistance = double.infinity;
+    int index = 0;
 
     for (List<double> point in slope.coordinates) {
       double pointDistance = Utils.calculateHaversineDistance(
@@ -120,17 +137,17 @@ class SlopeMap {
       );
       if (pointDistance < minPointDistance) {
         minPointDistance = pointDistance;
+        index = slope.coordinates.indexOf(point);
       }
     }
-    return minPointDistance;
+    return [minPointDistance, index.toDouble()];
   }
 
   static List<Slope> get slopes => _slopes;
 }
 
 class Slope {
-  late final String _name;
-  late final String _difficulty;
+  late final String _ref;
   late final String _type;
   final List<List<double>> _coordinates = [];
 
@@ -140,14 +157,25 @@ class Slope {
 
   late final bool _empty;
 
-  Slope({Map<String, dynamic> slope = const {}, bool lift = false, bool empty = false}) {
+  Slope(
+      {Map<String, dynamic> slope = const {},
+      bool lift = false,
+      bool empty = false}) {
     _empty = empty;
     _lift = lift;
-    if(!empty) {
+    if (lift && !empty) {
       _slope = slope;
-      _difficulty = slope['tags']['piste:difficulty'] ?? 'Unknown';
-      _type = slope['tags']['piste:type'] ?? 'Unknown';
-      _name = slope['tags']['ref'] ?? slope['tags']['name'] ?? 'Unknown';
+      _type = slope['tags']['aerialway'] ?? 'Unknown';
+      String name = slope['tags']['name'] ?? 'Unknown';
+      _ref = name != 'Unknown'
+          ? '$name '
+          : '' + (slope['tags']['ref'] ?? 'Unknown');
+      _initData();
+    }
+    if (!empty && !lift) {
+      _slope = slope;
+      _type = slope['tags']['piste:difficulty'] ?? 'Unknown';
+      _ref = slope['tags']['ref'] ?? slope['tags']['name'] ?? 'Unknown';
       _initData();
     }
   }
@@ -191,9 +219,9 @@ class Slope {
   }
 
   /* Getter methods */
-  String get name => !_empty ? _name : 'Unknown';
+  String get ref => !_empty ? _ref : 'Unknown';
 
-  String get difficulty => !_empty ? _difficulty : 'Unknown';
+  String get type => !_empty ? _type : 'Unknown';
 
   String get pisteType => !_empty ? _type : 'Unknown';
 
@@ -204,7 +232,7 @@ class Slope {
   bool get lift => _lift;
 
   @override
-  int get hashCode => name.hashCode + difficulty.hashCode;
+  int get hashCode => ref.hashCode + type.hashCode + lift.hashCode;
 
   @override
   bool operator ==(Object other) {

@@ -55,27 +55,27 @@ class ActivityRoute {
   void addSlope(Slope nearestSlope) {
     if(slopes.isEmpty) {
       slopes.add(SlopeInfo(
-        name: nearestSlope.name,
-        difficulty: nearestSlope.difficulty,
+        name: nearestSlope.ref,
+        type: nearestSlope.type,
         startTime: DateTime.now(),
       ));
     } else {
-      if(slopes.last.name == nearestSlope.name && slopes.last.difficulty == nearestSlope.difficulty) {
+      if(slopes.last.name == nearestSlope.ref && slopes.last.type == nearestSlope.type) {
         return;
       }
       slopes.last.endTime = DateTime.now();
       // Check if last slope was longer then 30s otherwise delete the slope
-      if(slopes.last.endTime.difference(slopes.last.startTime).inSeconds < 5) {
+      if(slopes.last.endTime.difference(slopes.last.startTime).inSeconds < 15) {
         slopes.removeLast();
       }
       // Check if its now the same slope
-      if(slopes.last.name == nearestSlope.name && slopes.last.difficulty == nearestSlope.difficulty) {
+      if(slopes.last.name == nearestSlope.ref && slopes.last.type == nearestSlope.type) {
         return;
       }
       slopes.last.endTime = DateTime.now();
       slopes.add(SlopeInfo(
-        name: nearestSlope.name,
-        difficulty: nearestSlope.difficulty,
+        name: nearestSlope.ref,
+        type: nearestSlope.type,
         startTime: DateTime.now(),
       ));
     }
@@ -89,23 +89,23 @@ class ActivityRoute {
 
 class SlopeInfo {
   late String _name;
-  late String _difficulty;
+  late String _type;
   late DateTime _startTime;
   late DateTime endTime;
 
   SlopeInfo({
     required String name,
-    required String difficulty,
+    required String type,
     required DateTime startTime,
   }) {
     _name = name;
-    _difficulty = difficulty;
+    _type = type;
     _startTime = startTime;
   }
 
   String get name => _name;
 
-  String get difficulty => _difficulty;
+  String get type => _type;
 
   DateTime get startTime => _startTime;
 
@@ -118,7 +118,7 @@ class SlopeInfo {
   factory SlopeInfo.fromJson(Map<String, dynamic> json) {
     SlopeInfo slopeInfo = SlopeInfo(
       name: json['name'],
-      difficulty: json['difficulty'],
+      type: json['type'],
       startTime: DateTime.parse(json['endTime']),
     );
     slopeInfo.endTime = DateTime.parse(json['endTime']);
@@ -129,7 +129,7 @@ class SlopeInfo {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'difficulty': difficulty,
+      'type': type,
       'startTime': startTime.toString(),
       'endTime': endTime.toString(),
     };
@@ -142,8 +142,8 @@ class SlopeInfo {
 
   static SlopeInfo slopeToSlopeInfo(Slope slope) {
     return SlopeInfo(
-      name: slope.name,
-      difficulty: slope.difficulty,
+      name: slope.ref,
+      type: slope.type,
       startTime: DateTime.now(),
     );
   }
