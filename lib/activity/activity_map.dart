@@ -40,10 +40,10 @@ class _MapPageState extends State<MapPage> {
       body: Stack(
         children: [
           if (widget.activityDataProvider.status == ActivityStatus.inactive ||
-              SlopeMap.slopes.isEmpty)
+              SlopeMap.slopes.isEmpty || widget.activityDataProvider.route.slopes.isEmpty)
             widget.activityMap,
           if (widget.activityDataProvider.status != ActivityStatus.inactive &&
-              SlopeMap.slopes.isNotEmpty)
+              SlopeMap.slopes.isNotEmpty && widget.activityDataProvider.route.slopes.isNotEmpty)
             CustomScrollView(
               controller: _scrollController,
               slivers: [
@@ -625,9 +625,6 @@ class _ActivityMapState extends State<ActivityMap>
   List<Polyline> _buildPolyline(ActivityRoute route) {
     List<Polyline> polylines = [];
     List<LatLng> polylinePoints = [];
-
-    print(route.coordinates);
-    print(_middlePoint);
 
     for (List<double> coordinate in route.coordinates) {
       polylinePoints.add(LatLng(coordinate[1], coordinate[0]));

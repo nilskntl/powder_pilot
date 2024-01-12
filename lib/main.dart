@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:ski_tracker/utils/connectivity_controller.dart';
 import 'package:ski_tracker/utils/shared_preferences.dart';
@@ -133,8 +134,8 @@ class SkiTracker extends StatelessWidget {
     _activityData = activityData;
   }
 
-  static void createNewActivity({String areaName = ''}) {
-    _activity = Activity(id: ++_activityId, areaName: areaName);
+  static void createNewActivity({String areaName = '', LatLng currentPosition = const LatLng(0, 0), bool mapDownloaded = false}) {
+    _activity = Activity(id: ++_activityId, areaName: areaName, currentPosition: currentPosition, mapDownloaded: mapDownloaded);
     _activity.init();
   }
 

@@ -1,11 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:geocode/geocode.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
+import 'package:ski_tracker/activity/activity_summary.dart';
 import 'package:ski_tracker/fetch_data.dart';
 import 'package:ski_tracker/utils/activity_database.dart';
+import 'package:ski_tracker/utils/custom_app_bar.dart';
 import 'package:ski_tracker/utils/shared_preferences.dart';
 
 import '../main.dart';
@@ -38,11 +41,87 @@ enum GpsAccuracy {
   high,
 }
 
+class CustomDialog extends StatefulWidget {
+  const CustomDialog({super.key, required this.activityDatabase});
+
+  final ActivityDatabase activityDatabase;
+
+  @override
+  State<CustomDialog> createState() => _CustomDialogState();
+}
+
+class _CustomDialogState extends State<CustomDialog>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    _controller.forward();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      child: Dialog(
+        insetPadding: const EdgeInsets.all(16.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16.0),
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: CustomAppBarDesign.appBar(title: 'Summary'),
+            body: Container(
+              width: double.infinity,
+              height: double.infinity,
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16.0),
+                color: ColorTheme.background,
+              ), child: ActivitySummary(activityDatabase: widget.activityDatabase, small: true,),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+}
+
 class Activity extends ActivityLocation {
   final int id;
 
-  Activity({required this.id, String areaName = ''}) {
-    if(areaName != '' || areaName != 'Unknown') {
+  Activity({required this.id, String areaName = '', LatLng currentPosition = const LatLng(0.0, 0.0), bool mapDownloaded = false}) {
+    currentLatitude = currentPosition.latitude;
+    currentLongitude = currentPosition.longitude;
+    _mapDownloaded = mapDownloaded;
+    if(mapDownloaded) {
+      _latitudeWhenDownloaded = currentLatitude;
+      _longitudeWhenDownloaded = currentLongitude;
+    }
+    if (areaName != '' || areaName != 'Unknown') {
       this.areaName = areaName;
     }
   }
@@ -82,7 +161,7 @@ class Activity extends ActivityLocation {
     _locationSettings();
   }
 
-  void stopActivity() {
+  void stopActivity(BuildContext context) {
     if (!_active) {
       return;
     }
@@ -96,18 +175,28 @@ class Activity extends ActivityLocation {
     _statusPause = true;
     _stopStopwatch();
     _locationSubscription?.cancel();
-    _locationInitialized = false;
     _activityInitialized = false;
-    if(route.slopes.isNotEmpty) {
+    if (route.slopes.isNotEmpty) {
       route.slopes.last.endTime = DateTime.now();
-    }
-    if(_locationInitialized) {
-      saveActivity();
-      _addActivityToList();
     }
     _elapsedTime = Duration.zero;
     updateData();
-    SkiTracker.createNewActivity(areaName: areaName);
+    if (_locationInitialized) {
+      ActivityDatabase activityDatabase = saveActivity();
+      _locationInitialized = false;
+      _showCustomDialog(context, activityDatabase);
+      _addActivityToList();
+    }
+    SkiTracker.createNewActivity(areaName: areaName, currentPosition: LatLng(currentLatitude, currentLongitude), mapDownloaded: _mapDownloaded);
+  }
+
+  void _showCustomDialog(BuildContext context, ActivityDatabase activityDatabase) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomDialog(activityDatabase: activityDatabase,);
+      },
+    );
   }
 
   void _addActivityToList() async {
@@ -188,7 +277,10 @@ class ActivityLocation extends ActivityUtils {
         speed = location.speed!;
         maxSpeed = speed > maxSpeed ? speed : maxSpeed;
 
-        speeds.add([elapsedTime.inSeconds.toDouble(), double.parse(speed.toStringAsFixed(1))]);
+        speeds.add([
+          elapsedTime.inSeconds.toDouble(),
+          double.parse(speed.toStringAsFixed(1))
+        ]);
 
         if (speed < 0.6) {
           speed = 0.0;
@@ -206,7 +298,7 @@ class ActivityLocation extends ActivityUtils {
 
       altitude = _smoothAltitude(location.altitude!);
       maxAltitude = altitude > maxAltitude ? altitude : maxAltitude;
-      if(minAltitude == 0.0) {
+      if (minAltitude == 0.0) {
         minAltitude = altitude;
       }
       minAltitude = altitude < minAltitude ? altitude : minAltitude;
@@ -247,11 +339,11 @@ class ActivityLocation extends ActivityUtils {
           totalRuns++;
         }
       } else {
-        if (altitude - _currentExtrema > 20) {
+        if (altitude - _currentExtrema > 15) {
           _statusUphill = true;
           _statusDownhill = false;
           currentRunLength = 0.0;
-        } else if (altitude - _currentExtrema < -20) {
+        } else if (altitude - _currentExtrema < -15) {
           _statusUphill = false;
           _statusDownhill = true;
           currentRunLength = 0.0;
@@ -274,7 +366,6 @@ class ActivityLocation extends ActivityUtils {
     }
 
     void updateSlope(LocationData location) {
-
       // Update slope
       if (!_statusPause) {
         double difference = (_tempAltitude - altitude).abs();
@@ -315,7 +406,8 @@ class ActivityLocation extends ActivityUtils {
       _currentExtrema = altitude;
       _tempAltitude = altitude;
       _tempLocation = location;
-      if ((route.slopes.isEmpty || route.slopes.last.name == 'Unknown') && _mapDownloaded == true) {
+      if ((route.slopes.isEmpty || route.slopes.last.name == 'Unknown') &&
+          _mapDownloaded == true) {
         _updateNearestSlope();
       }
     }
@@ -359,7 +451,6 @@ class ActivityLocation extends ActivityUtils {
           if (!_locationInitialized) {
             _locationInitialized = true;
           }
-
         } else {
           // Set values to 0 if GPS accuracy is low
           speed = 0.0;
@@ -375,11 +466,11 @@ class ActivityLocation extends ActivityUtils {
       }
       _numberOfLocationUpdates++;
       if (_numberOfLocationUpdates % 15 == 0) {
-        if(SkiTracker.connectionStatus == true) {
-          if(areaName == '' || areaName == 'Unknown') {
+        if (SkiTracker.connectionStatus == true) {
+          if (areaName == '' || areaName == 'Unknown') {
             _updateAddress();
           }
-          if(_numberOfLocationUpdates % 120 == 0) {
+          if (_numberOfLocationUpdates % 120 == 0) {
             _updateAddress();
           }
           if (!_mapDownloaded) {
@@ -397,9 +488,14 @@ class ActivityLocation extends ActivityUtils {
   }
 
   Future<void> _updateNearestSlope() async {
-
     if (_mapDownloaded == true) {
-      route.addSlope(SlopeMap.findNearestSlope(currentLatitude, currentLongitude));
+      if (_statusUphill) {
+        route.addSlope(
+            SlopeMap.findNearestSlope(latitude: currentLatitude, longitude: currentLongitude, lift: true));
+      } else if (_statusDownhill) {
+        route.addSlope(
+            SlopeMap.findNearestSlope(latitude: currentLatitude, longitude: currentLongitude, lift: false));
+      }
     }
   }
 
@@ -411,8 +507,11 @@ class ActivityLocation extends ActivityUtils {
     }
     _isDownloadRunning = true;
     if (SkiTracker.connectionStatus == true) {
-      bool b = await SlopeFetcher.fetchData(currentLatitude, currentLongitude);
-      if (b) {
+      if (_mapDownloaded == true) {
+        return;
+      }
+      await SlopeFetcher.fetchData(currentLatitude, currentLongitude);
+      if (SlopeMap.slopes.isNotEmpty) {
         _latitudeWhenDownloaded = currentLatitude;
         _longitudeWhenDownloaded = currentLongitude;
         _mapDownloaded = true;
@@ -442,7 +541,7 @@ class ActivityLocation extends ActivityUtils {
       onTapBringToFront: true,
       color: ColorTheme.secondary,
       description: 'Distance: ${(distance / 1000).toStringAsFixed(1)} km\n'
-          'Speed: ${(maxSpeed * Info.speedFactor ).toStringAsFixed(1) } km/h\n'
+          'Speed: ${(maxSpeed * Info.speedFactor).toStringAsFixed(1)} km/h\n'
           'Altitude: ${altitude.toStringAsFixed(0)} m\n'
           'Runs: $totalRuns\n',
       iconName: 'assets/images/icon_256.png',
@@ -600,8 +699,7 @@ class ActivityData extends ActivityDataTemp {
   // List of speeds
   List<List<double>> speeds = [];
 
-  void saveActivity() {
-
+  ActivityDatabase saveActivity() {
     ActivityDatabase activityDatabase = ActivityDatabase(
       areaName: areaName,
       maxSpeed: maxSpeed,
@@ -628,6 +726,7 @@ class ActivityData extends ActivityDataTemp {
     );
 
     ActivityDatabaseHelper.insertActivity(activityDatabase);
+    return activityDatabase;
   }
 
   void updateData() {

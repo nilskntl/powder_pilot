@@ -16,8 +16,17 @@ class ActivityDisplay extends StatefulWidget {
   static const Duration animationDuration = Duration(milliseconds: 500);
   static const double expandedHeight = 200.0;
 
-  static Widget buildSlopeName(SlopeInfo slope, {double size = FontTheme.sizeSubHeader}) {
-    if (slope.name != 'Unknown' && slope.name != '') {
+  static Widget buildSlopeName(SlopeInfo slope,
+      {double size = FontTheme.sizeSubHeader}) {
+    if(slope.type == 'gondola' || slope.type == 'chair_lift' || slope.type == 'drag_lift' || slope.type == 'platter' || slope.type == 't-bar') {
+      return Utils.buildText(
+          text: slope.name,
+          color: ColorTheme.contrast,
+          fontSize: size,
+          caps: false,
+          fontWeight: FontWeight.bold);
+    }
+    else if (slope.name != 'Unknown' && slope.name != '') {
       return Utils.buildText(
           text: 'Slope: ${slope.name}',
           color: ColorTheme.contrast,
@@ -127,7 +136,8 @@ class _ActivityDisplayState extends State<ActivityDisplay> {
 }
 
 class CurrentSlope extends StatefulWidget {
-  const CurrentSlope({super.key, required this.slope, this.size = 48, this.animated = false});
+  const CurrentSlope(
+      {super.key, required this.slope, this.size = 48, this.animated = false});
 
   final double size;
 
@@ -173,9 +183,41 @@ class _CurrentSlopeState extends State<CurrentSlope> {
 
   bool _initialized = false;
 
+  String getIconString(String type) {
+    if(type == 'gondola') {
+      return 'assets/images/lift/gondola.png';
+    } else{
+      return 'assets/images/lift/chair_lift.png';
+    }
+  }
+
+  Widget _buildInside() {
+    if (widget.slope.type == 'intermediate' || widget.slope.type == 'easy' ||
+        widget.slope.type == 'advanced') {
+      return Utils.buildText(
+          text: widget.slope.name,
+          fontSize: widget.size / 3,
+          color: ColorTheme.secondary,
+          fontWeight: FontWeight.bold,
+          caps: false);
+    } else if (widget.slope.type == 'gondola' || widget.slope.type == 'chair_lift' ||
+        widget.slope.type == 'drag_lift' || widget.slope.type == 'platter' || widget.slope.type == 't-bar') {
+      return Image.asset(
+        getIconString(widget.slope.type),
+        width: widget.size / 3 * 2,
+        height: widget.size / 3 * 2);
+    } else {
+      return Icon(
+        Icons.downhill_skiing_rounded,
+        color: ColorTheme.secondary,
+        size: widget.size / 3 * 2,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    Color color = _getColor(widget.slope.difficulty);
+    Color color = _getColor(widget.slope.type);
 
     return Stack(
       children: [
@@ -193,7 +235,7 @@ class _CurrentSlopeState extends State<CurrentSlope> {
                   borderRadius: BorderRadius.circular((widget.size + 8) / 2),
                 ),
           onEnd: () {
-            if(widget.animated) {
+            if (widget.animated) {
               setState(() {
                 transparent = !transparent;
               });
@@ -216,18 +258,7 @@ class _CurrentSlopeState extends State<CurrentSlope> {
                 borderRadius: BorderRadius.circular(widget.size / 2),
               ),
               alignment: Alignment.center,
-              child: (widget.slope.name != 'Unknown')
-                  ? Utils.buildText(
-                      text: widget.slope.name,
-                      fontSize: widget.size / 3,
-                      color: ColorTheme.secondary,
-                      fontWeight: FontWeight.bold,
-                      caps: false)
-                  : Icon(
-                      Icons.downhill_skiing_rounded,
-                      color: ColorTheme.secondary,
-                      size: widget.size / 3 * 2,
-                    ),
+              child: _buildInside(),
             ),
           ),
         ),
@@ -369,7 +400,7 @@ class _BlinkingDotState extends State<BlinkingDot> {
     return GestureDetector(
       onTap: () {
         if (widget.activityDataProvider.status != ActivityStatus.inactive) {
-          SkiTracker.getActivity().stopActivity();
+          SkiTracker.getActivity().stopActivity(context);
         }
       },
       child: Stack(
@@ -494,7 +525,10 @@ class _StatusState extends State<Status> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => MapPage(activityDataProvider: widget.activityDataProvider, activityMap: widget.activityMap,),
+                builder: (context) => MapPage(
+                  activityDataProvider: widget.activityDataProvider,
+                  activityMap: widget.activityMap,
+                ),
                 settings: const RouteSettings(
                     name:
                         '/fullscreen'), // Setzen Sie hier den gewünschten Routennamen
@@ -541,37 +575,39 @@ class _StatusState extends State<Status> {
                 ),
                 if (widget.activityDataProvider.currentLatitude != 0.0)
                   AnimatedContainer(
-                      duration: const Duration(milliseconds: 500),
-                      height: widget.activityDataProvider.status ==
-                          ActivityStatus.running
-                          ? 20
-                          : 0,
-                      decoration: BoxDecoration(
-                        color: ColorTheme.primary.withOpacity(0.5),
-                        borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(8.0),
-                            bottomRight: Radius.circular(8.0)),
-                      ),
-                      alignment: Alignment.center,
-                      child: widget.activityDataProvider.status ==
-                          ActivityStatus.running
-                          ? Utils.buildText(
-                          text: 'Click for more info',
-                          fontSize: FontTheme.size - 4,
-                          color: ColorTheme.secondary,
-                          fontWeight: FontWeight.bold)
-                          : Container(),
+                    duration: const Duration(milliseconds: 500),
+                    height: widget.activityDataProvider.status ==
+                            ActivityStatus.running
+                        ? 20
+                        : 0,
+                    decoration: BoxDecoration(
+                      color: ColorTheme.primary.withOpacity(0.5),
+                      borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(8.0),
+                          bottomRight: Radius.circular(8.0)),
+                    ),
+                    alignment: Alignment.center,
+                    child: widget.activityDataProvider.status ==
+                            ActivityStatus.running
+                        ? Utils.buildText(
+                            text: 'Click for more info',
+                            fontSize: FontTheme.size - 4,
+                            color: ColorTheme.secondary,
+                            fontWeight: FontWeight.bold)
+                        : Container(),
                   ),
                 if (widget.activityDataProvider.currentLatitude != 0.0 &&
                     widget.activityDataProvider.status ==
-                        ActivityStatus.running && SlopeMap.slopes.isNotEmpty)
-                  if(widget.activityDataProvider.route.slopes.isNotEmpty)
-                  Positioned(
-                    right: 4,
-                    bottom: 4,
-                    child: CurrentSlope(
-                        slope: widget.activityDataProvider.route.slopes.last, animated: true),
-                  ),
+                        ActivityStatus.running &&
+                    SlopeMap.slopes.isNotEmpty)
+                  if (widget.activityDataProvider.route.slopes.isNotEmpty)
+                    Positioned(
+                      right: 4,
+                      bottom: 4,
+                      child: CurrentSlope(
+                          slope: widget.activityDataProvider.route.slopes.last,
+                          animated: true),
+                    ),
               ],
             ),
           ),
@@ -651,8 +687,9 @@ class _StatusState extends State<Status> {
       children: [
         const SizedBox(width: 4),
         Utils.buildText(
-            text:
-                widget.activityDataProvider.elapsedTime.toString().substring(0, 7),
+            text: widget.activityDataProvider.elapsedTime
+                .toString()
+                .substring(0, 7),
             fontSize: FontTheme.sizeSubHeader,
             color: widget.activityDataProvider.status ==
                         ActivityStatus.running ||
@@ -832,9 +869,17 @@ class _InfoState extends State<Info> {
             icon: Icons.terrain_rounded,
             title: 'Altitude',
             unit: Info.unitAltitude,
-            value1: (widget.activityDataProvider.altitude * Info.altitudeFactor).round().toString(),
-            value2: (widget.activityDataProvider.maxAltitude * Info.altitudeFactor).round().toString(),
-            value3: (widget.activityDataProvider.minAltitude * Info.altitudeFactor).round().toString(),
+            value1: (widget.activityDataProvider.altitude * Info.altitudeFactor)
+                .round()
+                .toString(),
+            value2:
+                (widget.activityDataProvider.maxAltitude * Info.altitudeFactor)
+                    .round()
+                    .toString(),
+            value3:
+                (widget.activityDataProvider.minAltitude * Info.altitudeFactor)
+                    .round()
+                    .toString(),
             titleValue1: 'Current',
             titleValue2: 'Max',
             titleValue3: 'Min',
@@ -843,11 +888,17 @@ class _InfoState extends State<Info> {
             icon: Icons.map_rounded,
             title: 'Distance',
             unit: Info.unitDistance,
-            value1: (widget.activityDataProvider.distance * Info.distanceFactor / 1000)
+            value1: (widget.activityDataProvider.distance *
+                    Info.distanceFactor /
+                    1000)
                 .toStringAsFixed(1),
-            value2: (widget.activityDataProvider.distanceDownhill * Info.distanceFactor / 1000)
+            value2: (widget.activityDataProvider.distanceDownhill *
+                    Info.distanceFactor /
+                    1000)
                 .toStringAsFixed(1),
-            value3: (widget.activityDataProvider.distanceUphill * Info.distanceFactor / 1000)
+            value3: (widget.activityDataProvider.distanceUphill *
+                    Info.distanceFactor /
+                    1000)
                 .toStringAsFixed(1),
             titleValue1: 'Total',
             titleValue2: 'Downhill',
@@ -1113,79 +1164,33 @@ class _InfoState extends State<Info> {
   }
 }
 
-class GraphPainter extends CustomPainter {
-  final List<int> data;
-  final double width;
-
-  GraphPainter(this.data, this.width);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint paint = Paint()
-      ..color = ColorTheme.primary
-      ..strokeWidth = 3.0
-      ..strokeCap = StrokeCap.round;
-
-    if (data.isEmpty || data.length == 1) {
-      return;
-    }
-
-    int maxData =
-        data.reduce((value, element) => value > element ? value : element);
-    int minData =
-        data.reduce((value, element) => value < element ? value : element);
-
-    double width = this.width;
-
-    double factor = width / (data.length - 1);
-
-    for (int i = 0; i < data.length - 1; i++) {
-      double x1 = i * factor / 2;
-      if (maxData - minData == 0) {
-        maxData = 1;
-      }
-
-      double y1 = size.height -
-          (size.height * (data[i] - minData) / (maxData - minData));
-      double x2 = (i + 1) * factor / 2;
-      double y2 = size.height -
-          (size.height * (data[i + 1] - minData) / (maxData - minData));
-
-      canvas.drawLine(Offset(x1 - this.width / 2, y1), Offset(x2, y2), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
-  }
-}
 
 class Graph extends StatefulWidget {
   const Graph(
-      {super.key, required this.dataAltitudes, required this.dataSpeeds});
+      {super.key, required this.dataAltitudes, required this.dataSpeeds, this.small = false});
 
   final List<List<int>> dataAltitudes;
 
   final List<List<double>> dataSpeeds;
+
+  final bool small;
 
   @override
   State<Graph> createState() => _GraphState();
 }
 
 class _GraphState extends State<Graph> {
-  
   @override
   void initState() {
     super.initState();
-    if(!_differentEntries) {
+    if (!_differentEntries) {
       hasDifferentEntry(widget.dataAltitudes);
       hasDifferentEntry(widget.dataSpeeds);
     }
   }
-  
+
   List<FlSpot> _convertIntToFlSpots(List<List<int>> integerLists) {
-    if(!_differentEntries) {
+    if (!_differentEntries) {
       hasDifferentEntry(integerLists);
     }
     List<FlSpot> flSpots = [];
@@ -1201,7 +1206,7 @@ class _GraphState extends State<Graph> {
   }
 
   List<FlSpot> _convertDoubleToFlSpots(List<List<double>> doubleList) {
-    if(!_differentEntries) {
+    if (!_differentEntries) {
       hasDifferentEntry(doubleList);
     }
     List<FlSpot> flSpots = [];
@@ -1217,7 +1222,7 @@ class _GraphState extends State<Graph> {
   }
 
   bool _differentEntries = false;
-  
+
   bool hasDifferentEntry<T>(List<List<T>> list) {
     // Check if the list has at least one element
     if (list.isEmpty) {
@@ -1267,62 +1272,71 @@ class _GraphState extends State<Graph> {
         padding: Info.padding / 2,
         child: Column(
           children: [
-        Container(
-        padding: Info.padding,
-        decoration: const BoxDecoration(
-        color: ColorTheme.secondary,
-          borderRadius: BorderRadius.only(topRight: Radius.circular(16.0), topLeft: Radius.circular(16.0)),
-        ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
+            Container(
+              padding: Info.padding,
+              decoration: const BoxDecoration(
+                color: ColorTheme.secondary,
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(16.0),
+                    topLeft: Radius.circular(16.0)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    width: Info.iconSize / 2,
-                    height: Info.iconSize / 2,
-                    decoration: BoxDecoration(
-                      color: ColorTheme.primary,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        width: Info.iconSize / 2,
+                        height: Info.iconSize / 2,
+                        decoration: BoxDecoration(
+                          color: ColorTheme.primary,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Utils.buildText(
+                        text: 'Altitude',
+                        fontSize: widget.small ? FontTheme.size - 9 : FontTheme.size,
+                        color: ColorTheme.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  Utils.buildText(
-                      text: 'Altitude',
-                      fontSize: FontTheme.size,
-                      color: ColorTheme.contrast,
-                      fontWeight: FontWeight.bold,),
+                  Row(
+                    children: [
+                      Utils.buildText(
+                        text: 'Speed',
+                        fontSize: widget.small ? FontTheme.size - 9 : FontTheme.size,
+                        color: ColorTheme.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        width: Info.iconSize / 2,
+                        height: Info.iconSize / 2,
+                        decoration: BoxDecoration(
+                          color: ColorTheme.contrast,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
-              Row(
-                children: [
-                  Utils.buildText(
-                      text: 'Speed',
-                      fontSize: FontTheme.size,
-                      color: ColorTheme.contrast,
-                      fontWeight: FontWeight.bold,),
-                  const SizedBox(width: 8),
-                  Container(
-                    width: Info.iconSize / 2,
-                    height: Info.iconSize / 2,
-                    decoration: BoxDecoration(
-                      color: ColorTheme.contrast,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                ],
-              )
-            ],
-
-          ),
-        ),
+            ),
             AnimatedContainer(
               duration: const Duration(milliseconds: 500),
               decoration: const BoxDecoration(
                 color: ColorTheme.secondary,
-                borderRadius: BorderRadius.only(bottomRight: Radius.circular(16.0), bottomLeft: Radius.circular(16.0)),
+                borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(16.0),
+                    bottomLeft: Radius.circular(16.0)),
               ),
-              height: widget.dataSpeeds.isEmpty ? 16 : _differentEntries == false ? 32 : 150,
+              height: widget.dataSpeeds.isEmpty
+                  ? 16
+                  : _differentEntries == false
+                      ? 32
+                      : 150,
               padding: Info.padding * 2,
               child: Stack(
                 children: [
@@ -1463,8 +1477,7 @@ class _ElapsedTimeState extends State<ElapsedTime> {
                   children: [
                     const SizedBox(width: 4),
                     Utils.buildText(
-                        text:
-                            widget.downhillTime.toString().substring(0, 7),
+                        text: widget.downhillTime.toString().substring(0, 7),
                         fontSize: FontTheme.size,
                         color: ColorTheme.contrast,
                         caps: false,
@@ -1472,8 +1485,7 @@ class _ElapsedTimeState extends State<ElapsedTime> {
                   ],
                 ),
                 Utils.buildText(
-                    text:
-                        widget.pauseTime.toString().substring(0, 7),
+                    text: widget.pauseTime.toString().substring(0, 7),
                     fontSize: FontTheme.size,
                     color: ColorTheme.contrast,
                     fontWeight: FontWeight.bold,
@@ -1481,8 +1493,7 @@ class _ElapsedTimeState extends State<ElapsedTime> {
                 Row(
                   children: [
                     Utils.buildText(
-                        text:
-                            widget.uphillTime.toString().substring(0, 7),
+                        text: widget.uphillTime.toString().substring(0, 7),
                         fontSize: FontTheme.size,
                         color: ColorTheme.contrast,
                         fontWeight: FontWeight.bold,

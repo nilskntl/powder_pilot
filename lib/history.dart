@@ -14,11 +14,43 @@ class History extends StatefulWidget {
 
   static const double iconHeight = 64.0;
 
+  static void showDeleteConfirmationDialog(BuildContext context, ActivityDatabase activity, void Function() onPressed) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Utils.buildText(text: 'Delete activity?', caps: false, align: TextAlign.left, fontWeight: FontWeight.bold, fontSize: FontTheme.sizeSubHeader),
+          content: Utils.buildText(text: 'Do you really want to delete this activity?', caps: false, align: TextAlign.left),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Utils.buildText(text: 'Cancel', caps: false, align: TextAlign.left, color: ColorTheme.primary),
+            ),
+            TextButton(
+              onPressed: () {
+                _deleteActivity(activity);
+                Navigator.of(context).pop();
+                onPressed();
+              },
+              child: Utils.buildText(text: 'Delete', caps: false, align: TextAlign.left, color: ColorTheme.primary),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  static void _deleteActivity(ActivityDatabase activity) {
+    ActivityDatabaseHelper.deleteActivity(activity.id);
+  }
+
   @override
-  State<History> createState() => _HistoryState();
+  State<History> createState() => HistoryState();
 }
 
-class _HistoryState extends State<History> {
+class HistoryState extends State<History> {
   late final ScrollController _scrollController = ScrollController(
       initialScrollOffset: MediaQuery.sizeOf(context).height - 420);
 
@@ -300,12 +332,17 @@ class _HistoryState extends State<History> {
 
 
     return GestureDetector(
+      onLongPress: () {
+        History.showDeleteConfirmationDialog(context, activity, () {
+          setState(() {});
+        });
+      },
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ActivitySummaryPage(
-              activityDatabase: activity,
+              activityDatabase: activity, historyState: this,
             ),
           ),
         );

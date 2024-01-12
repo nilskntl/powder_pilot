@@ -4,28 +4,64 @@ import 'package:ski_tracker/main.dart';
 import 'package:ski_tracker/route.dart';
 import 'package:ski_tracker/utils/custom_app_bar.dart';
 
+import '../history.dart';
 import '../utils/activity_database.dart';
 import '../utils/general_utils.dart';
 import 'activity_display.dart';
 
 class ActivitySummaryPage extends StatelessWidget {
-  const ActivitySummaryPage({super.key, required this.activityDatabase});
+  const ActivitySummaryPage(
+      {super.key, required this.activityDatabase, required this.historyState});
+
+  final HistoryState historyState;
 
   final ActivityDatabase activityDatabase;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBarDesign.appBar(title: 'Summary'),
+      appBar: CustomAppBarDesign.appBar(
+        title: 'Summary,',
+        child: PopupMenuButton<String>(
+          onSelected: (value) {
+            switch (value) {
+              case 'delete':
+                History.showDeleteConfirmationDialog(
+                  context,
+                  activityDatabase,
+                  () {
+                    Navigator.pop(context);
+                    // Set state to update the list
+                    historyState.setState(() {});
+                  },
+                );
+                break;
+            }
+          },
+          itemBuilder: (BuildContext context) {
+            return [
+              PopupMenuItem<String>(
+                height: 40,
+                value: 'delete',
+                child: Utils.buildText(text: 'Delete', caps: false),
+              ),
+              // Weitere PopupMenuItems hinzufügen, falls benötigt
+            ];
+          },
+        ),
+      ),
       body: ActivitySummary(activityDatabase: activityDatabase),
     );
   }
 }
 
 class ActivitySummary extends StatefulWidget {
-  const ActivitySummary({super.key, required this.activityDatabase});
+  const ActivitySummary(
+      {super.key, required this.activityDatabase, this.small = false});
 
   static const iconSize = 32.0;
+
+  final bool small;
 
   final ActivityDatabase activityDatabase;
 
@@ -48,6 +84,10 @@ class _ActivitySummaryState extends State<ActivitySummary> {
 
   late final ActivityMap _activityMap;
 
+  late final double minus = widget.small ? 4 : 0;
+
+  final double verticalPadding = 8.0;
+
   @override
   void initState() {
     super.initState();
@@ -62,7 +102,7 @@ class _ActivitySummaryState extends State<ActivitySummary> {
 
   List<List<int>> parseStringToListListInt(String stringRepresentation) {
     // Remove square brackets at the beginning and end of the string
-    if(stringRepresentation.length < 6) {
+    if (stringRepresentation.length < 6) {
       return [];
     }
     String cleanedString =
@@ -82,6 +122,9 @@ class _ActivitySummaryState extends State<ActivitySummary> {
 
   List<List<double>> parseStringToListListDouble(String stringRepresentation) {
     // Remove square brackets at the beginning and end of the string
+    if (stringRepresentation.length < 6) {
+      return [];
+    }
     String cleanedString =
         stringRepresentation.substring(2, stringRepresentation.length - 2);
 
@@ -114,24 +157,32 @@ class _ActivitySummaryState extends State<ActivitySummary> {
         );
       },
       child: Container(
-        height: 160,
+        height: widget.small ? 120 : 160,
         padding: Info.padding / 2,
         child: Row(
           children: [
             Expanded(
               flex: 1,
               child: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: ColorTheme.secondary,
                   borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16.0),
-                      bottomLeft: Radius.circular(16.0)),
+                      topLeft: const Radius.circular(16.0),
+                      bottomLeft: const Radius.circular(16.0),
+                      topRight:
+                          Radius.circular(route.slopes.isEmpty ? 16.0 : 0.0),
+                      bottomRight:
+                          Radius.circular(route.slopes.isEmpty ? 16.0 : 0.0)),
                 ),
                 alignment: Alignment.center,
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(16.0),
-                      bottomLeft: Radius.circular(16.0)),
+                  borderRadius: BorderRadius.only(
+                      topLeft: const Radius.circular(16.0),
+                      bottomLeft: const Radius.circular(16.0),
+                      topRight:
+                          Radius.circular(route.slopes.isEmpty ? 16.0 : 0.0),
+                      bottomRight:
+                          Radius.circular(route.slopes.isEmpty ? 16.0 : 0.0)),
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
@@ -146,8 +197,9 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                             ],
                             stops: const [0.0, 0.8, 1.0],
                             center: Alignment.center,
-                            radius:
-                                1.2, // Radius steuert die Größe des Gradients
+                            radius: route.slopes.isEmpty
+                                ? 1.5
+                                : 1.2, // Radius steuert die Größe des Gradients
                           ),
                         ),
                       ),
@@ -156,64 +208,58 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                 ),
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: Container(
-                height: 160,
-                decoration: const BoxDecoration(
-                  color: ColorTheme.secondary,
-                  borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(16.0),
-                      bottomRight: Radius.circular(16.0)),
-                ),
-                alignment: Alignment.topLeft,
-                child: ListView.builder(
-                  controller: ScrollController(),
-                  shrinkWrap: true,
-                  itemCount: route
-                      .slopes.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: ColorTheme.secondary,
-                        borderRadius:
-                        BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.center,
-                        children: [
-                          CurrentSlope(
-                              slope: route
-                                  .slopes[index], size: 32),
-                          const SizedBox(width: 8),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ActivityDisplay.buildSlopeName(route
-                                  .slopes[index], size: FontTheme.size),
-                              Utils.buildText(
-                                  text: Utils.durationStringToString(route
-                                      .slopes[index]
-                                      .startTime
-                                      .toString())[1],
-                                  caps: false,
-                                  fontSize:
-                                  FontTheme.size -
-                                      4,
-                                  color: ColorTheme
-                                      .grey),
-                            ],
-                          )
-                        ],
-                      ),
-                    );
-                  },
+            if (route.slopes.isNotEmpty)
+              Expanded(
+                flex: 1,
+                child: Container(
+                  height: widget.small ? 120 : 160,
+                  decoration: const BoxDecoration(
+                    color: ColorTheme.secondary,
+                    borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(16.0),
+                        bottomRight: Radius.circular(16.0)),
+                  ),
+                  alignment: Alignment.topLeft,
+                  child: ListView.builder(
+                    controller: ScrollController(),
+                    shrinkWrap: true,
+                    itemCount: route.slopes.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: ColorTheme.secondary,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CurrentSlope(
+                                slope: route.slopes[index], size: 32 - minus),
+                            const SizedBox(width: 8),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ActivityDisplay.buildSlopeName(
+                                    route.slopes[index],
+                                    size: FontTheme.size - minus),
+                                Utils.buildText(
+                                    text: Utils.durationStringToString(route
+                                        .slopes[index].startTime
+                                        .toString())[1],
+                                    caps: false,
+                                    fontSize: FontTheme.size - 4 - minus / 2,
+                                    color: ColorTheme.grey),
+                              ],
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -251,15 +297,17 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                               color: ColorTheme.primary),
                         ],
                       ),
-                      const SizedBox(
-                        height: 8.0,
+                      SizedBox(
+                        height: verticalPadding - minus / 2,
                       ),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Expanded(
+                          Expanded(
                             flex: 3,
-                            child: ImageFile(),
+                            child: ImageFile(
+                              small: widget.small,
+                            ),
                           ),
                           Expanded(
                               flex: 4,
@@ -276,16 +324,18 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                                           text: Utils.durationStringToString(
                                               widget.activityDatabase
                                                   .startTime)[0],
-                                          fontSize: FontTheme.sizeSubHeader,
+                                          fontSize:
+                                              FontTheme.sizeSubHeader - minus,
                                           fontWeight: FontWeight.bold),
                                       Utils.buildText(
                                           text: ' / ',
-                                          fontSize: FontTheme.sizeSubHeader,
+                                          fontSize:
+                                              FontTheme.sizeSubHeader - minus,
                                           fontWeight: FontWeight.bold),
                                       Utils.buildText(
                                           text:
                                               '${widget.activityDatabase.elapsedTime.substring(0, 4)} ${Info.unitTime}',
-                                          fontSize: FontTheme.size,
+                                          fontSize: FontTheme.size - minus,
                                           fontWeight: FontWeight.bold,
                                           caps: false),
                                     ],
@@ -297,6 +347,7 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                                       text:
                                           '${Utils.durationStringToString(widget.activityDatabase.startTime)[1]}-${Utils.durationStringToString(widget.activityDatabase.endTime)[1]}',
                                       color: ColorTheme.grey,
+                                      fontSize: FontTheme.size - minus,
                                       caps: false),
                                   const SizedBox(
                                     height: 16.0,
@@ -311,8 +362,8 @@ class _ActivitySummaryState extends State<ActivitySummary> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 8.0,
+          SizedBox(
+            height: verticalPadding - minus / 2,
           ),
           Container(
             padding: Info.padding / 2,
@@ -336,12 +387,12 @@ class _ActivitySummaryState extends State<ActivitySummary> {
               ],
             ),
           ),
-          const SizedBox(
-            height: 8.0,
+          SizedBox(
+            height: verticalPadding - minus / 2,
           ),
           _map(),
-          const SizedBox(
-            height: 8.0,
+          SizedBox(
+            height: verticalPadding - minus / 2,
           ),
           Row(
             children: [
@@ -349,10 +400,12 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                   icon: Icons.speed_rounded,
                   title: 'Speed',
                   unit: Info.unitSpeed,
-                  value1: (widget.activityDatabase.maxSpeed * Info.speedFactor).toStringAsFixed(1),
+                  value1: (widget.activityDatabase.maxSpeed * Info.speedFactor)
+                      .toStringAsFixed(1),
                   titleValue1: 'Max',
                   value2:
-                  (widget.activityDatabase.averageSpeed * Info.speedFactor).toStringAsFixed(1),
+                      (widget.activityDatabase.averageSpeed * Info.speedFactor)
+                          .toStringAsFixed(1),
                   titleValue2: 'Avg'),
               _buildActivityDisplay(
                   icon: Icons.line_axis_rounded,
@@ -364,8 +417,8 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                   titleValue3: 'Avg'),
             ],
           ),
-          const SizedBox(
-            height: 8.0,
+          SizedBox(
+            height: verticalPadding - minus / 2,
           ),
           Row(
             children: [
@@ -373,38 +426,48 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                   icon: Icons.height_rounded,
                   title: 'Altitude',
                   unit: Info.unitAltitude,
-                  value1:
-                  (widget.activityDatabase.maxAltitude * Info.altitudeFactor).round().toString(),
+                  value1: (widget.activityDatabase.maxAltitude *
+                          Info.altitudeFactor)
+                      .round()
+                      .toString(),
                   titleValue1: 'Max',
-                  value2:
-                  (widget.activityDatabase.minAltitude * Info.altitudeFactor).round().toString(),
+                  value2: (widget.activityDatabase.minAltitude *
+                          Info.altitudeFactor)
+                      .round()
+                      .toString(),
                   titleValue2: 'Min',
-                  value3:
-                  (widget.activityDatabase.avgAltitude * Info.altitudeFactor).round().toString(),
+                  value3: (widget.activityDatabase.avgAltitude *
+                          Info.altitudeFactor)
+                      .round()
+                      .toString(),
                   titleValue3: 'Avg'),
               _buildActivityDisplay(
                   icon: Icons.directions_walk_rounded,
                   title: 'Distance',
                   unit: Info.unitDistance,
-                  value1: (widget.activityDatabase.distance * Info.distanceFactor / 1000).toStringAsFixed(1),
+                  value1: (widget.activityDatabase.distance *
+                          Info.distanceFactor /
+                          1000)
+                      .toStringAsFixed(1),
                   titleValue1: 'Total',
-                  value2: (widget.activityDatabase.distanceDownhill * Info.distanceFactor / 1000)
+                  value2: (widget.activityDatabase.distanceDownhill *
+                          Info.distanceFactor /
+                          1000)
                       .toStringAsFixed(1),
                   titleValue2: 'Downhill',
-                  value3:
-                  (widget.activityDatabase.distanceUphill * Info.distanceFactor / 1000).toStringAsFixed(1),
+                  value3: (widget.activityDatabase.distanceUphill *
+                          Info.distanceFactor /
+                          1000)
+                      .toStringAsFixed(1),
                   titleValue3: 'Uphill'),
             ],
           ),
-          const SizedBox(
-            height: 8.0,
+          SizedBox(
+            height: verticalPadding - minus / 2,
           ),
           Graph(dataAltitudes: dataAltitudes, dataSpeeds: dataSpeeds),
-          const SizedBox(
-            height: 8.0,
-          ),
-          const SizedBox(
-            height: 8.0,
+          SizedBox(
+            height: verticalPadding - minus / 2,
           ),
         ],
       ),
@@ -427,18 +490,20 @@ class _ActivitySummaryState extends State<ActivitySummary> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Utils.buildText(
-              text: title, fontSize: FontTheme.size, color: ColorTheme.grey),
+              text: title,
+              fontSize: FontTheme.size - minus,
+              color: ColorTheme.grey),
           Row(
             children: [
               Utils.buildText(
                   text: value,
-                  fontSize: FontTheme.size,
+                  fontSize: FontTheme.size - minus,
                   color: ColorTheme.contrast,
                   fontWeight: FontWeight.bold),
               const SizedBox(width: 4),
               Utils.buildText(
                   text: unit,
-                  fontSize: FontTheme.size,
+                  fontSize: FontTheme.size - minus,
                   color: ColorTheme.contrast,
                   fontWeight: FontWeight.bold,
                   caps: false),
@@ -459,8 +524,8 @@ class _ActivitySummaryState extends State<ActivitySummary> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Container(
-                  width: Info.iconSize - 8,
-                  height: Info.iconSize - 8,
+                  width: Info.iconSize - 8 - minus * 2,
+                  height: Info.iconSize - 8 - minus * 2,
                   decoration: BoxDecoration(
                     color: ColorTheme.primary,
                     borderRadius: BorderRadius.circular(8.0),
@@ -474,19 +539,23 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                 const SizedBox(width: 8),
                 Utils.buildText(
                     text: title,
-                    fontSize: FontTheme.sizeSubHeader,
+                    fontSize: FontTheme.sizeSubHeader - minus * 2,
                     color: ColorTheme.grey,
                     fontWeight: FontWeight.bold),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(
+              height: verticalPadding - minus / 2,
+            ),
             if (value1 != '') const SizedBox(height: 8),
             if (value1 != '') buildValue(value: value1, title: titleValue1),
             if (value2 != '') const SizedBox(height: 8),
             if (value2 != '') buildValue(value: value2, title: titleValue2),
             if (value3 != '') const SizedBox(height: 8),
             if (value3 != '') buildValue(value: value3, title: titleValue3),
-            const SizedBox(height: 8),
+            SizedBox(
+              height: verticalPadding - minus / 2,
+            ),
           ],
         ),
       ),
@@ -496,7 +565,7 @@ class _ActivitySummaryState extends State<ActivitySummary> {
   Widget _buildContainer(
       {required Widget child, EdgeInsets padding = Info.padding}) {
     return Container(
-      padding: padding / 2,
+      padding: padding / 2 - EdgeInsets.all(minus / 2),
       child: Container(
         padding: Info.padding,
         decoration: const BoxDecoration(
@@ -510,7 +579,9 @@ class _ActivitySummaryState extends State<ActivitySummary> {
 }
 
 class ImageFile extends StatefulWidget {
-  const ImageFile({super.key});
+  const ImageFile({super.key, this.small = false});
+
+  final bool small;
 
   @override
   State<ImageFile> createState() => _ImageFileState();
@@ -519,35 +590,33 @@ class ImageFile extends StatefulWidget {
 class _ImageFileState extends State<ImageFile> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 120,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: ColorTheme.grey,
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8.0),
-        /*
-                        child: Image.asset(
-                          'assets/images/background.png',
-                          fit: BoxFit.cover,
-                        ),
-
-                         */
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.camera_alt_rounded,
-              color: ColorTheme.secondary,
-              size: 64,
-            ),
-            Utils.buildText(
-                text: 'Add a photo',
+    return GestureDetector(
+      onTap: () {
+        print('lol');
+      },
+      child: Container(
+        height: widget.small ? 90 : 120,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: ColorTheme.grey,
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.camera_alt_rounded,
                 color: ColorTheme.secondary,
-                fontSize: FontTheme.size),
-          ],
+                size: widget.small ? 36 : 48,
+              ),
+              Utils.buildText(
+                  text: 'Add a photo',
+                  color: ColorTheme.secondary,
+                  fontSize: FontTheme.size),
+            ],
+          ),
         ),
       ),
     );

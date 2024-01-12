@@ -1,9 +1,11 @@
 import 'package:app_settings/app_settings.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
 import '../main.dart';
 import '../utils/general_utils.dart';
+import '../utils/shared_preferences.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({
@@ -116,6 +118,7 @@ class _WelcomePageState extends State<WelcomePage> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => const SkiTracker()));
+                          SharedPref.saveBool('welcome', true);
                         } else {
                           widget.pageController.animateToPage(
                             widget.currentPage + 1,
@@ -156,27 +159,6 @@ class _WelcomePageState extends State<WelcomePage> {
   }
 }
 
-class BatteryOptimizationButton extends StatefulWidget {
-  const BatteryOptimizationButton(
-      {super.key, required this.pageController, required this.currentPage});
-
-  final PageController pageController;
-  final int currentPage;
-
-  @override
-  State<BatteryOptimizationButton> createState() =>
-      _BatteryOptimizationButtonState();
-}
-
-class _BatteryOptimizationButtonState extends State<BatteryOptimizationButton> {
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
-  }
-  
-}
-
 class BackgroundLocationButton extends StatefulWidget {
   const BackgroundLocationButton(
       {super.key, required this.pageController, required this.currentPage});
@@ -193,15 +175,27 @@ class _BackgroundLocationButtonState extends State<BackgroundLocationButton> {
   String buttonText = 'Open Location Settings';
 
   Future<void> _requestLocationPermission() async {
-    Location location = Location();
-    location.enableBackgroundMode(enable: true);
+    try {
+      Location location = Location();
+      location.enableBackgroundMode(enable: true);
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
     setState(() {
       buttonText = 'Open Battery Settings';
     });
   }
 
   void _openBatterySettings() {
-    AppSettings.openAppSettings(type: AppSettingsType.batteryOptimization);
+    try {
+      AppSettings.openAppSettings(type: AppSettingsType.batteryOptimization);
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
     setState(() {
       buttonText = 'Next';
     });
@@ -212,7 +206,9 @@ class _BackgroundLocationButtonState extends State<BackgroundLocationButton> {
     return Column(
       children: [
         if(buttonText != 'Next')
-          Utils.buildText(text: 'Step ${buttonText == 'Open Location Settings' ? '1' : '2'}', fontSize: FontTheme.size - 2, fontWeight: FontWeight.normal, color: ColorTheme.contrast),
+          Utils.buildText(text: 'Step ${buttonText == 'Open Location Settings' ? '1' : '2'}/2', fontSize: FontTheme.size - 2, fontWeight: FontWeight.normal, color: ColorTheme.contrast),
+        if(buttonText != 'Next')
+          const SizedBox(height: 8),
         Container(
           width: double.infinity,
           height: 64.0,
@@ -307,6 +303,8 @@ class _LocationPageButtonState extends State<LocationButton> {
       children: [
         if(buttonText == 'Settings')
           Utils.buildText(text: 'Please enable location in the settings', fontSize: FontTheme.size - 2, fontWeight: FontWeight.normal, color: ColorTheme.contrast),
+        if(buttonText == 'Settings')
+          const SizedBox(height: 8),
         Container(
           width: double.infinity,
           height: 64.0,
