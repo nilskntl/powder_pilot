@@ -167,6 +167,7 @@ class Activity extends ActivityLocation {
     }
     speed = 0.0;
     slope = 0.0;
+    activityLocations = activityLocations.setEndLocation([currentLongitude, currentLatitude]);
     _running = false;
     endTime = DateTime.now();
     _active = false;
@@ -179,7 +180,6 @@ class Activity extends ActivityLocation {
     if (route.slopes.isNotEmpty) {
       route.slopes.last.endTime = DateTime.now();
     }
-    _elapsedTime = Duration.zero;
     updateData();
     if (_locationInitialized) {
       ActivityDatabase activityDatabase = saveActivity();
@@ -187,6 +187,9 @@ class Activity extends ActivityLocation {
       _showCustomDialog(context, activityDatabase);
       _addActivityToList();
     }
+
+    _elapsedTime = Duration.zero;
+
     SkiTracker.createNewActivity(areaName: areaName, currentPosition: LatLng(currentLatitude, currentLongitude), mapDownloaded: _mapDownloaded);
   }
 
@@ -275,7 +278,11 @@ class ActivityLocation extends ActivityUtils {
     void updateSpeed(LocationData location) {
       if (location.speed! < 55) {
         speed = location.speed!;
-        maxSpeed = speed > maxSpeed ? speed : maxSpeed;
+
+        if(speed > maxSpeed) {
+          activityLocations = activityLocations.setFastestLocation([currentLongitude, currentLatitude]);
+          maxSpeed = speed;
+        }
 
         speeds.add([
           elapsedTime.inSeconds.toDouble(),
@@ -406,6 +413,7 @@ class ActivityLocation extends ActivityUtils {
       _currentExtrema = altitude;
       _tempAltitude = altitude;
       _tempLocation = location;
+      activityLocations = activityLocations.setStartLocation([currentLongitude, currentLatitude]);
       if ((route.slopes.isEmpty || route.slopes.last.name == 'Unknown') &&
           _mapDownloaded == true) {
         _updateNearestSlope();
@@ -691,13 +699,17 @@ class ActivityData extends ActivityDataTemp {
   GpsAccuracy gpsAccuracy = GpsAccuracy.none;
 
   // Route
-  ActivityRoute route = ActivityRoute(slopes: [], coordinates: []);
+  final ActivityRoute route = ActivityRoute(slopes: [], coordinates: []); // Don't define as const
 
   // List of altitudes
   List<List<int>> altitudes = [];
 
   // List of speeds
   List<List<double>> speeds = [];
+
+  // Important locations
+  ActivityLocations activityLocations = const ActivityLocations();
+
 
   ActivityDatabase saveActivity() {
     ActivityDatabase activityDatabase = ActivityDatabase(
@@ -723,6 +735,9 @@ class ActivityData extends ActivityDataTemp {
       endTime: endTime.toString(),
       altitudes: altitudes.toString(),
       speeds: speeds.toString(),
+      speedLocation: activityLocations.fastestLocation.toString(),
+      startLocation: activityLocations.startLocation.toString(),
+      endLocation: activityLocations.endLocation.toString(),
     );
 
     ActivityDatabaseHelper.insertActivity(activityDatabase);
@@ -745,10 +760,10 @@ class ActivityData extends ActivityDataTemp {
       newSlope: slope,
       newMaxSlope: maxSlope,
       newAvgSlope: avgSlope,
-      newElapsedTime: SkiTracker.getActivity().elapsedTime,
-      newElapsedPauseTime: SkiTracker.getActivity().elapsedPauseTime,
-      newElapsedDownhillTime: SkiTracker.getActivity().elapsedDownhillTime,
-      newElapsedUphillTime: SkiTracker.getActivity().elapsedUphillTime,
+      newElapsedTime: _elapsedTime,
+      newElapsedPauseTime: _elapsedPauseTime,
+      newElapsedDownhillTime: _elapsedDownhillTime,
+      newElapsedUphillTime: _elapsedUphillTime,
       newCurrentLatitude: currentLatitude,
       newCurrentLongitude: currentLongitude,
       newGpsAccuracy: gpsAccuracy,
@@ -763,6 +778,7 @@ class ActivityData extends ActivityDataTemp {
       newArea: areaName,
       newAltitudes: altitudes,
       newSpeeds: speeds,
+      newActivityLocations: activityLocations,
     );
   }
 }
@@ -795,4 +811,26 @@ class ActivityDataTemp {
   bool get isRunning => _running;
 
   bool get isActive => _active;
+}
+
+class ActivityLocations {
+  final List<double> fastestLocation;
+  final List<double> startLocation;
+  final List<double> endLocation;
+
+  const ActivityLocations({this.fastestLocation = const [0.0, 0.0], this.startLocation = const [0.0, 0.0], this.endLocation = const [0.0, 0.0]});
+
+  // Edit value of final Lists
+  ActivityLocations setFastestLocation(List<double> newFastestLocation) {
+    return ActivityLocations(fastestLocation: newFastestLocation, startLocation: startLocation, endLocation: endLocation);
+  }
+
+  ActivityLocations setStartLocation(List<double> newStartLocation) {
+    return ActivityLocations(fastestLocation: fastestLocation, startLocation: newStartLocation, endLocation: endLocation);
+  }
+
+  ActivityLocations setEndLocation(List<double> newEndLocation) {
+    return ActivityLocations(fastestLocation: fastestLocation, startLocation: startLocation, endLocation: newEndLocation);
+  }
+  
 }

@@ -378,14 +378,24 @@ class HistoryState extends State<History> {
                           color: ColorTheme.primary),
                     ],
                   ),
+                  const SizedBox(height: 4.0),
                   Row(
                     children: [
                       Container(
-                        width: History.iconHeight,
-                        height: History.iconHeight / 3 * 2,
+                        width: History.iconHeight - 12,
+                        height: History.iconHeight - 12,
                         decoration: const BoxDecoration(
-                          color: Colors.transparent,
+                          color: ColorTheme.primary,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(16.0),)
                         ),
+                        child: const Icon(
+                          Icons.downhill_skiing_rounded,
+                          color: ColorTheme.secondary,
+                          size: History.iconHeight - 36,
+                        ),
+                      ),
+                        /*
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16.0),
                           child: Image.asset(
@@ -394,6 +404,7 @@ class HistoryState extends State<History> {
                           ),
                         ),
                       ),
+                         */
                       const SizedBox(width: 8.0),
                       Expanded(
                         child: Column(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:ski_tracker/activity/activity_map.dart';
 import 'package:ski_tracker/main.dart';
 import 'package:ski_tracker/route.dart';
@@ -7,6 +8,7 @@ import 'package:ski_tracker/utils/custom_app_bar.dart';
 import '../history.dart';
 import '../utils/activity_database.dart';
 import '../utils/general_utils.dart';
+import 'activity.dart';
 import 'activity_display.dart';
 
 class ActivitySummaryPage extends StatelessWidget {
@@ -94,10 +96,45 @@ class _ActivitySummaryState extends State<ActivitySummary> {
     dataAltitudes = parseStringToListListInt(widget.activityDatabase.altitudes);
     dataSpeeds = parseStringToListListDouble(widget.activityDatabase.speeds);
     route = ActivityRoute.stringToRoute(widget.activityDatabase.route);
+    List<double> startLocation =
+        parseStringToDoubleList(widget.activityDatabase.startLocation);
+    List<double> endLocation = parseStringToDoubleList(
+        widget.activityDatabase.endLocation);
+    final List<double> fastestLocation = parseStringToDoubleList(
+        widget.activityDatabase.speedLocation);
     _activityMap = ActivityMap(
       route: route,
       staticMap: true,
+      activityLocations: ActivityLocations(
+        fastestLocation: fastestLocation,
+        startLocation: startLocation,
+        endLocation: endLocation,
+      ),
     );
+  }
+
+  List<double> parseStringToDoubleList(String doubleListString) {
+    // Remove square brackets and split the string into individual double strings
+    List<String> doubleStrings = doubleListString.replaceAll('[', '').replaceAll(']', '').split(', ');
+
+    // Parse each string into a double and create a list of doubles
+    List<double> doubleList = doubleStrings.map((string) => double.parse(string)).toList();
+
+    return doubleList;
+  }
+
+  LatLng parseStringToLatLng(String coordinateString) {
+    // Remove square brackets and split the string into longitude and latitude
+    List<String> coordinates = coordinateString.replaceAll('[', '').replaceAll(']', '').split(', ');
+
+    // Parse the strings into doubles
+    double longitude = double.parse(coordinates[0]);
+    double latitude = double.parse(coordinates[1]);
+
+    // Create a LatLng object
+    LatLng latLng = LatLng(latitude, longitude);
+
+    return latLng;
   }
 
   List<List<int>> parseStringToListListInt(String stringRepresentation) {
@@ -298,27 +335,29 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                         ],
                       ),
                       SizedBox(
-                        height: verticalPadding - minus / 2,
+                        height: verticalPadding - minus * 2,
                       ),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          /*
                           Expanded(
                             flex: 3,
                             child: ImageFile(
                               small: widget.small,
                             ),
                           ),
+                          */
                           Expanded(
                               flex: 4,
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const SizedBox(
                                     height: 8.0,
                                   ),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Utils.buildText(
                                           text: Utils.durationStringToString(
@@ -588,11 +627,11 @@ class ImageFile extends StatefulWidget {
 }
 
 class _ImageFileState extends State<ImageFile> {
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print('lol');
       },
       child: Container(
         height: widget.small ? 90 : 120,

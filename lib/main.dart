@@ -185,7 +185,6 @@ class _MyHomePageState extends State<MyHomePage> {
       overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
     );
 
-    // Verberge die Navigationsleiste
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky,
         overlays: [SystemUiOverlay.bottom]);
 

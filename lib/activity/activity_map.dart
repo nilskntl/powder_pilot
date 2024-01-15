@@ -463,10 +463,11 @@ class ActivityMap extends StatefulWidget {
   const ActivityMap(
       {super.key,
       this.staticMap = false,
-      this.route = const ActivityRoute(coordinates: [], slopes: [])});
+      this.route = const ActivityRoute(coordinates: [], slopes: []), this.activityLocations = const ActivityLocations()});
 
   final bool staticMap;
   final ActivityRoute route;
+  final ActivityLocations activityLocations;
 
   @override
   State<ActivityMap> createState() => _ActivityMapState();
@@ -490,6 +491,8 @@ class _ActivityMapState extends State<ActivityMap>
 
   List<Polyline> _route = [];
 
+  late ActivityLocations _activityLocations = widget.activityLocations;
+
   LatLng _middlePoint = const LatLng(0.0, 0.0);
 
   @override
@@ -499,6 +502,8 @@ class _ActivityMapState extends State<ActivityMap>
       if(widget.staticMap) {
         _middlePoint = _calculateMiddlePoint(widget.route.coordinates);
         _route = _buildPolyline(widget.route);
+      } else {
+        _activityLocations = SkiTracker.getActivity().activityLocations;
       }
     }
     mapController = AnimatedMapController(
@@ -517,6 +522,7 @@ class _ActivityMapState extends State<ActivityMap>
     setState(() {
       if (!_previewMode) {
         if (!widget.staticMap) {
+          _activityLocations = SkiTracker.getActivity().activityLocations;
           _route = _buildPolyline(SkiTracker.getActivity().route);
         }
       }
@@ -566,7 +572,7 @@ class _ActivityMapState extends State<ActivityMap>
 
   TileLayer _tileLayer() {
     return TileLayer(
-      urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     );
   }
 
@@ -593,6 +599,43 @@ class _ActivityMapState extends State<ActivityMap>
     );
   }
 
+  Widget _buildMarker({required LatLng point, required IconData icon}) {
+    return MarkerLayer(
+      markers: [
+        Marker(
+          width: markerSize,
+          height: markerSize,
+          point: point,
+          child: Container(
+            width: markerSize,
+            height: markerSize,
+            decoration: BoxDecoration(
+              color: ColorTheme.primary,
+              borderRadius: BorderRadius.circular(markerSize / 2),
+            ),
+            child: Icon(
+              icon,
+              color: ColorTheme.secondary,
+              size: markerSize - 12,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _fastestPosition() {
+    return _buildMarker(point: LatLng(_activityLocations.fastestLocation[1], _activityLocations.fastestLocation[0]), icon: Icons.speed_rounded);
+  }
+
+  Widget _startPosition() {
+    return _buildMarker(point: LatLng(_activityLocations.startLocation[1], _activityLocations.startLocation[0]), icon: Icons.play_arrow_rounded);
+  }
+
+  Widget _endPosition() {
+    return _buildMarker(point: LatLng(_activityLocations.endLocation[1], _activityLocations.endLocation[0]), icon: Icons.flag_rounded);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
@@ -615,8 +658,11 @@ class _ActivityMapState extends State<ActivityMap>
         children: [
           _tileLayer(),
           if(!widget.staticMap || (!_previewMode && widget.staticMap)) _pisteLayer(),
-          if (!_previewMode && !widget.staticMap) _markerLayer(),
           if (!_previewMode  || widget.staticMap) PolylineLayer(polylines: _route),
+          if((!_previewMode || widget.staticMap) && _activityLocations.startLocation[0] != 0.0) _startPosition(),
+          if((!_previewMode || widget.staticMap) && _activityLocations.endLocation[0] != 0.0) _endPosition(),
+          if((!_previewMode || widget.staticMap) && _activityLocations.fastestLocation[0] != 0.0) _fastestPosition(),
+          if (!_previewMode && !widget.staticMap) _markerLayer(),
         ],
       ),
     ]);

@@ -18,15 +18,18 @@ class ActivityDisplay extends StatefulWidget {
 
   static Widget buildSlopeName(SlopeInfo slope,
       {double size = FontTheme.sizeSubHeader}) {
-    if(slope.type == 'gondola' || slope.type == 'chair_lift' || slope.type == 'drag_lift' || slope.type == 'platter' || slope.type == 't-bar') {
+    if (slope.type == 'gondola' ||
+        slope.type == 'chair_lift' ||
+        slope.type == 'drag_lift' ||
+        slope.type == 'platter' ||
+        slope.type == 't-bar') {
       return Utils.buildText(
           text: slope.name,
           color: ColorTheme.contrast,
           fontSize: size,
           caps: false,
           fontWeight: FontWeight.bold);
-    }
-    else if (slope.name != 'Unknown' && slope.name != '') {
+    } else if (slope.name != 'Unknown' && slope.name != '') {
       return Utils.buildText(
           text: 'Slope: ${slope.name}',
           color: ColorTheme.contrast,
@@ -51,12 +54,12 @@ class _ActivityDisplayState extends State<ActivityDisplay> {
   late final ScrollController _scrollController;
   bool _scrollControllerInitialized = false;
 
+  late ActivityDataProvider activityDataProvider =
+      Provider.of<ActivityDataProvider>(context);
+
   @override
   Widget build(BuildContext context) {
-    ActivityDataProvider activityDataProvider =
-        Provider.of<ActivityDataProvider>(context);
     SkiTracker.setActivityDataProvider(activityDataProvider);
-
     // Check if scroll controller is initialized
     if (!_scrollControllerInitialized) {
       // Check if activity is running
@@ -184,15 +187,16 @@ class _CurrentSlopeState extends State<CurrentSlope> {
   bool _initialized = false;
 
   String getIconString(String type) {
-    if(type == 'gondola') {
+    if (type == 'gondola') {
       return 'assets/images/lift/gondola.png';
-    } else{
+    } else {
       return 'assets/images/lift/chair_lift.png';
     }
   }
 
   Widget _buildInside() {
-    if (widget.slope.type == 'intermediate' || widget.slope.type == 'easy' ||
+    if (widget.slope.type == 'intermediate' ||
+        widget.slope.type == 'easy' ||
         widget.slope.type == 'advanced') {
       return Utils.buildText(
           text: widget.slope.name,
@@ -200,12 +204,13 @@ class _CurrentSlopeState extends State<CurrentSlope> {
           color: ColorTheme.secondary,
           fontWeight: FontWeight.bold,
           caps: false);
-    } else if (widget.slope.type == 'gondola' || widget.slope.type == 'chair_lift' ||
-        widget.slope.type == 'drag_lift' || widget.slope.type == 'platter' || widget.slope.type == 't-bar') {
-      return Image.asset(
-        getIconString(widget.slope.type),
-        width: widget.size / 3 * 2,
-        height: widget.size / 3 * 2);
+    } else if (widget.slope.type == 'gondola' ||
+        widget.slope.type == 'chair_lift' ||
+        widget.slope.type == 'drag_lift' ||
+        widget.slope.type == 'platter' ||
+        widget.slope.type == 't-bar') {
+      return Image.asset(getIconString(widget.slope.type),
+          width: widget.size / 3 * 2, height: widget.size / 3 * 2);
     } else {
       return Icon(
         Icons.downhill_skiing_rounded,
@@ -453,7 +458,7 @@ class _BlinkingDotState extends State<BlinkingDot> {
 }
 
 class Status extends StatefulWidget {
-  const Status(
+  Status(
       {super.key,
       required this.activityDataProvider,
       required this.scrollController});
@@ -473,13 +478,18 @@ class Status extends StatefulWidget {
   static const String finished = 'Finished';
   static const String inactive = 'Inactive';
 
-  final activityMap = const ActivityMap(staticMap: false);
+  late final ActivityMap activityMap = const ActivityMap(staticMap: false);
 
   @override
   State<StatefulWidget> createState() => _StatusState();
 }
 
 class _StatusState extends State<Status> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -1164,10 +1174,12 @@ class _InfoState extends State<Info> {
   }
 }
 
-
 class Graph extends StatefulWidget {
   const Graph(
-      {super.key, required this.dataAltitudes, required this.dataSpeeds, this.small = false});
+      {super.key,
+      required this.dataAltitudes,
+      required this.dataSpeeds,
+      this.small = false});
 
   final List<List<int>> dataAltitudes;
 
@@ -1296,7 +1308,8 @@ class _GraphState extends State<Graph> {
                       const SizedBox(width: 8),
                       Utils.buildText(
                         text: 'Altitude',
-                        fontSize: widget.small ? FontTheme.size - 9 : FontTheme.size,
+                        fontSize:
+                            widget.small ? FontTheme.size - 9 : FontTheme.size,
                         color: ColorTheme.grey,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1306,7 +1319,8 @@ class _GraphState extends State<Graph> {
                     children: [
                       Utils.buildText(
                         text: 'Speed',
-                        fontSize: widget.small ? FontTheme.size - 9 : FontTheme.size,
+                        fontSize:
+                            widget.small ? FontTheme.size - 9 : FontTheme.size,
                         color: ColorTheme.grey,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1390,11 +1404,17 @@ class _ElapsedTimeState extends State<ElapsedTime> {
             flex: flexDownhill,
             child: Container(
               height: 8,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: ColorTheme.primary,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(4.0),
-                  bottomLeft: Radius.circular(4.0),
+                  topLeft: const Radius.circular(4.0),
+                  bottomLeft: const Radius.circular(4.0),
+                  topRight: (flexPause == 0 && flexUphill == 0)
+                      ? const Radius.circular(4.0)
+                      : const Radius.circular(0.0),
+                  bottomRight: (flexPause == 0 && flexUphill == 0)
+                      ? const Radius.circular(4.0)
+                      : const Radius.circular(0.0),
                 ),
               ),
             )),
@@ -1402,22 +1422,43 @@ class _ElapsedTimeState extends State<ElapsedTime> {
             flex: flexPause,
             child: Container(
               height: 8,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: ColorTheme.grey,
-              ),
-            )),
-        Expanded(
-            flex: flexUphill,
-            child: Container(
-              height: 8,
-              decoration: const BoxDecoration(
-                color: ColorTheme.contrast,
                 borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(4.0),
-                  bottomRight: Radius.circular(4.0),
+                  topRight: (flexUphill == 0)
+                      ? const Radius.circular(4.0)
+                      : const Radius.circular(0.0),
+                  bottomRight: (flexUphill == 0)
+                      ? const Radius.circular(4.0)
+                      : const Radius.circular(0.0),
+                  topLeft: (flexDownhill == 0)
+                      ? const Radius.circular(4.0)
+                      : const Radius.circular(0.0),
+                  bottomLeft: (flexDownhill == 0)
+                      ? const Radius.circular(4.0)
+                      : const Radius.circular(0.0),
                 ),
               ),
             )),
+        Expanded(
+          flex: flexUphill,
+          child: Container(
+            height: 8,
+            decoration: BoxDecoration(
+              color: ColorTheme.contrast,
+              borderRadius: BorderRadius.only(
+                topRight: const Radius.circular(4.0),
+                bottomRight: const Radius.circular(4.0),
+                topLeft: (flexPause == 0 && flexDownhill == 0)
+                    ? const Radius.circular(4.0)
+                    : const Radius.circular(0.0),
+                bottomLeft: (flexPause == 0 && flexDownhill == 0)
+                    ? const Radius.circular(4.0)
+                    : const Radius.circular(0.0),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }

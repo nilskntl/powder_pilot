@@ -63,7 +63,11 @@ class ActivityDataProvider extends ChangeNotifier {
   List<List<double>> speeds = [];
 
   // Route
-  ActivityRoute route = ActivityRoute(coordinates: [], slopes: []);
+  ActivityRoute route = const ActivityRoute(coordinates: [], slopes: []);
+
+  // Activity Locations
+  late final ActivityLocations activityLocations;
+  bool _activityLocationsLoaded = false;
 
   void updateData({
     required double newSpeed,
@@ -92,7 +96,7 @@ class ActivityDataProvider extends ChangeNotifier {
     required ActivityStatus newStatus,
     required String newArea,
     required List<List<int>> newAltitudes,
-    required List<List<double>> newSpeeds,
+    required List<List<double>> newSpeeds, required ActivityLocations newActivityLocations,
   }) {
     speed = newSpeed;
     maxSpeed = newMaxSpeed;
@@ -121,6 +125,10 @@ class ActivityDataProvider extends ChangeNotifier {
     area = newArea;
     altitudes = newAltitudes;
     speeds = newSpeeds;
+    if(!_activityLocationsLoaded) {
+      activityLocations = newActivityLocations;
+      _activityLocationsLoaded = true;
+    }
 
     notifyListeners();
   }

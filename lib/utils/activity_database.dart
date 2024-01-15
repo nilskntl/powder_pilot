@@ -8,7 +8,7 @@ import 'package:sqflite/sqflite.dart';
 class ActivityDatabaseHelper {
 
   // This is the actual database filename that is saved in the docs directory.
-  static const _databaseName = "activity_databassesn.db";
+  static const _databaseName = "activity_databassas.db";
   // Table name
   static const _tableName = "activity";
   // Increment this version when you need to change the schema.
@@ -68,6 +68,9 @@ class ActivityDatabaseHelper {
                 endTime TEXT,
                 altitudes TEXT,
                 speeds TEXT,
+                speedLocation TEXT,
+                startLocation TEXT,
+                endLocation TEXT,
                 image BLOB
               )
               ''');
@@ -140,6 +143,9 @@ class ActivityDatabaseHelper {
         endTime: maps[i]['endTime'] as String,
         altitudes: maps[i]['altitudes'] as String,
         speeds: maps[i]['speeds'] as String,
+        speedLocation: maps[i]['speedLocation'] as String,
+        startLocation: maps[i]['startLocation'] as String,
+        endLocation: maps[i]['endLocation'] as String,
         image: maps[i]['image'] as Uint8List?,
       );
     });
@@ -235,6 +241,11 @@ class ActivityDatabase {
   // Image
   final Uint8List? image;
 
+  // Important locations
+  final String speedLocation;
+  final String startLocation;
+  final String endLocation;
+
   const ActivityDatabase(
       {required this.areaName,
       required this.maxSpeed,
@@ -253,7 +264,7 @@ class ActivityDatabase {
       required this.elapsedDownhillTime,
       required this.elapsedUphillTime,
       required this.elapsedPauseTime,
-      required this.route, required this.startTime, required this.endTime, this.image, this.id=-1, required this.altitudes, required this.speeds});
+      required this.route, required this.startTime, required this.endTime, this.image, this.id=-1, required this.altitudes, required this.speeds, required  this.speedLocation, required this.startLocation, required this.endLocation});
 
   // Convert a Activity into a Map. The keys must correspond to the names of the
   // columns in the database.
@@ -282,6 +293,9 @@ class ActivityDatabase {
       'endTime': endTime,
       'altitudes': altitudes,
       'speeds': speeds,
+      'speedLocation': speedLocation,
+      'startLocation': startLocation,
+      'endLocation': endLocation,
       if (image != null) 'image': image,
     };
     return map;
@@ -291,7 +305,7 @@ class ActivityDatabase {
   // each Activity when using the print statement.
   @override
   String toString() {
-    return 'Activity{id: $id, areaName: $areaName, maxSpeed: $maxSpeed, averageSpeed: $averageSpeed, totalRuns: $totalRuns, longestRun: $longestRun, maxAltitude: $maxAltitude, minAltitude: $minAltitude, avgAltitude: $avgAltitude, maxSlope: $maxSlope, avgSlope: $avgSlope, distance: $distance, distanceDownhill: $distanceDownhill, distanceUphill: $distanceUphill, elapsedTime: $elapsedTime, elapsedDownhillTime: $elapsedDownhillTime, elapsedUphillTime: $elapsedUphillTime, elapsedPauseTime: $elapsedPauseTime, route: $route, startTime: $startTime, endTime: $endTime, altitudes: $altitudes}';
+    return 'Activity{id: $id, areaName: $areaName, maxSpeed: $maxSpeed, averageSpeed: $averageSpeed, totalRuns: $totalRuns, longestRun: $longestRun, maxAltitude: $maxAltitude, minAltitude: $minAltitude, avgAltitude: $avgAltitude, maxSlope: $maxSlope, avgSlope: $avgSlope, distance: $distance, distanceDownhill: $distanceDownhill, distanceUphill: $distanceUphill, elapsedTime: $elapsedTime, elapsedDownhillTime: $elapsedDownhillTime, elapsedUphillTime: $elapsedUphillTime, elapsedPauseTime: $elapsedPauseTime, route: $route, startTime: $startTime, endTime: $endTime, altitudes: $altitudes, speeds: $speeds, image: $image, speedLocation: $speedLocation, startLocation: $startLocation, endLocation: $endLocation}';
   }
 
   ActivityDatabase copyWith({required int newId}) {
@@ -320,6 +334,9 @@ class ActivityDatabase {
       altitudes: altitudes,
       speeds: speeds,
       image: image,
+      speedLocation: speedLocation,
+      startLocation: startLocation,
+      endLocation: endLocation,
     );
   }
 }
