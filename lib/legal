@@ -1,0 +1,55 @@
+Terms and Conditions (T&C) for the SkiTracker App:
+
+1. Scope of Application
+
+These General Terms and Conditions (hereinafter "T&C") apply to the use of the SkiTracker App (hereinafter "App") developed by Nils Knittel.
+
+2. Use of the App
+
+The use of the App is subject to the following conditions. By using the App, you agree to these T&C.
+
+3. Intellectual Property
+
+The App and all associated content, including but not limited to texts, graphics, logos, and software, are the property of Nils Knittel and are protected by copyright.
+
+4. Disclaimer
+
+The use of the App is at your own risk. Nils Knittel assumes no liability for damages, losses, or issues arising from the use of the App.
+
+5. Maintenance and Support
+
+Nils Knittel reserves the right to update, modify, or expand the App at its discretion. There is no obligation to provide maintenance or support unless expressly agreed upon.
+
+6. Changes to the T&C
+
+Nils Knittel reserves the right to change these T&C at any time. Changes will be published within the App. Continued use of the App is considered acceptance of the amended T&C.
+
+7. Termination
+
+Nils Knittel reserves the right to terminate the use of the App by a user at any time, especially in case of violations of these T&C.
+
+8. Applicable Law and Jurisdiction
+
+These T&C are governed by the law of Nils Knittel. The place of jurisdiction for all disputes is the registered office of Nils Knittel.
+
+9. Miscellaneous Provisions
+
+Additional provisions can be added [here if specific regulations are necessary].
+
+Privacy Policy for the SkiTracker App:
+
+1. Data Sources and Types
+
+The App uses data from the Overpass API  for a slope analysis and the Flutter Geocode Library for location determination. Nils Knittel does not collect personal data from users.
+
+2. Data Usage and Disclosure
+
+The data obtained from the Overpass API and the Flutter Geocode Library is solely for the purpose of location determination in the App. Nils Knittel has no control over the data collection and processing by these external sources.
+
+3. Security
+
+Nils Knittel implements appropriate security measures to ensure the integrity and security of the data.
+
+4. Changes to the Privacy Policy
+
+Nils Knittel reserves the right to update this Privacy Policy. Changes will be published within the App.
