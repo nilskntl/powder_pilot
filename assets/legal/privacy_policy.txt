@@ -2,15 +2,11 @@ Privacy Policy:
 
 1. Data Sources and Types
 
-The App uses data from the Overpass API  for a slope analysis and the Flutter Geocode Library for location determination. Nils Knittel does not collect personal data from users.
+The App uses data from the Overpass API for a slope analysis, from opensnowmap.org for the map and the Flutter Geocode Library for location determination. Nils Knittel does not collect personal data from users.
 
 2. Data Usage and Disclosure
 
-The data obtained from the Overpass API and the Flutter Geocode Library is solely for the purpose of location determination in the App. Nils Knittel has no control over the data collection and processing by these external sources.
-
-3. Security
-
-Nils Knittel implements appropriate security measures to ensure the integrity and security of the data.
+The data obtained from the Overpass API, opensnowmap.org and the Flutter Geocode Library is solely for the purpose of location determination in the App. Nils Knittel has no control over the data collection and processing by these external sources.
 
 4. Changes to the Privacy Policy
 
