@@ -95,7 +95,11 @@ class _CustomDialogState extends State<CustomDialog>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16.0),
                 color: ColorTheme.background,
-              ), child: ActivitySummary(activityDatabase: widget.activityDatabase, small: true,),
+              ),
+              child: ActivitySummary(
+                activityDatabase: widget.activityDatabase,
+                small: true,
+              ),
             ),
           ),
         ),
@@ -113,11 +117,15 @@ class _CustomDialogState extends State<CustomDialog>
 class Activity extends ActivityLocation {
   final int id;
 
-  Activity({required this.id, String areaName = '', LatLng currentPosition = const LatLng(0.0, 0.0), bool mapDownloaded = false}) {
+  Activity(
+      {required this.id,
+      String areaName = '',
+      LatLng currentPosition = const LatLng(0.0, 0.0),
+      bool mapDownloaded = false}) {
     currentLatitude = currentPosition.latitude;
     currentLongitude = currentPosition.longitude;
     _mapDownloaded = mapDownloaded;
-    if(mapDownloaded) {
+    if (mapDownloaded) {
       _latitudeWhenDownloaded = currentLatitude;
       _longitudeWhenDownloaded = currentLongitude;
     }
@@ -167,7 +175,8 @@ class Activity extends ActivityLocation {
     }
     speed = 0.0;
     slope = 0.0;
-    activityLocations = activityLocations.setEndLocation([currentLongitude, currentLatitude]);
+    activityLocations =
+        activityLocations.setEndLocation([currentLongitude, currentLatitude]);
     _running = false;
     endTime = DateTime.now();
     _active = false;
@@ -190,14 +199,20 @@ class Activity extends ActivityLocation {
 
     _elapsedTime = Duration.zero;
 
-    SkiTracker.createNewActivity(areaName: areaName, currentPosition: LatLng(currentLatitude, currentLongitude), mapDownloaded: _mapDownloaded);
+    SkiTracker.createNewActivity(
+        areaName: areaName,
+        currentPosition: LatLng(currentLatitude, currentLongitude),
+        mapDownloaded: _mapDownloaded);
   }
 
-  void _showCustomDialog(BuildContext context, ActivityDatabase activityDatabase) {
+  void _showCustomDialog(
+      BuildContext context, ActivityDatabase activityDatabase) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return CustomDialog(activityDatabase: activityDatabase,);
+        return CustomDialog(
+          activityDatabase: activityDatabase,
+        );
       },
     );
   }
@@ -279,8 +294,9 @@ class ActivityLocation extends ActivityUtils {
       if (location.speed! < 55) {
         speed = location.speed!;
 
-        if(speed > maxSpeed) {
-          activityLocations = activityLocations.setFastestLocation([currentLongitude, currentLatitude]);
+        if (speed > maxSpeed) {
+          activityLocations = activityLocations
+              .setFastestLocation([currentLongitude, currentLatitude]);
           maxSpeed = speed;
         }
 
@@ -297,7 +313,6 @@ class ActivityLocation extends ActivityUtils {
           elapsedTime.inSeconds.toDouble(),
           double.parse(speed.toStringAsFixed(1))
         ]);
-
       }
     }
 
@@ -414,7 +429,8 @@ class ActivityLocation extends ActivityUtils {
       _currentExtrema = altitude;
       _tempAltitude = altitude;
       _tempLocation = location;
-      activityLocations = activityLocations.setStartLocation([currentLongitude, currentLatitude]);
+      activityLocations = activityLocations
+          .setStartLocation([currentLongitude, currentLatitude]);
       if ((route.slopes.isEmpty || route.slopes.last.name == 'Unknown') &&
           _mapDownloaded == true) {
         _updateNearestSlope();
@@ -499,11 +515,15 @@ class ActivityLocation extends ActivityUtils {
   Future<void> _updateNearestSlope() async {
     if (_mapDownloaded == true) {
       if (_statusUphill) {
-        route.addSlope(
-            SlopeMap.findNearestSlope(latitude: currentLatitude, longitude: currentLongitude, lift: true));
+        route.addSlope(SlopeMap.findNearestSlope(
+            latitude: currentLatitude,
+            longitude: currentLongitude,
+            lift: true));
       } else if (_statusDownhill) {
-        route.addSlope(
-            SlopeMap.findNearestSlope(latitude: currentLatitude, longitude: currentLongitude, lift: false));
+        route.addSlope(SlopeMap.findNearestSlope(
+            latitude: currentLatitude,
+            longitude: currentLongitude,
+            lift: false));
       }
     }
   }
@@ -700,6 +720,7 @@ class ActivityData extends ActivityDataTemp {
   GpsAccuracy gpsAccuracy = GpsAccuracy.none;
 
   // Route
+  // ignore: prefer_const_constructors
   final ActivityRoute route = ActivityRoute(slopes: [], coordinates: []); // Don't define as const
 
   // List of altitudes
@@ -710,7 +731,6 @@ class ActivityData extends ActivityDataTemp {
 
   // Important locations
   ActivityLocations activityLocations = const ActivityLocations();
-
 
   ActivityDatabase saveActivity() {
     ActivityDatabase activityDatabase = ActivityDatabase(
@@ -819,19 +839,30 @@ class ActivityLocations {
   final List<double> startLocation;
   final List<double> endLocation;
 
-  const ActivityLocations({this.fastestLocation = const [0.0, 0.0], this.startLocation = const [0.0, 0.0], this.endLocation = const [0.0, 0.0]});
+  const ActivityLocations(
+      {this.fastestLocation = const [0.0, 0.0],
+      this.startLocation = const [0.0, 0.0],
+      this.endLocation = const [0.0, 0.0]});
 
   // Edit value of final Lists
   ActivityLocations setFastestLocation(List<double> newFastestLocation) {
-    return ActivityLocations(fastestLocation: newFastestLocation, startLocation: startLocation, endLocation: endLocation);
+    return ActivityLocations(
+        fastestLocation: newFastestLocation,
+        startLocation: startLocation,
+        endLocation: endLocation);
   }
 
   ActivityLocations setStartLocation(List<double> newStartLocation) {
-    return ActivityLocations(fastestLocation: fastestLocation, startLocation: newStartLocation, endLocation: endLocation);
+    return ActivityLocations(
+        fastestLocation: fastestLocation,
+        startLocation: newStartLocation,
+        endLocation: endLocation);
   }
 
   ActivityLocations setEndLocation(List<double> newEndLocation) {
-    return ActivityLocations(fastestLocation: fastestLocation, startLocation: startLocation, endLocation: newEndLocation);
+    return ActivityLocations(
+        fastestLocation: fastestLocation,
+        startLocation: startLocation,
+        endLocation: newEndLocation);
   }
-  
 }

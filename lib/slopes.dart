@@ -1,7 +1,8 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:ski_tracker/utils/general_utils.dart';
-import 'dart:math' as math;
 
 class SlopeMap {
   static final List<Slope> _slopes = [];
@@ -23,29 +24,40 @@ class SlopeMap {
   // Get a list of possible near Slopes
   static double distanceBuffer = 60;
 
-  static Slope findNearestSlope({required double latitude, required double longitude, bool lift = false}) {
+  static Slope findNearestSlope(
+      {required double latitude,
+      required double longitude,
+      bool lift = false}) {
     if (_slopes.isEmpty) {
       return Slope(empty: true);
     }
 
-    double calculateDistanceToLine(double latitude, double longitude,
-        double x1, double y1, double x2, double y2) {
-
-      double segmentLengthSquared = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+    double calculateDistanceToLine(double latitude, double longitude, double x1,
+        double y1, double x2, double y2) {
+      double segmentLengthSquared =
+          (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
 
       if (segmentLengthSquared == 0) {
         // Handle case where the line segment is just a point
-        return math.sqrt((longitude - x1) * (longitude - x1) + (latitude - y1) * (latitude - y1));
+        return math.sqrt((longitude - x1) * (longitude - x1) +
+            (latitude - y1) * (latitude - y1));
       }
 
-      double t = math.max(0, math.min(1, ((longitude - x1) * (x2 - x1) + (latitude - y1) * (y2 - y1)) / segmentLengthSquared));
+      double t = math.max(
+          0,
+          math.min(
+              1,
+              ((longitude - x1) * (x2 - x1) + (latitude - y1) * (y2 - y1)) /
+                  segmentLengthSquared));
       double projectedX = x1 + t * (x2 - x1);
       double projectedY = y1 + t * (y2 - y1);
 
       const double degreesToKilometers = 111.0;
       const double metersConversionFactor = degreesToKilometers * 1000.0;
 
-      return math.sqrt((longitude - projectedX) * (longitude - projectedX) + (latitude - projectedY) * (latitude - projectedY)) * metersConversionFactor;
+      return math.sqrt((longitude - projectedX) * (longitude - projectedX) +
+              (latitude - projectedY) * (latitude - projectedY)) *
+          metersConversionFactor;
     }
 
     Slope nearestSlope = _slopes[0];
@@ -54,8 +66,9 @@ class SlopeMap {
     double getDistanceByIndex(
         {required Slope slope,
         required int firstIndex,
-        required int secondIndex, required double distanceToPoint}) {
-      if(distanceToPoint > 200) {
+        required int secondIndex,
+        required double distanceToPoint}) {
+      if (distanceToPoint > 200) {
         return distanceToPoint;
       }
       double x1 = slope.coordinates[firstIndex][1];
@@ -75,7 +88,8 @@ class SlopeMap {
     }
 
     for (Slope slope in _slopes) {
-      if (((!slope.lift && !lift) || (slope.lift && lift)) && slope.coordinates.isNotEmpty) {
+      if (((!slope.lift && !lift) || (slope.lift && lift)) &&
+          slope.coordinates.isNotEmpty) {
         List<double> distanceToSlope =
             calculateSlopeDistance(slope, longitude, latitude);
         int indexOfNearestPoint = distanceToSlope[1].toInt();
@@ -87,13 +101,15 @@ class SlopeMap {
             getDistanceByIndex(
                 slope: slope,
                 firstIndex: indexOfNearestPoint - 1,
-                secondIndex: indexOfNearestPoint, distanceToPoint: slopeDistanceToPoint);
+                secondIndex: indexOfNearestPoint,
+                distanceToPoint: slopeDistanceToPoint);
           }
           if (indexOfNearestPoint != slope.coordinates.length - 1) {
             getDistanceByIndex(
                 slope: slope,
                 firstIndex: indexOfNearestPoint,
-                secondIndex: indexOfNearestPoint + 1, distanceToPoint: slopeDistanceToPoint);
+                secondIndex: indexOfNearestPoint + 1,
+                distanceToPoint: slopeDistanceToPoint);
           }
         } else {
           // Only one point in the slope, calculate distance directly
@@ -105,7 +121,7 @@ class SlopeMap {
       }
     }
 
-    if(!lift) {
+    if (!lift) {
       if (minDistance > distanceBuffer) {
         return Slope(empty: true);
       }
@@ -156,9 +172,7 @@ class Slope {
       _slope = slope;
       _type = slope['tags']['aerialway'] ?? 'Unknown';
       String name = slope['tags']['name'] ?? 'Unknown';
-      _ref = name != 'Unknown'
-          ? '$name '
-          : (slope['tags']['ref'] ?? 'Unknown');
+      _ref = name != 'Unknown' ? '$name ' : (slope['tags']['ref'] ?? 'Unknown');
       _initData();
     }
     if (!empty && !lift) {

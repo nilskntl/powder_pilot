@@ -52,17 +52,21 @@ class _BackgroundLocationButtonState extends State<BackgroundLocationButton> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if(buttonText != 'Next')
-          Utils.buildText(text: 'Step ${buttonText == 'Open Location Settings' ? '1' : '2'}/2', fontSize: FontTheme.size - 2, fontWeight: FontWeight.normal, color: ColorTheme.contrast),
-        if(buttonText != 'Next')
-          const SizedBox(height: 8),
+        if (buttonText != 'Next')
+          Utils.buildText(
+              text:
+                  'Step ${buttonText == 'Open Location Settings' ? '1' : '2'}/2',
+              fontSize: FontTheme.size - 2,
+              fontWeight: FontWeight.normal,
+              color: ColorTheme.contrast),
+        if (buttonText != 'Next') const SizedBox(height: 8),
         Container(
           width: double.infinity,
           height: 64.0,
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: ElevatedButton(
             onPressed: () {
-              if(buttonText == 'Open Location Settings') {
+              if (buttonText == 'Open Location Settings') {
                 _requestLocationPermission();
               } else if (buttonText == 'Open Battery Settings') {
                 _openBatterySettings();
@@ -77,7 +81,7 @@ class _BackgroundLocationButtonState extends State<BackgroundLocationButton> {
             style: ElevatedButton.styleFrom(
               foregroundColor: ColorTheme.contrast,
               backgroundColor:
-              buttonText == 'Next' ? ColorTheme.primary : ColorTheme.grey,
+                  buttonText == 'Next' ? ColorTheme.primary : ColorTheme.grey,
               padding: const EdgeInsets.symmetric(vertical: 20),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),

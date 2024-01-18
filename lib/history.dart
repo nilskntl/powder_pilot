@@ -14,19 +14,32 @@ class History extends StatefulWidget {
 
   static const double iconHeight = 64.0;
 
-  static void showDeleteConfirmationDialog(BuildContext context, ActivityDatabase activity, void Function() onPressed) {
+  static void showDeleteConfirmationDialog(BuildContext context,
+      ActivityDatabase activity, void Function() onPressed) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Utils.buildText(text: 'Delete activity?', caps: false, align: TextAlign.left, fontWeight: FontWeight.bold, fontSize: FontTheme.sizeSubHeader),
-          content: Utils.buildText(text: 'Do you really want to delete this activity?', caps: false, align: TextAlign.left),
+          title: Utils.buildText(
+              text: 'Delete activity?',
+              caps: false,
+              align: TextAlign.left,
+              fontWeight: FontWeight.bold,
+              fontSize: FontTheme.sizeSubHeader),
+          content: Utils.buildText(
+              text: 'Do you really want to delete this activity?',
+              caps: false,
+              align: TextAlign.left),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Utils.buildText(text: 'Cancel', caps: false, align: TextAlign.left, color: ColorTheme.primary),
+              child: Utils.buildText(
+                  text: 'Cancel',
+                  caps: false,
+                  align: TextAlign.left,
+                  color: ColorTheme.primary),
             ),
             TextButton(
               onPressed: () {
@@ -34,7 +47,11 @@ class History extends StatefulWidget {
                 Navigator.of(context).pop();
                 onPressed();
               },
-              child: Utils.buildText(text: 'Delete', caps: false, align: TextAlign.left, color: ColorTheme.primary),
+              child: Utils.buildText(
+                  text: 'Delete',
+                  caps: false,
+                  align: TextAlign.left,
+                  color: ColorTheme.primary),
             ),
           ],
         );
@@ -243,7 +260,8 @@ class HistoryState extends State<History> {
                                                       Utils.buildText(
                                                           text: 'Activities',
                                                           fontSize:
-                                                              FontTheme.size - 4,
+                                                              FontTheme.size -
+                                                                  4,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           color:
@@ -255,7 +273,11 @@ class HistoryState extends State<History> {
                                                         CrossAxisAlignment.end,
                                                     children: [
                                                       Utils.buildText(
-                                                          text: Utils.durationStringToString(activities.first.startTime)[0],
+                                                          text: Utils.durationStringToString(
+                                                                  activities
+                                                                      .first
+                                                                      .startTime)[
+                                                              0],
                                                           fontSize:
                                                               FontTheme.size,
                                                           fontWeight:
@@ -265,7 +287,8 @@ class HistoryState extends State<History> {
                                                       Utils.buildText(
                                                           text: 'Latest',
                                                           fontSize:
-                                                              FontTheme.size - 4,
+                                                              FontTheme.size -
+                                                                  4,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           color:
@@ -277,7 +300,11 @@ class HistoryState extends State<History> {
                                                         CrossAxisAlignment.end,
                                                     children: [
                                                       Utils.buildText(
-                                                          text: Utils.durationStringToString(activities.last.startTime)[0],
+                                                          text: Utils.durationStringToString(
+                                                                  activities
+                                                                      .last
+                                                                      .startTime)[
+                                                              0],
                                                           fontSize:
                                                               FontTheme.size,
                                                           fontWeight:
@@ -287,7 +314,8 @@ class HistoryState extends State<History> {
                                                       Utils.buildText(
                                                           text: 'Earliest',
                                                           fontSize:
-                                                              FontTheme.size - 4,
+                                                              FontTheme.size -
+                                                                  4,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           color:
@@ -333,8 +361,6 @@ class HistoryState extends State<History> {
   }
 
   Widget _buildItem(ActivityDatabase activity) {
-
-
     return GestureDetector(
       onLongPress: () {
         History.showDeleteConfirmationDialog(context, activity, () {
@@ -346,7 +372,8 @@ class HistoryState extends State<History> {
           context,
           MaterialPageRoute(
             builder: (context) => ActivitySummaryPage(
-              activityDatabase: activity, historyState: this,
+              activityDatabase: activity,
+              historyState: this,
             ),
           ),
         );
@@ -389,17 +416,17 @@ class HistoryState extends State<History> {
                         width: History.iconHeight - 12,
                         height: History.iconHeight - 12,
                         decoration: const BoxDecoration(
-                          color: ColorTheme.primary,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(16.0),)
-                        ),
+                            color: ColorTheme.primary,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(16.0),
+                            )),
                         child: const Icon(
                           Icons.downhill_skiing_rounded,
                           color: ColorTheme.secondary,
                           size: History.iconHeight - 36,
                         ),
                       ),
-                        /*
+                      /*
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16.0),
                           child: Image.asset(
@@ -415,14 +442,16 @@ class HistoryState extends State<History> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Utils.buildText(
-                                text: Utils.durationStringToString(activity.startTime)[0],
+                                text: Utils.durationStringToString(
+                                    activity.startTime)[0],
                                 fontSize: FontTheme.sizeSubHeader,
                                 fontWeight: FontWeight.bold,
                                 color: ColorTheme.contrast),
                             Row(
                               children: [
                                 Utils.buildText(
-                                    text: Utils.durationStringToString(activity.startTime)[1],
+                                    text: Utils.durationStringToString(
+                                        activity.startTime)[1],
                                     fontSize: FontTheme.size,
                                     fontWeight: FontWeight.bold,
                                     color: ColorTheme.grey),
@@ -434,7 +463,8 @@ class HistoryState extends State<History> {
                                     color: ColorTheme.grey),
                                 const SizedBox(width: 4.0),
                                 Utils.buildText(
-                                    text: Utils.durationStringToString(activity.endTime)[1],
+                                    text: Utils.durationStringToString(
+                                        activity.endTime)[1],
                                     fontSize: FontTheme.size,
                                     fontWeight: FontWeight.bold,
                                     color: ColorTheme.grey),

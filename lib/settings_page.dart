@@ -17,7 +17,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-
   @override
   void initState() {
     super.initState();
@@ -47,17 +46,28 @@ class _SettingsPageState extends State<SettingsPage> {
               children: [
                 TextButton(
                   onPressed: () {
-                    _showDialog(context: context, asset: 'assets/legal/privacy_policy.txt');
+                    _showDialog(
+                        context: context,
+                        asset: 'assets/legal/privacy_policy.txt');
                   },
-                  child: Utils.buildText(text: 'Privacy Policy', color: ColorTheme.grey, caps: false, fontWeight: FontWeight.bold),
+                  child: Utils.buildText(
+                      text: 'Privacy Policy',
+                      color: ColorTheme.grey,
+                      caps: false,
+                      fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 16.0),
                 TextButton(
-                  onPressed: () {
-                    _showDialog(context: context, asset: 'assets/legal/terms_of_service.txt');
-                  },
-                  child: Utils.buildText(text: 'Terms of Service', color: ColorTheme.grey, caps: false, fontWeight: FontWeight.bold)
-                ),
+                    onPressed: () {
+                      _showDialog(
+                          context: context,
+                          asset: 'assets/legal/terms_of_service.txt');
+                    },
+                    child: Utils.buildText(
+                        text: 'Terms of Service',
+                        color: ColorTheme.grey,
+                        caps: false,
+                        fontWeight: FontWeight.bold)),
               ],
             ),
             const SizedBox(height: 16),
@@ -74,7 +84,7 @@ class _SettingsPageState extends State<SettingsPage> {
         return Dialog(
           child: Container(
             padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-            height: 150,// Hier die gewünschte Breite setzen
+            height: 150, // Hier die gewünschte Breite setzen
             child: ListView(
               children: [
                 _buildLanguageOption("Metric (km/h)"),
@@ -102,11 +112,11 @@ class _SettingsPageState extends State<SettingsPage> {
       onTap: () {
         setState(() {
           Info.setUnits(unit.contains("Metric") ? 'metric' : 'imperial');
-          SharedPref.saveString('units', unit.contains("Metric") ? 'metric' : 'imperial');
+          SharedPref.saveString(
+              'units', unit.contains("Metric") ? 'metric' : 'imperial');
         });
         Navigator.pop(context); // Close the dialog
       },
     );
   }
-
 }

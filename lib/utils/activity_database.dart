@@ -6,17 +6,20 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class ActivityDatabaseHelper {
-
   // This is the actual database filename that is saved in the docs directory.
   static const _databaseName = "activity_database.db";
+
   // Table name
   static const _tableName = "activity";
+
   // Increment this version when you need to change the schema.
   static const _databaseVersion = 1;
 
   // Make this a singleton class.
   ActivityDatabaseHelper._privateConstructor();
-  static final ActivityDatabaseHelper instance = ActivityDatabaseHelper._privateConstructor();
+
+  static final ActivityDatabaseHelper instance =
+      ActivityDatabaseHelper._privateConstructor();
 
   // Only allow a single open connection to the database.
   static late Database _database;
@@ -91,7 +94,7 @@ class ActivityDatabaseHelper {
     if (activityDatabase.id == -1) {
       // Query the maximum existing id in the database.
       List<Map<String, dynamic>> result =
-      await db.rawQuery('SELECT MAX(id) as maxId FROM $_tableName');
+          await db.rawQuery('SELECT MAX(id) as maxId FROM $_tableName');
       int maxId = (result.first['maxId'] ?? 0) as int;
 
       // Generate a new unique id.
@@ -149,7 +152,6 @@ class ActivityDatabaseHelper {
         image: maps[i]['image'] as Uint8List?,
       );
     });
-
   }
 
   static Future<void> updateActivity(ActivityDatabase activityDatabase) async {
@@ -264,7 +266,16 @@ class ActivityDatabase {
       required this.elapsedDownhillTime,
       required this.elapsedUphillTime,
       required this.elapsedPauseTime,
-      required this.route, required this.startTime, required this.endTime, this.image, this.id=-1, required this.altitudes, required this.speeds, required  this.speedLocation, required this.startLocation, required this.endLocation});
+      required this.route,
+      required this.startTime,
+      required this.endTime,
+      this.image,
+      this.id = -1,
+      required this.altitudes,
+      required this.speeds,
+      required this.speedLocation,
+      required this.startLocation,
+      required this.endLocation});
 
   // Convert a Activity into a Map. The keys must correspond to the names of the
   // columns in the database.
@@ -342,7 +353,6 @@ class ActivityDatabase {
 }
 
 class DummyActivities {
-
   void createDummyActivityDatabase() {
     ActivityDatabase activityDatabase = const ActivityDatabase(
       areaName: 'Austria, Kitzbühel',
@@ -375,9 +385,5 @@ class DummyActivities {
     );
 
     ActivityDatabaseHelper.insertActivity(activityDatabase);
-
   }
-
-
-
 }

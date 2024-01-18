@@ -62,8 +62,10 @@ class CustomAppBar extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       // Open Settings page
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage()));
-
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SettingsPage()));
                     },
                     child: const SizedBox(
                       width: itemsSize,

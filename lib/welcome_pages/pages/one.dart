@@ -15,9 +15,9 @@ class _PageOneWidgetState extends State<PageOneWidget> {
 
   Widget _buildPageIcon(
       {required String image,
-        required String text,
-        required int pageBack,
-        required int pageForward}) {
+      required String text,
+      required int pageBack,
+      required int pageForward}) {
     double height = MediaQuery.of(context).size.height * 0.30;
 
     Widget buildButton({required int page}) {
@@ -85,27 +85,26 @@ class _PageOneWidgetState extends State<PageOneWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-        flex: 2,
-        child: PageView(
-          controller: _pageController,
-          children: [
-            _buildPageIcon(
-                image: 'assets/images/welcome_pages/activity.png',
-                text: 'Track your skiing activity with ${SkiTracker.appName}',
-                pageBack: 2,
-                pageForward: 1),
-            _buildPageIcon(
-                image: 'assets/images/welcome_pages/stats.png',
-                text: 'See your stats and improve your skiing',
-                pageBack: 0,
-                pageForward: 2),
-            _buildPageIcon(
-                image: 'assets/images/welcome_pages/slope_info.png',
-                text: 'Analyse your ski day',
-                pageBack: 1,
-                pageForward: 0),
-          ],
-        ));
+    return PageView(
+      clipBehavior: Clip.hardEdge,
+      controller: _pageController,
+      children: [
+        _buildPageIcon(
+            image: 'assets/images/welcome_pages/activity.png',
+            text: 'Track your skiing activity with ${SkiTracker.appName}',
+            pageBack: 2,
+            pageForward: 1),
+        _buildPageIcon(
+            image: 'assets/images/welcome_pages/stats.png',
+            text: 'See your stats and improve your skiing',
+            pageBack: 0,
+            pageForward: 2),
+        _buildPageIcon(
+            image: 'assets/images/welcome_pages/slope_info.png',
+            text: 'Analyse your ski day',
+            pageBack: 1,
+            pageForward: 0),
+      ],
+    );
   }
 }

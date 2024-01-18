@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +14,7 @@ class WeatherDisplay extends StatefulWidget {
 
 class _WeatherDisplayState extends State<WeatherDisplay> {
   double height = 200.0;
-  late final Timer _timer;
+  // late final Timer _timer;
 
   double getStatusBarHeight(BuildContext context) {
     return MediaQuery.of(context).padding.top;
@@ -34,20 +32,21 @@ class _WeatherDisplayState extends State<WeatherDisplay> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(0.0),
-      height: height *3,
-      child: Stack (
-        children: [
-          Image.asset(
-            'assets/images/background_image.png',
-            width: double.infinity, // Bildbreite auf Bildschirmbreite strecken
-            fit: BoxFit.cover,
-            alignment: Alignment.topCenter,
-          ),
-        ],
-      )
-    );
+        padding: const EdgeInsets.all(0.0),
+        height: height * 3,
+        child: Stack(
+          children: [
+            Image.asset(
+              'assets/images/background_image.png',
+              width: double.infinity,
+              // Bildbreite auf Bildschirmbreite strecken
+              fit: BoxFit.cover,
+              alignment: Alignment.topCenter,
+            ),
+          ],
+        ));
   }
+
 /*
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {

@@ -39,13 +39,12 @@ class WeatherManager {
       if (!locationLoaded) {
         if (SkiTracker.getActivity().currentLatitude != 0.0 &&
             SkiTracker.getActivity().currentLongitude != 0.0) {
-          fetchData(SkiTracker.getActivity().currentLatitude, SkiTracker.getActivity().currentLongitude);
+          fetchData(SkiTracker.getActivity().currentLatitude,
+              SkiTracker.getActivity().currentLongitude);
           locationLoaded = true;
         }
         if (!weatherLoaded) {
-          if (SkiTracker.getActivity != null) {
-            weatherLoaded = true;
-          }
+          weatherLoaded = true;
         }
         if (weatherLoaded && locationLoaded) {
           _timer.cancel();
@@ -58,7 +57,8 @@ class WeatherManager {
   }
 
   Future<void> fetchData(double latitude, double longitude) async {
-    final url = Uri.parse("https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m&hourly=precipitation_probability,snow_depth,visibility&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max");
+    final url = Uri.parse(
+        "https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m&hourly=precipitation_probability,snow_depth,visibility&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max");
 
     final response = await http.get(url);
 
@@ -79,7 +79,8 @@ class WeatherManager {
       sunset = data['daily']['sunset'] ?? 0;
       uvIndexMax = data['daily']['uv_index_max'] ?? 0;
 
-      precipitationProbability = data['hourly']['precipitation_probability'] ?? 0;
+      precipitationProbability =
+          data['hourly']['precipitation_probability'] ?? 0;
       snowDepth = data['hourly']['snow_depth'] ?? 0;
       visibility = data['hourly']['visibility'] ?? 0;
 
@@ -98,9 +99,10 @@ class WeatherManager {
     return "WeatherManager: temperature: $temperature, relativeHumidity: $relativeHumidity, apparentTemperature: $apparentTemperature, weatherCode: $weatherCode, surfacePressure: $surfacePressure, windSpeed: $windSpeed, windDirection: $windDirection, maxTemperature: $maxTemperature, minTemperature: $minTemperature, sunrise: $sunrise, sunset: $sunset, uvIndexMax: $uvIndexMax, precipitationProbability: $precipitationProbability, snowDepth: $snowDepth, visibility: $visibility";
   }
 
-  void updateCurrentTemperature() async{
+  void updateCurrentTemperature() async {
     if (DateTime.now().hour != lastFetchTime.hour) {
-      await fetchData(SkiTracker.getActivity().currentLatitude, SkiTracker.getActivity().currentLongitude);
+      await fetchData(SkiTracker.getActivity().currentLatitude,
+          SkiTracker.getActivity().currentLongitude);
       lastFetchTime = DateTime.now();
     }
   }

@@ -1204,7 +1204,8 @@ class _GraphState extends State<Graph> {
     }
   }
 
-  List<FlSpot> _convertIntToFlSpots(List<List<int>> integerLists, double factor) {
+  List<FlSpot> _convertIntToFlSpots(
+      List<List<int>> integerLists, double factor) {
     if (!_differentEntries) {
       hasDifferentEntry(integerLists);
     }
@@ -1213,14 +1214,16 @@ class _GraphState extends State<Graph> {
     for (List<int> integers in integerLists) {
       // Annahme: Die Liste hat genau zwei Elemente (x und y).
       if (integers.length == 2) {
-        flSpots.add(FlSpot(integers[0].toDouble(), integers[1].toDouble() * factor));
+        flSpots.add(
+            FlSpot(integers[0].toDouble(), integers[1].toDouble() * factor));
       }
     }
 
     return flSpots;
   }
 
-  List<FlSpot> _convertDoubleToFlSpots(List<List<double>> doubleList, double factor) {
+  List<FlSpot> _convertDoubleToFlSpots(
+      List<List<double>> doubleList, double factor) {
     if (!_differentEntries) {
       hasDifferentEntry(doubleList);
     }
@@ -1359,11 +1362,13 @@ class _GraphState extends State<Graph> {
                 children: [
                   _buildLineChart(
                     color: ColorTheme.primary,
-                    flSpots: _convertIntToFlSpots(widget.dataAltitudes, Info.altitudeFactor),
+                    flSpots: _convertIntToFlSpots(
+                        widget.dataAltitudes, Info.altitudeFactor),
                   ),
                   _buildLineChart(
                     color: ColorTheme.contrast,
-                    flSpots: _convertDoubleToFlSpots(widget.dataSpeeds, Info.speedFactor),
+                    flSpots: _convertDoubleToFlSpots(
+                        widget.dataSpeeds, Info.speedFactor),
                   ),
                 ],
               ),

@@ -1,9 +1,6 @@
 import 'dart:io';
 
-import 'package:app_settings/app_settings.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
 import 'package:ski_tracker/welcome_pages/pages/background.dart';
 import 'package:ski_tracker/welcome_pages/pages/legal.dart';
 import 'package:ski_tracker/welcome_pages/pages/location.dart';
@@ -46,10 +43,7 @@ class _WelcomePageState extends State<WelcomePage> {
       child: Column(
         children: [
           SizedBox(
-            height: MediaQuery
-                .of(context)
-                .padding
-                .top,
+            height: MediaQuery.of(context).padding.top,
           ),
           Expanded(
             flex: 2,
@@ -82,29 +76,25 @@ class _WelcomePageState extends State<WelcomePage> {
               ],
             ),
           ),
-          if (widget.currentPage == 0) const PageOneWidget(),
-          if (widget.currentPage != 0)
-            Expanded(
-              flex: 3,
-              child:
-              Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-                Container(
-                  padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height * 0.30,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16.0),
-                    child: Image.asset(
-                      widget.image,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
+          Expanded(
+            flex: 3,
+            child: widget.currentPage == 0
+                ? const PageOneWidget()
+                : Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+                    Container(
+                      padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                      height: MediaQuery.of(context).size.height * 0.30,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16.0),
+                        child: Image.asset(
+                          widget.image,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ]),
-            ),
+                  ]),
+          ),
           Expanded(
             flex: 2,
             child: Column(
@@ -120,7 +110,8 @@ class _WelcomePageState extends State<WelcomePage> {
                       currentPage: widget.currentPage),
                 if ((widget.currentPage == 2 && Platform.isIOS) ||
                     (widget.currentPage == 3 && Platform.isAndroid))
-                  LegalPageButton(pageController: widget.pageController,
+                  LegalPageButton(
+                      pageController: widget.pageController,
                       currentPage: widget.currentPage),
                 if (widget.currentPage == 0)
                   Container(
@@ -161,8 +152,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 const SizedBox(height: 8),
                 Utils.buildText(
                     text:
-                    '${(widget.currentPage + 1).toString().substring(
-                        0, 1)} / ${Platform.isAndroid ? '4' : '3'}',
+                        '${(widget.currentPage + 1).toString().substring(0, 1)} / ${Platform.isAndroid ? '4' : '3'}',
                     fontSize: FontTheme.size,
                     fontWeight: FontWeight.normal,
                     color: ColorTheme.contrast),
@@ -174,5 +164,4 @@ class _WelcomePageState extends State<WelcomePage> {
       ),
     );
   }
-
 }

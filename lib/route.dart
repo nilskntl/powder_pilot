@@ -5,17 +5,17 @@ import 'package:ski_tracker/slopes.dart';
 class ActivityRoute {
   final List<List<double>> coordinates;
   final List<SlopeInfo> slopes;
-  
+
   const ActivityRoute({
     required this.coordinates,
     required this.slopes,
   });
-  
+
   // from Json
   factory ActivityRoute.fromString(String jsonString) {
     return ActivityRoute.fromJson(jsonDecode(jsonString));
   }
-  
+
   // Factory-Methode zum Erstellen eines Objekts aus einer Map
   factory ActivityRoute.fromJson(Map<String, dynamic> json) {
     return ActivityRoute(
@@ -27,7 +27,7 @@ class ActivityRoute {
       ),
     );
   }
-  
+
   // Methode zum Konvertieren des Objekts in eine Map
   Map<String, dynamic> toJson() {
     return {
@@ -35,41 +35,43 @@ class ActivityRoute {
       'slopes': slopes.map((slope) => slope.toJson()).toList(),
     };
   }
-  
+
   // Convert List of SlopeInfo to String
   static String listToString(List<ActivityRoute> list) {
     return jsonEncode(list.map((route) => route.toJson()).toList());
   }
-  
+
   // toString Method
   @override
   String toString() {
     return jsonEncode(toJson());
   }
-  
+
   // String to Route
   static ActivityRoute stringToRoute(String jsonString) {
     return ActivityRoute.fromJson(jsonDecode(jsonString));
   }
 
   void addSlope(Slope nearestSlope) {
-    if(slopes.isEmpty) {
+    if (slopes.isEmpty) {
       slopes.add(SlopeInfo(
         name: nearestSlope.ref,
         type: nearestSlope.type,
         startTime: DateTime.now(),
       ));
     } else {
-      if(slopes.last.name == nearestSlope.ref && slopes.last.type == nearestSlope.type) {
+      if (slopes.last.name == nearestSlope.ref &&
+          slopes.last.type == nearestSlope.type) {
         return;
       }
       slopes.last.endTime = DateTime.now();
       // Check if last slope was longer then 30s otherwise delete the slope
-      if(slopes.last.endTime.difference(slopes.last.startTime).inSeconds < 15) {
+      if (slopes.last.endTime.difference(slopes.last.startTime).inSeconds < 5) {
         slopes.removeLast();
       }
       // Check if its now the same slope
-      if(slopes.last.name == nearestSlope.ref && slopes.last.type == nearestSlope.type) {
+      if (slopes.last.name == nearestSlope.ref &&
+          slopes.last.type == nearestSlope.type) {
         return;
       }
       slopes.last.endTime = DateTime.now();
@@ -84,7 +86,6 @@ class ActivityRoute {
   void addCoordinates(List<double> list) {
     coordinates.add(list);
   }
-  
 }
 
 class SlopeInfo {

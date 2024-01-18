@@ -593,7 +593,7 @@ class _ActivityMapState extends State<ActivityMap>
     return TileLayer(
         urlTemplate: '$pistesOnlyOverlayUrl{z}/{x}/{y}.png',
         additionalOptions: const {
-          'referer': 'com.example.ski_tracker',
+          'referer': 'com.lumino.ski_tracker',
         });
   }
 

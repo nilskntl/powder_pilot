@@ -27,7 +27,6 @@ Units
  */
 
 void main() {
-
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.dumpErrorToConsole(details);
   };
@@ -40,19 +39,21 @@ void main() {
 void init() async {
   bool welcome = await SharedPref.readBool('welcome');
   String units = await SharedPref.readString('units');
-  if(units == '') {
+  if (units == '') {
     units = 'metric';
     SharedPref.saveString('units', units);
-  } else if(units == 'imperial'){
+  } else if (units == 'imperial') {
     Info.setUnits(units);
-  } else if(units != 'metric') {
+  } else if (units != 'metric') {
     SharedPref.saveString('units', 'metric');
   }
 
   runApp(
     ChangeNotifierProvider(
       create: (context) => ActivityDataProvider(),
-      child: Start(welcome: welcome,),
+      child: Start(
+        welcome: welcome,
+      ),
     ),
   );
 }
@@ -69,7 +70,6 @@ class ColorTheme {
   static const Color blue = Color(0xff3498db);
   static const Color black = Color(0xff000000);
   static const Color darkGrey = Color(0xff2f2f2f);
-
 }
 
 class FontTheme {
@@ -90,14 +90,12 @@ class Start extends StatelessWidget {
       title: 'Ski Tracker',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-            seedColor: ColorTheme.primary,
-            background: ColorTheme.background),
+            seedColor: ColorTheme.primary, background: ColorTheme.background),
         useMaterial3: true,
       ),
       home: welcome ? const SkiTracker() : const WelcomePages(),
     );
   }
-
 }
 
 class SkiTracker extends StatelessWidget {
@@ -134,8 +132,15 @@ class SkiTracker extends StatelessWidget {
     _activityData = activityData;
   }
 
-  static void createNewActivity({String areaName = '', LatLng currentPosition = const LatLng(0, 0), bool mapDownloaded = false}) {
-    _activity = Activity(id: ++_activityId, areaName: areaName, currentPosition: currentPosition, mapDownloaded: mapDownloaded);
+  static void createNewActivity(
+      {String areaName = '',
+      LatLng currentPosition = const LatLng(0, 0),
+      bool mapDownloaded = false}) {
+    _activity = Activity(
+        id: ++_activityId,
+        areaName: areaName,
+        currentPosition: currentPosition,
+        mapDownloaded: mapDownloaded);
     _activity.init();
   }
 
@@ -155,7 +160,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   final ActivityDisplay _activity = const ActivityDisplay();
   final History _history = const History();
 
@@ -239,7 +243,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: _buildBottomBarContainer(
                       iconData: Icons.downhill_skiing_rounded,
-                      text: 'Activity', page: 0),
+                      text: 'Activity',
+                      page: 0),
                 ),
               ),
               Expanded(
@@ -253,7 +258,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                   child: _buildBottomBarContainer(
-                      iconData: Icons.calendar_month_rounded, text: 'History', page: 1),
+                      iconData: Icons.calendar_month_rounded,
+                      text: 'History',
+                      page: 1),
                 ),
               ),
             ],

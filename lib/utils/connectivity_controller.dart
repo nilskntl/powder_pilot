@@ -29,6 +29,7 @@ class ConnectivityController {
       _updateStatus(isConnected.value);
     });
   }
+
   bool isInternetConnected(ConnectivityResult? result) {
     if (result == ConnectivityResult.none) {
       isConnected.value = false;

@@ -12,7 +12,9 @@ class Utils {
       Color color = ColorTheme.contrast,
       bool softWrap = false,
       FontWeight fontWeight = FontWeight.normal,
-      bool caps = true, TextAlign align = TextAlign.center, TextOverflow overflow = TextOverflow.visible}) {
+      bool caps = true,
+      TextAlign align = TextAlign.center,
+      TextOverflow overflow = TextOverflow.visible}) {
     return Text(
       caps ? text.toUpperCase() : text,
       overflow: overflow,
@@ -26,14 +28,16 @@ class Utils {
     );
   }
 
-  static double calculateFontSizeByContext({required String text, double paddingLeftRight = 0.0, double standardFontSize = FontTheme.size, required BuildContext context, fontWeight = FontWeight.normal}) {
+  static double calculateFontSizeByContext(
+      {required String text,
+      double paddingLeftRight = 0.0,
+      double standardFontSize = FontTheme.size,
+      required BuildContext context,
+      fontWeight = FontWeight.normal}) {
     // Berechnung der maximalen verfügbaren Breite unter Berücksichtigung des linken und rechten Randes
-    double maxWidth = MediaQuery
-        .of(context)
-        .size
-        .width - paddingLeftRight;
+    double maxWidth = MediaQuery.of(context).size.width - paddingLeftRight;
 
-    if(maxWidth < 0) {
+    if (maxWidth < 0) {
       maxWidth = 0;
     }
 
@@ -52,8 +56,7 @@ class Utils {
         ),
         maxLines: 1,
         textDirection: TextDirection.ltr,
-      )
-        ..layout(maxWidth: maxWidth);
+      )..layout(maxWidth: maxWidth);
 
       // Überprüfen, ob der Text zu breit ist und die Schriftgröße anpassen
       if (textPainter.width < maxWidth) {
@@ -63,8 +66,7 @@ class Utils {
     return fontSize;
   }
 
-  static double calculateHaversineDistance(
-      LatLng pos1, LatLng pos2) {
+  static double calculateHaversineDistance(LatLng pos1, LatLng pos2) {
     double toRadians(double degree) {
       return degree * (math.pi / 180.0);
     }
@@ -90,43 +92,31 @@ class Utils {
   }
 
   static List<String> durationStringToString(String activity) {
-    String year = DateTime.parse(
-        activity)
-        .year
-        .toString();
-    String month = DateTime.parse(
-        activity)
-        .month
-        .toString();
-    if(month.length == 1) {
+    String year = DateTime.parse(activity).year.toString();
+    String month = DateTime.parse(activity).month.toString();
+    if (month.length == 1) {
       month = '0$month';
     }
-    String day = DateTime.parse(
-        activity).day.toString();
-    if(day.length == 1) {
+    String day = DateTime.parse(activity).day.toString();
+    if (day.length == 1) {
       day = '0$day';
     }
 
-    String hour = DateTime.parse(
-        activity).hour.toString();
-    if(hour.length == 1) {
+    String hour = DateTime.parse(activity).hour.toString();
+    if (hour.length == 1) {
       hour = '0$hour';
     }
 
-    String minute = DateTime.parse(
-        activity).minute.toString();
-    if(minute.length == 1) {
+    String minute = DateTime.parse(activity).minute.toString();
+    if (minute.length == 1) {
       minute = '0$minute';
     }
 
-    String date =
-        '$month/$day/$year';
+    String date = '$month/$day/$year';
 
-    String time =
-        '$hour:$minute';
+    String time = '$hour:$minute';
 
     return [date, time];
-
   }
 
   static formatDuration(Duration difference) {
@@ -135,11 +125,11 @@ class Utils {
     String twoDigitSeconds = twoDigits(difference.inSeconds.remainder(60));
     return "$twoDigitMinutes:$twoDigitSeconds";
   }
-
 }
 
 class DrawDottedHorizontalLine extends CustomPainter {
   final Paint _paint = Paint();
+
   DrawDottedHorizontalLine() {
     _paint.color = Colors.black; //dots color
     _paint.strokeWidth = 2; //dots thickness

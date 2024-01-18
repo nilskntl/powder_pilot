@@ -5,7 +5,6 @@ import 'package:ski_tracker/activity/activity.dart';
 import '../route.dart';
 
 class ActivityDataProvider extends ChangeNotifier {
-
   // Speed
   double speed = 0.0;
   double maxSpeed = 0.0;
@@ -96,7 +95,8 @@ class ActivityDataProvider extends ChangeNotifier {
     required ActivityStatus newStatus,
     required String newArea,
     required List<List<int>> newAltitudes,
-    required List<List<double>> newSpeeds, required ActivityLocations newActivityLocations,
+    required List<List<double>> newSpeeds,
+    required ActivityLocations newActivityLocations,
   }) {
     speed = newSpeed;
     maxSpeed = newMaxSpeed;
@@ -125,7 +125,7 @@ class ActivityDataProvider extends ChangeNotifier {
     area = newArea;
     altitudes = newAltitudes;
     speeds = newSpeeds;
-    if(!_activityLocationsLoaded) {
+    if (!_activityLocationsLoaded) {
       activityLocations = newActivityLocations;
       _activityLocationsLoaded = true;
     }

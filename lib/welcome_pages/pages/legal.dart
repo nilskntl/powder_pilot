@@ -216,7 +216,9 @@ class _LegalDialogState extends State<LegalDialog>
                     ),
                   ),
                 ),
-                if (arr.isNotEmpty) _buildDialogText(text: arr.first, fontWeight: FontWeight.bold),
+                if (arr.isNotEmpty)
+                  _buildDialogText(
+                      text: arr.first, fontWeight: FontWeight.bold),
                 const SizedBox(height: 12),
                 ...arr
                     .skip(1)

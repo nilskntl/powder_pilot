@@ -82,7 +82,8 @@ class SharedPref {
     return value;
   }
 
-  static Future<void> saveStringList(String keyName, List<String> stringListValue) async {
+  static Future<void> saveStringList(
+      String keyName, List<String> stringListValue) async {
     final prefs = await SharedPreferences.getInstance();
     final key = keyName;
     final value = stringListValue;

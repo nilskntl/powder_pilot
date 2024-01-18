@@ -58,10 +58,13 @@ class _LocationPageButtonState extends State<LocationButton> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if(buttonText == 'Settings')
-          Utils.buildText(text: 'Please enable location in the settings', fontSize: FontTheme.size - 2, fontWeight: FontWeight.normal, color: ColorTheme.contrast),
-        if(buttonText == 'Settings')
-          const SizedBox(height: 8),
+        if (buttonText == 'Settings')
+          Utils.buildText(
+              text: 'Please enable location in the settings',
+              fontSize: FontTheme.size - 2,
+              fontWeight: FontWeight.normal,
+              color: ColorTheme.contrast),
+        if (buttonText == 'Settings') const SizedBox(height: 8),
         Container(
           width: double.infinity,
           height: 64.0,
@@ -69,7 +72,8 @@ class _LocationPageButtonState extends State<LocationButton> {
           child: ElevatedButton(
             onPressed: () {
               if ((permissionStatus == PermissionStatus.denied ||
-                  permissionStatus == PermissionStatus.deniedForever) && _alreadyAskedForPermission) {
+                      permissionStatus == PermissionStatus.deniedForever) &&
+                  _alreadyAskedForPermission) {
                 AppSettings.openAppSettings(type: AppSettingsType.location);
               } else if (_isLocationEnabled) {
                 widget.pageController.animateToPage(
@@ -85,7 +89,7 @@ class _LocationPageButtonState extends State<LocationButton> {
             style: ElevatedButton.styleFrom(
               foregroundColor: ColorTheme.contrast,
               backgroundColor:
-              _isLocationEnabled ? ColorTheme.primary : ColorTheme.grey,
+                  _isLocationEnabled ? ColorTheme.primary : ColorTheme.grey,
               padding: const EdgeInsets.symmetric(vertical: 20),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),

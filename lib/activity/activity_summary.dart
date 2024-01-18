@@ -97,10 +97,10 @@ class _ActivitySummaryState extends State<ActivitySummary> {
     route = ActivityRoute.stringToRoute(widget.activityDatabase.route);
     List<double> startLocation =
         parseStringToDoubleList(widget.activityDatabase.startLocation);
-    List<double> endLocation = parseStringToDoubleList(
-        widget.activityDatabase.endLocation);
-    final List<double> fastestLocation = parseStringToDoubleList(
-        widget.activityDatabase.speedLocation);
+    List<double> endLocation =
+        parseStringToDoubleList(widget.activityDatabase.endLocation);
+    final List<double> fastestLocation =
+        parseStringToDoubleList(widget.activityDatabase.speedLocation);
     _activityMap = ActivityMap(
       route: route,
       staticMap: true,
@@ -114,17 +114,20 @@ class _ActivitySummaryState extends State<ActivitySummary> {
 
   List<double> parseStringToDoubleList(String doubleListString) {
     // Remove square brackets and split the string into individual double strings
-    List<String> doubleStrings = doubleListString.replaceAll('[', '').replaceAll(']', '').split(', ');
+    List<String> doubleStrings =
+        doubleListString.replaceAll('[', '').replaceAll(']', '').split(', ');
 
     // Parse each string into a double and create a list of doubles
-    List<double> doubleList = doubleStrings.map((string) => double.parse(string)).toList();
+    List<double> doubleList =
+        doubleStrings.map((string) => double.parse(string)).toList();
 
     return doubleList;
   }
 
   LatLng parseStringToLatLng(String coordinateString) {
     // Remove square brackets and split the string into longitude and latitude
-    List<String> coordinates = coordinateString.replaceAll('[', '').replaceAll(']', '').split(', ');
+    List<String> coordinates =
+        coordinateString.replaceAll('[', '').replaceAll(']', '').split(', ');
 
     // Parse the strings into doubles
     double longitude = double.parse(coordinates[0]);
@@ -626,12 +629,10 @@ class ImageFile extends StatefulWidget {
 }
 
 class _ImageFileState extends State<ImageFile> {
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-      },
+      onTap: () {},
       child: Container(
         height: widget.small ? 90 : 120,
         width: double.infinity,
