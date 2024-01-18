@@ -1,7 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ski_tracker/utils/custom_app_bar.dart';
+import 'package:ski_tracker/utils/general_utils.dart';
 import 'package:ski_tracker/utils/shared_preferences.dart';
+import 'package:ski_tracker/welcome_pages/pages/legal.dart';
 
 import 'activity/activity_display.dart';
 import 'main.dart';
@@ -31,13 +32,35 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Column(
           children: [
             ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               title: const Text("Measurement"),
               subtitle: Text("Current system: ${Info.unitSpeed}"),
               onTap: () {
                 _showLanguageSelectionDialog();
               },
             ),
-            const SizedBox(height: 8.0),
+            const Spacer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    _showDialog(context: context, asset: 'assets/legal/privacy_policy.txt');
+                  },
+                  child: Utils.buildText(text: 'Privacy Policy', color: ColorTheme.grey, caps: false, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 16.0),
+                TextButton(
+                  onPressed: () {
+                    _showDialog(context: context, asset: 'assets/legal/terms_of_service.txt');
+                  },
+                  child: Utils.buildText(text: 'Terms of Service', color: ColorTheme.grey, caps: false, fontWeight: FontWeight.bold)
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -60,6 +83,15 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
         );
+      },
+    );
+  }
+
+  void _showDialog({required BuildContext context, required String asset}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return LegalDialog(asset: asset);
       },
     );
   }
