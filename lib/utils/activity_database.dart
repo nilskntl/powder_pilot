@@ -8,7 +8,7 @@ import 'package:sqflite/sqflite.dart';
 class ActivityDatabaseHelper {
 
   // This is the actual database filename that is saved in the docs directory.
-  static const _databaseName = "activity_databassas.db";
+  static const _databaseName = "activity_database.db";
   // Table name
   static const _tableName = "activity";
   // Increment this version when you need to change the schema.
