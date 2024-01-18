@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -552,8 +553,13 @@ class ActivityLocation extends ActivityUtils {
   Future<void> _updateAddress() async {
     if (kDebugMode) {}
     try {
+
+      //  For data protection reasons: Randomise the location to 100m radius
+      double lat = currentLatitude + Random().nextDouble() * 0.001;
+      double lon = currentLongitude + Random().nextDouble() * 0.001;
+
       var address = await GeoCode().reverseGeocoding(
-          latitude: currentLatitude, longitude: currentLongitude);
+          latitude: lat, longitude: lon);
       areaName = '${address.countryName!}, ${address.city!}';
       updateData();
     } catch (e) {
