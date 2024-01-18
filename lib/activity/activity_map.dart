@@ -9,12 +9,12 @@ import 'package:latlong2/latlong.dart';
 import 'package:ski_tracker/activity/activity.dart';
 import 'package:ski_tracker/main.dart';
 
-import '../route.dart';
-import '../slopes.dart';
-import '../utils/custom_app_bar.dart';
+import 'route.dart';
+import 'slopes.dart';
+import '../utils/app_bar.dart';
 import '../utils/general_utils.dart';
 import 'activity_data_provider.dart';
-import 'activity_display.dart';
+import '../pages/activity_display.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage(
@@ -36,7 +36,7 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBarDesign.appBar(title: 'Map'),
+      appBar: CustomMaterialAppBar.appBar(title: 'Map'),
       body: Stack(
         children: [
           if (widget.activityDataProvider.status == ActivityStatus.inactive ||
@@ -287,7 +287,7 @@ class _MapPageSummaryState extends State<MapPageSummary> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBarDesign.appBar(title: 'Map'),
+      appBar: CustomMaterialAppBar.appBar(title: 'Map'),
       body: Stack(
         children: [
           if (widget.route.slopes.isEmpty) widget.activityMap,

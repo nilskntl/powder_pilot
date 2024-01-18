@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:ski_tracker/activity/activity_map.dart';
 import 'package:ski_tracker/main.dart';
-import 'package:ski_tracker/route.dart';
-import 'package:ski_tracker/utils/custom_app_bar.dart';
+import 'package:ski_tracker/activity/route.dart';
 
-import '../history.dart';
-import '../utils/activity_database.dart';
+import 'history.dart';
+import '../utils/app_bar.dart';
+import '../activity/activity_database.dart';
 import '../utils/general_utils.dart';
-import 'activity.dart';
+import '../activity/activity.dart';
 import 'activity_display.dart';
 
 class ActivitySummaryPage extends StatelessWidget {
@@ -22,7 +22,7 @@ class ActivitySummaryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBarDesign.appBar(
+      appBar: CustomMaterialAppBar.appBar(
         title: 'Summary,',
         child: PopupMenuButton<String>(
           onSelected: (value) {

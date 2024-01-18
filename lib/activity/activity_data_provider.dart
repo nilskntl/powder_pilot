@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ski_tracker/activity/activity.dart';
 
-import '../route.dart';
+import 'route.dart';
 
 class ActivityDataProvider extends ChangeNotifier {
   // Speed

@@ -2,14 +2,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ski_tracker/activity/activity.dart';
-import 'package:ski_tracker/utils/activity_database.dart';
+import 'package:ski_tracker/activity/activity_database.dart';
 
 import '../main.dart';
-import '../route.dart';
-import '../slopes.dart';
+import '../activity/route.dart';
+import '../activity/slopes.dart';
 import '../utils/general_utils.dart';
-import 'activity_data_provider.dart';
-import 'activity_map.dart';
+import '../activity/activity_data_provider.dart';
+import '../activity/activity_map.dart';
 
 class ActivityDisplay extends StatefulWidget {
   const ActivityDisplay({super.key});

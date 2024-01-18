@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:ski_tracker/main.dart';
-import 'package:ski_tracker/slopes.dart';
+import 'package:ski_tracker/activity/slopes.dart';
 
 class SlopeFetcher {
   static bool currentlyFetching = false;

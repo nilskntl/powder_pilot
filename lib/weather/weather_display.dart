@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:ski_tracker/weather.dart';
+import 'package:ski_tracker/weather/weather.dart';
 
 class WeatherDisplay extends StatefulWidget {
   const WeatherDisplay({super.key, required this.weatherManager});

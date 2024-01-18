@@ -1,8 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:ski_tracker/settings_page.dart';
+import 'package:ski_tracker/pages/settings.dart';
 import 'package:ski_tracker/utils/general_utils.dart';
 
-import 'main.dart';
+import '../main.dart';
+
+
+class CustomMaterialAppBar {
+  static AppBar appBar(
+      {required String title, Widget child = const SizedBox()}) {
+    return AppBar(
+      backgroundColor: ColorTheme.contrast,
+      foregroundColor: ColorTheme.secondary,
+      title: Utils.buildText(
+          text: title,
+          color: ColorTheme.secondary,
+          fontSize: FontTheme.sizeSubHeader - 4),
+      actions: [child],
+    );
+  }
+}
 
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({super.key});

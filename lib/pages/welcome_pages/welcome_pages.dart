@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:ski_tracker/welcome_pages/welcome_page.dart';
+import 'package:ski_tracker/pages/welcome_pages/welcome_page.dart';
 
-import '../main.dart';
+import '../../main.dart';
 
 class WelcomePages extends StatefulWidget {
   const WelcomePages({super.key});

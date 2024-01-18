@@ -1,14 +1,13 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:ski_tracker/welcome_pages/pages/background.dart';
-import 'package:ski_tracker/welcome_pages/pages/legal.dart';
-import 'package:ski_tracker/welcome_pages/pages/location.dart';
-import 'package:ski_tracker/welcome_pages/pages/one.dart';
+import 'package:ski_tracker/pages/welcome_pages/pages/background.dart';
+import 'package:ski_tracker/pages/welcome_pages/pages/legal.dart';
+import 'package:ski_tracker/pages/welcome_pages/pages/location.dart';
+import 'package:ski_tracker/pages/welcome_pages/pages/one.dart';
 
-import '../main.dart';
-import '../utils/general_utils.dart';
-import '../utils/shared_preferences.dart';
+import '../../main.dart';
+import '../../utils/general_utils.dart';
+import '../../utils/shared_preferences.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({

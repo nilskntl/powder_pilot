@@ -5,17 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:geocode/geocode.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
-import 'package:ski_tracker/activity/activity_summary.dart';
-import 'package:ski_tracker/fetch_data.dart';
-import 'package:ski_tracker/utils/activity_database.dart';
-import 'package:ski_tracker/utils/custom_app_bar.dart';
+import 'package:ski_tracker/activity/activity_database.dart';
+import 'package:ski_tracker/pages/activity_summary.dart';
+import 'package:ski_tracker/utils/fetch_slope_data.dart';
 import 'package:ski_tracker/utils/shared_preferences.dart';
 
 import '../main.dart';
-import '../route.dart';
-import '../slopes.dart';
+import 'route.dart';
+import 'slopes.dart';
+import '../utils/app_bar.dart';
 import '../utils/general_utils.dart';
-import 'activity_display.dart';
+import '../pages/activity_display.dart';
 
 enum ActivityType {
   ski,
@@ -87,7 +87,7 @@ class _CustomDialogState extends State<CustomDialog>
           borderRadius: BorderRadius.circular(16.0),
           child: Scaffold(
             backgroundColor: Colors.transparent,
-            appBar: CustomAppBarDesign.appBar(title: 'Summary'),
+            appBar: CustomMaterialAppBar.appBar(title: 'Summary'),
             body: Container(
               width: double.infinity,
               height: double.infinity,

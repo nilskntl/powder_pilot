@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../main.dart';
-import '../../utils/general_utils.dart';
-import '../../utils/shared_preferences.dart';
+import '../../../main.dart';
+import '../../../utils/general_utils.dart';
+import '../../../utils/shared_preferences.dart';
 
 class LegalPageButton extends StatefulWidget {
   const LegalPageButton(

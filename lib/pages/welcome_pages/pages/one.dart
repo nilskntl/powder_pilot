@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../main.dart';
-import '../../utils/general_utils.dart';
+import '../../../main.dart';
+import '../../../utils/general_utils.dart';
 
 class PageOneWidget extends StatefulWidget {
   const PageOneWidget({super.key});

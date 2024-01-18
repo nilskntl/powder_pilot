@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:ski_tracker/pages/welcome_pages/welcome_pages.dart';
 import 'package:ski_tracker/utils/connectivity_controller.dart';
 import 'package:ski_tracker/utils/shared_preferences.dart';
-import 'package:ski_tracker/welcome_pages/welcome_pages.dart';
 
 import 'activity/activity.dart';
 import 'activity/activity_data_provider.dart';
-import 'activity/activity_display.dart';
-import 'app_bar.dart';
-import 'history.dart';
+import 'pages/activity_display.dart';
+import 'pages/history.dart';
+import 'utils/app_bar.dart';
 
 /*
 Key names

@@ -3,8 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
-import '../../main.dart';
-import '../../utils/general_utils.dart';
+import '../../../main.dart';
+import '../../../utils/general_utils.dart';
 
 class BackgroundLocationButton extends StatefulWidget {
   const BackgroundLocationButton(

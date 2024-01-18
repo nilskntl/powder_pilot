@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:ski_tracker/utils/custom_app_bar.dart';
+import 'package:ski_tracker/pages/welcome_pages/pages/legal.dart';
+import 'package:ski_tracker/utils/app_bar.dart';
 import 'package:ski_tracker/utils/general_utils.dart';
 import 'package:ski_tracker/utils/shared_preferences.dart';
-import 'package:ski_tracker/welcome_pages/pages/legal.dart';
 
-import 'activity/activity_display.dart';
-import 'main.dart';
+import 'activity_display.dart';
+import '../main.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -25,7 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBarDesign.appBar(title: 'Settings'),
+      appBar: CustomMaterialAppBar.appBar(title: 'Settings'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

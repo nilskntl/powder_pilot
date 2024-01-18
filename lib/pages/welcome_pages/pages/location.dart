@@ -2,8 +2,8 @@ import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
-import '../../main.dart';
-import '../../utils/general_utils.dart';
+import '../../../main.dart';
+import '../../../utils/general_utils.dart';
 
 class LocationButton extends StatefulWidget {
   const LocationButton(

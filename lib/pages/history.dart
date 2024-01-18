@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:ski_tracker/utils/activity_database.dart';
+import 'package:ski_tracker/activity/activity_database.dart';
 import 'package:ski_tracker/utils/general_utils.dart';
 
-import 'activity/activity_display.dart';
-import 'activity/activity_summary.dart';
-import 'main.dart';
+import 'activity_display.dart';
+import 'activity_summary.dart';
+import '../main.dart';
 
 class History extends StatefulWidget {
   const History({super.key});
