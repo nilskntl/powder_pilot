@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:ski_tracker/pages/welcome_pages/pages/legal.dart';
-import 'package:ski_tracker/utils/app_bar.dart';
-import 'package:ski_tracker/utils/general_utils.dart';
-import 'package:ski_tracker/utils/shared_preferences.dart';
+import 'package:powder_pilot/pages/welcome_pages/pages/legal.dart';
 
-import 'activity_display.dart';
 import '../main.dart';
+import '../utils/app_bar.dart';
+import '../utils/general_utils.dart';
+import '../utils/shared_preferences.dart';
+import 'activity_display.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});

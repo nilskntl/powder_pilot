@@ -91,7 +91,7 @@ class _PageOneWidgetState extends State<PageOneWidget> {
       children: [
         _buildPageIcon(
             image: 'assets/images/welcome_pages/activity.png',
-            text: 'Track your skiing activity with ${SkiTracker.appName}',
+            text: 'Track your skiing activity with ${PowderPilot.appName}',
             pageBack: 2,
             pageForward: 1),
         _buildPageIcon(

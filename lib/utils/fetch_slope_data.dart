@@ -2,8 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:ski_tracker/main.dart';
-import 'package:ski_tracker/activity/slopes.dart';
+
+import '../activity/slopes.dart';
+import '../main.dart';
 
 class SlopeFetcher {
   static bool currentlyFetching = false;
@@ -50,7 +51,7 @@ class SlopeFetcher {
       double latitude, double longitude, String type, String value) async {
     const distance = 20000;
 
-    if (SkiTracker.connectionStatus) {
+    if (PowderPilot.connectionStatus) {
       final String overpassQuery = '''
     [out:json];
     (
@@ -78,7 +79,7 @@ class SlopeFetcher {
       double latitude, double longitude, String type) async {
     const distance = 20000;
 
-    if (SkiTracker.connectionStatus) {
+    if (PowderPilot.connectionStatus) {
       final String overpassQuery = '''
     [out:json];
     (

@@ -6,15 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:ski_tracker/activity/activity.dart';
-import 'package:ski_tracker/main.dart';
 
-import 'route.dart';
-import 'slopes.dart';
+import '../main.dart';
+import '../pages/activity_display.dart';
 import '../utils/app_bar.dart';
 import '../utils/general_utils.dart';
+import 'activity.dart';
 import 'activity_data_provider.dart';
-import '../pages/activity_display.dart';
+import 'route.dart';
+import 'slopes.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage(
@@ -498,7 +498,7 @@ class _ActivityMapState extends State<ActivityMap>
         _middlePoint = _calculateMiddlePoint(widget.route.coordinates);
         _route = _buildPolyline(widget.route);
       } else {
-        _activityLocations = SkiTracker.getActivity().activityLocations;
+        _activityLocations = PowderPilot.getActivity().activityLocations;
       }
     }
     mapController = AnimatedMapController(
@@ -517,8 +517,8 @@ class _ActivityMapState extends State<ActivityMap>
     setState(() {
       if (!_previewMode) {
         if (!widget.staticMap) {
-          _activityLocations = SkiTracker.getActivity().activityLocations;
-          _route = _buildPolyline(SkiTracker.getActivity().route);
+          _activityLocations = PowderPilot.getActivity().activityLocations;
+          _route = _buildPolyline(PowderPilot.getActivity().route);
         }
       }
     });
@@ -532,10 +532,10 @@ class _ActivityMapState extends State<ActivityMap>
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
-      if (_previewMode && SkiTracker.getActivity().currentLatitude != 0.0) {
+      if (_previewMode && PowderPilot.getActivity().currentLatitude != 0.0) {
         mapController.animateTo(
-          dest: LatLng(SkiTracker.getActivity().currentLatitude,
-              SkiTracker.getActivity().currentLongitude),
+          dest: LatLng(PowderPilot.getActivity().currentLatitude,
+              PowderPilot.getActivity().currentLongitude),
         );
       }
     });
@@ -578,8 +578,8 @@ class _ActivityMapState extends State<ActivityMap>
         Marker(
           width: markerSize,
           height: markerSize,
-          point: LatLng(SkiTracker.getActivity().currentLatitude,
-              SkiTracker.getActivity().currentLongitude),
+          point: LatLng(PowderPilot.getActivity().currentLatitude,
+              PowderPilot.getActivity().currentLongitude),
           child: CustomPaint(
             painter: LocationMark(),
           ),
@@ -593,7 +593,7 @@ class _ActivityMapState extends State<ActivityMap>
     return TileLayer(
         urlTemplate: '$pistesOnlyOverlayUrl{z}/{x}/{y}.png',
         additionalOptions: const {
-          'referer': 'com.lumino.ski_tracker',
+          'referer': 'com.lumino.powder_pilot',
         });
   }
 
@@ -652,8 +652,8 @@ class _ActivityMapState extends State<ActivityMap>
           backgroundColor: backgroundColor,
           initialCenter: widget.staticMap
               ? _middlePoint
-              : LatLng(SkiTracker.getActivity().currentLatitude,
-                  SkiTracker.getActivity().currentLongitude),
+              : LatLng(PowderPilot.getActivity().currentLatitude,
+                  PowderPilot.getActivity().currentLongitude),
           initialZoom: widget.staticMap ? zoomOverview : zoomLevel,
           interactionOptions: const InteractionOptions(
             flags: InteractiveFlag.all & ~InteractiveFlag.rotate,

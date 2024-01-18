@@ -2,7 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:ski_tracker/utils/general_utils.dart';
+
+import '../utils/general_utils.dart';
 
 class SlopeMap {
   static final List<Slope> _slopes = [];

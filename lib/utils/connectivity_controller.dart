@@ -16,7 +16,7 @@ class ConnectivityController {
   }
 
   _updateStatus(bool isConnected) {
-    SkiTracker.getActivityDataProvider().updateInternetStatus(
+    PowderPilot.getActivityDataProvider().updateInternetStatus(
       newInternetStatus: isConnected,
     );
   }

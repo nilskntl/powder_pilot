@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:powder_pilot/pages/welcome_pages/welcome_pages.dart';
+import 'package:powder_pilot/utils/connectivity_controller.dart';
+import 'package:powder_pilot/utils/shared_preferences.dart';
 import 'package:provider/provider.dart';
-import 'package:ski_tracker/pages/welcome_pages/welcome_pages.dart';
-import 'package:ski_tracker/utils/connectivity_controller.dart';
-import 'package:ski_tracker/utils/shared_preferences.dart';
 
 import 'activity/activity.dart';
 import 'activity/activity_data_provider.dart';
@@ -87,21 +87,21 @@ class Start extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ski Tracker',
+      title: PowderPilot.appName,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
             seedColor: ColorTheme.primary, background: ColorTheme.background),
         useMaterial3: true,
       ),
-      home: welcome ? const SkiTracker() : const WelcomePages(),
+      home: welcome ? const PowderPilot() : const WelcomePages(),
     );
   }
 }
 
-class SkiTracker extends StatelessWidget {
-  const SkiTracker({super.key});
+class PowderPilot extends StatelessWidget {
+  const PowderPilot({super.key});
 
-  static const String appName = 'Ski Tracker';
+  static const String appName = 'Powder Pilot';
 
   static int _activityId = 0;
   static Activity _activity = Activity(id: _activityId);

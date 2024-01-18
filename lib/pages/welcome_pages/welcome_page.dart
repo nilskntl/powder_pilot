@@ -1,9 +1,10 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:ski_tracker/pages/welcome_pages/pages/background.dart';
-import 'package:ski_tracker/pages/welcome_pages/pages/legal.dart';
-import 'package:ski_tracker/pages/welcome_pages/pages/location.dart';
-import 'package:ski_tracker/pages/welcome_pages/pages/one.dart';
+import 'package:powder_pilot/pages/welcome_pages/pages/background.dart';
+import 'package:powder_pilot/pages/welcome_pages/pages/legal.dart';
+import 'package:powder_pilot/pages/welcome_pages/pages/location.dart';
+import 'package:powder_pilot/pages/welcome_pages/pages/one.dart';
 
 import '../../main.dart';
 import '../../utils/general_utils.dart';
@@ -123,7 +124,7 @@ class _WelcomePageState extends State<WelcomePage> {
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const SkiTracker()));
+                                  builder: (context) => const PowderPilot()));
                           SharedPref.saveBool('welcome', true);
                         } else {
                           widget.pageController.animateToPage(

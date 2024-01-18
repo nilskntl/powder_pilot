@@ -109,7 +109,7 @@ class _LegalPageButtonState extends State<LegalPageButton> {
                 Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const SkiTracker()));
+                        builder: (context) => const PowderPilot()));
                 SharedPref.saveBool('welcome', true);
               }
             },

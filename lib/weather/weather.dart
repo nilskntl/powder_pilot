@@ -3,7 +3,8 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:ski_tracker/main.dart';
+
+import '../main.dart';
 
 class WeatherManager {
   DateTime lastFetchTime = DateTime.now();
@@ -37,10 +38,10 @@ class WeatherManager {
   Future<void> init() async {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!locationLoaded) {
-        if (SkiTracker.getActivity().currentLatitude != 0.0 &&
-            SkiTracker.getActivity().currentLongitude != 0.0) {
-          fetchData(SkiTracker.getActivity().currentLatitude,
-              SkiTracker.getActivity().currentLongitude);
+        if (PowderPilot.getActivity().currentLatitude != 0.0 &&
+            PowderPilot.getActivity().currentLongitude != 0.0) {
+          fetchData(PowderPilot.getActivity().currentLatitude,
+              PowderPilot.getActivity().currentLongitude);
           locationLoaded = true;
         }
         if (!weatherLoaded) {
@@ -101,8 +102,8 @@ class WeatherManager {
 
   void updateCurrentTemperature() async {
     if (DateTime.now().hour != lastFetchTime.hour) {
-      await fetchData(SkiTracker.getActivity().currentLatitude,
-          SkiTracker.getActivity().currentLongitude);
+      await fetchData(PowderPilot.getActivity().currentLatitude,
+          PowderPilot.getActivity().currentLongitude);
       lastFetchTime = DateTime.now();
     }
   }

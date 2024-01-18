@@ -5,17 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:geocode/geocode.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
-import 'package:ski_tracker/activity/activity_database.dart';
-import 'package:ski_tracker/pages/activity_summary.dart';
-import 'package:ski_tracker/utils/fetch_slope_data.dart';
-import 'package:ski_tracker/utils/shared_preferences.dart';
 
 import '../main.dart';
+import '../pages/activity_display.dart';
+import '../pages/activity_summary.dart';
+import '../utils/app_bar.dart';
+import '../utils/fetch_slope_data.dart';
+import '../utils/general_utils.dart';
+import '../utils/shared_preferences.dart';
+import 'activity_database.dart';
 import 'route.dart';
 import 'slopes.dart';
-import '../utils/app_bar.dart';
-import '../utils/general_utils.dart';
-import '../pages/activity_display.dart';
 
 enum ActivityType {
   ski,
@@ -199,7 +199,7 @@ class Activity extends ActivityLocation {
 
     _elapsedTime = Duration.zero;
 
-    SkiTracker.createNewActivity(
+    PowderPilot.createNewActivity(
         areaName: areaName,
         currentPosition: LatLng(currentLatitude, currentLongitude),
         mapDownloaded: _mapDownloaded);
@@ -483,7 +483,7 @@ class ActivityLocation extends ActivityUtils {
         }
       }
       if (_activityInitialized) {
-        if (SkiTracker.connectionStatus == true && !_mapDownloaded) {
+        if (PowderPilot.connectionStatus == true && !_mapDownloaded) {
           _downloadMap();
         }
 
@@ -491,7 +491,7 @@ class ActivityLocation extends ActivityUtils {
       }
       _numberOfLocationUpdates++;
       if (_numberOfLocationUpdates % 15 == 0) {
-        if (SkiTracker.connectionStatus == true) {
+        if (PowderPilot.connectionStatus == true) {
           if (areaName == '' || areaName == 'Unknown') {
             _updateAddress();
           }
@@ -535,7 +535,7 @@ class ActivityLocation extends ActivityUtils {
       return;
     }
     _isDownloadRunning = true;
-    if (SkiTracker.connectionStatus == true) {
+    if (PowderPilot.connectionStatus == true) {
       if (_mapDownloaded == true) {
         return;
       }
@@ -721,7 +721,8 @@ class ActivityData extends ActivityDataTemp {
 
   // Route
   // ignore: prefer_const_constructors
-  final ActivityRoute route = ActivityRoute(slopes: [], coordinates: []); // Don't define as const
+  final ActivityRoute route =
+      ActivityRoute(slopes: [], coordinates: []); // Don't define as const
 
   // List of altitudes
   List<List<int>> altitudes = [];
@@ -767,7 +768,7 @@ class ActivityData extends ActivityDataTemp {
 
   void updateData() {
     // Update UI
-    SkiTracker.getActivityDataProvider().updateData(
+    PowderPilot.getActivityDataProvider().updateData(
       newSpeed: speed,
       newMaxSpeed: maxSpeed,
       newAvgSpeed: avgSpeed,

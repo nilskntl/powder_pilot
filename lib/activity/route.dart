@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:ski_tracker/activity/slopes.dart';
+import 'package:powder_pilot/activity/slopes.dart';
 
 class ActivityRoute {
   final List<List<double>> coordinates;

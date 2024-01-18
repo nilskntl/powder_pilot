@@ -1,4 +1,4 @@
-package com.lumino.ski_tracker
+package com.lumino.powder_pilot
 
 import io.flutter.embedding.android.FlutterActivity
 

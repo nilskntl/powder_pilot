@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:ski_tracker/activity/activity_map.dart';
-import 'package:ski_tracker/main.dart';
-import 'package:ski_tracker/activity/route.dart';
 
-import 'history.dart';
-import '../utils/app_bar.dart';
-import '../activity/activity_database.dart';
-import '../utils/general_utils.dart';
 import '../activity/activity.dart';
+import '../activity/activity_database.dart';
+import '../activity/activity_map.dart';
+import '../activity/route.dart';
+import '../main.dart';
+import '../utils/app_bar.dart';
+import '../utils/general_utils.dart';
 import 'activity_display.dart';
+import 'history.dart';
 
 class ActivitySummaryPage extends StatelessWidget {
   const ActivitySummaryPage(

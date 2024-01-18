@@ -1,15 +1,15 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ski_tracker/activity/activity.dart';
-import 'package:ski_tracker/activity/activity_database.dart';
 
-import '../main.dart';
+import '../activity/activity.dart';
+import '../activity/activity_data_provider.dart';
+import '../activity/activity_database.dart';
+import '../activity/activity_map.dart';
 import '../activity/route.dart';
 import '../activity/slopes.dart';
+import '../main.dart';
 import '../utils/general_utils.dart';
-import '../activity/activity_data_provider.dart';
-import '../activity/activity_map.dart';
 
 class ActivityDisplay extends StatefulWidget {
   const ActivityDisplay({super.key});
@@ -60,7 +60,7 @@ class _ActivityDisplayState extends State<ActivityDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    SkiTracker.setActivityDataProvider(activityDataProvider);
+    PowderPilot.setActivityDataProvider(activityDataProvider);
     // Check if scroll controller is initialized
     if (!_scrollControllerInitialized) {
       // Check if activity is running
@@ -406,7 +406,7 @@ class _BlinkingDotState extends State<BlinkingDot> {
     return GestureDetector(
       onTap: () {
         if (widget.activityDataProvider.status != ActivityStatus.inactive) {
-          SkiTracker.getActivity().stopActivity(context);
+          PowderPilot.getActivity().stopActivity(context);
         }
       },
       child: Stack(
@@ -765,7 +765,7 @@ class _StatusState extends State<Status> {
                 : Icons.play_arrow_rounded,
             ColorTheme.contrast, () {
           if (widget.activityDataProvider.status == ActivityStatus.inactive) {
-            SkiTracker.getActivity().startActivity();
+            PowderPilot.getActivity().startActivity();
             double targetPosition = MediaQuery.of(context).size.height - 200;
             widget.scrollController.animateTo(
               targetPosition,
@@ -774,10 +774,10 @@ class _StatusState extends State<Status> {
             );
           } else if (widget.activityDataProvider.status ==
               ActivityStatus.paused) {
-            SkiTracker.getActivity().resumeActivity();
+            PowderPilot.getActivity().resumeActivity();
           } else if (widget.activityDataProvider.status ==
               ActivityStatus.running) {
-            SkiTracker.getActivity().pauseActivity();
+            PowderPilot.getActivity().pauseActivity();
           }
         }),
       ],

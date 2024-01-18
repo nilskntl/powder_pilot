@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:ski_tracker/pages/welcome_pages/welcome_page.dart';
+import 'package:powder_pilot/pages/welcome_pages/welcome_page.dart';
 
 import '../../main.dart';
 
@@ -25,7 +25,7 @@ class _WelcomePagesState extends State<WelcomePages> {
         onPageChanged: (page) => setState(() => _currentPage = page),
         children: [
           WelcomePage(
-            title: 'Welcome to ${SkiTracker.appName}',
+            title: 'Welcome to ${PowderPilot.appName}',
             subtitle: 'The best app to track your skiing activity',
             image: 'assets/images/background.png',
             pageController: _pageController,
@@ -35,7 +35,7 @@ class _WelcomePagesState extends State<WelcomePages> {
           WelcomePage(
             title: 'Location Access',
             subtitle:
-                '${SkiTracker.appName} needs access to your location to track your activity',
+                '${PowderPilot.appName} needs access to your location to track your activity',
             image: 'assets/images/welcome_pages/location.png',
             buttonText: 'Enable Location',
             pageController: _pageController,
@@ -46,7 +46,7 @@ class _WelcomePagesState extends State<WelcomePages> {
             WelcomePage(
               title: 'Enable Background Mode',
               subtitle:
-                  'In order for ${SkiTracker.appName} to work properly when the screen is switched off, the background restrictions must be disabled.',
+                  'In order for ${PowderPilot.appName} to work properly when the screen is switched off, the background restrictions must be disabled.',
               image: 'assets/images/welcome_pages/battery_optimization.png',
               buttonText: 'Open Settings',
               pageController: _pageController,

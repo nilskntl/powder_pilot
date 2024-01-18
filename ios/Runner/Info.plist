@@ -8,9 +8,9 @@
 			<true/>
 		</dict>
 		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-		<string>To function properly, Ski Tracker needs access to your location</string>
+		<string>To function properly, Powder Pilot needs access to your location</string>
 		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>To function properly, Ski Tracker needs access to your location</string>
+		<string>To function properly, Powder Pilot needs access to your location</string>
 		<key>UIBackgroundModes</key>
 		<array>
 			<string>location</string>
@@ -18,7 +18,7 @@
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
-		<string>Ski Tracker</string>
+		<string>Powder Pilot</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>
@@ -26,7 +26,7 @@
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>
-		<string>ski_tracker</string>
+		<string>powder_pilot</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>

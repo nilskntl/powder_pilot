@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ski_tracker/pages/settings.dart';
-import 'package:ski_tracker/utils/general_utils.dart';
 
 import '../main.dart';
-
+import '../pages/settings.dart';
+import 'general_utils.dart';
 
 class CustomMaterialAppBar {
   static AppBar appBar(
@@ -56,7 +55,7 @@ class CustomAppBar extends StatelessWidget {
                 ],
               ),
               Utils.buildText(
-                text: 'Ski Tracker',
+                text: PowderPilot.appName,
                 fontSize: FontTheme.size,
                 fontWeight: FontWeight.bold,
               ),

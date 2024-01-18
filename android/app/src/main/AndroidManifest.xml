@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <application
-        android:label="Ski Tracker"
+        android:label="Powder Pilot"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
