@@ -51,11 +51,6 @@ class SlopeMap {
     Slope nearestSlope = _slopes[0];
     double minDistance = double.infinity;
 
-    Slope nearestSlopeAfterPoint = _slopes[0];
-    double minDistanceAfterPoint = double.infinity;
-
-    double betterDistance = double.infinity;
-
     double getDistanceByIndex(
         {required Slope slope,
         required int firstIndex,
@@ -73,7 +68,6 @@ class SlopeMap {
 
       if (distanceToLine < minDistance) {
         minDistance = distanceToLine;
-        betterDistance = distanceToPoint;
         nearestSlope = slope;
       }
 
@@ -86,11 +80,6 @@ class SlopeMap {
             calculateSlopeDistance(slope, longitude, latitude);
         int indexOfNearestPoint = distanceToSlope[1].toInt();
         double slopeDistanceToPoint = distanceToSlope[0];
-
-        if(slopeDistanceToPoint < minDistanceAfterPoint) {
-          minDistanceAfterPoint = slopeDistanceToPoint;
-          nearestSlopeAfterPoint = slope;
-        }
 
         if (slope.coordinates.length > 1) {
           // Check if the nearest point is the first or last point in the slope
@@ -169,7 +158,7 @@ class Slope {
       String name = slope['tags']['name'] ?? 'Unknown';
       _ref = name != 'Unknown'
           ? '$name '
-          : '' + (slope['tags']['ref'] ?? 'Unknown');
+          : (slope['tags']['ref'] ?? 'Unknown');
       _initData();
     }
     if (!empty && !lift) {
