@@ -109,7 +109,9 @@ class SlopeFetcher {
         Slope slope = Slope(slope: element, lift: lift);
         SlopeMap.addSlope(slope);
       } catch (e) {
-        print(e);
+        if (kDebugMode) {
+          print(e);
+        }
       }
     }
     return true;

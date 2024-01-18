@@ -40,10 +40,12 @@ class _MapPageState extends State<MapPage> {
       body: Stack(
         children: [
           if (widget.activityDataProvider.status == ActivityStatus.inactive ||
-              SlopeMap.slopes.isEmpty || widget.activityDataProvider.route.slopes.isEmpty)
+              SlopeMap.slopes.isEmpty ||
+              widget.activityDataProvider.route.slopes.isEmpty)
             widget.activityMap,
           if (widget.activityDataProvider.status != ActivityStatus.inactive &&
-              SlopeMap.slopes.isNotEmpty && widget.activityDataProvider.route.slopes.isNotEmpty)
+              SlopeMap.slopes.isNotEmpty &&
+              widget.activityDataProvider.route.slopes.isNotEmpty)
             CustomScrollView(
               controller: _scrollController,
               slivers: [
@@ -111,8 +113,10 @@ class _MapPageState extends State<MapPage> {
                                         if (widget.activityDataProvider.route
                                             .slopes.isNotEmpty)
                                           CurrentSlope(
-                                              slope: widget.activityDataProvider
-                                                  .route.slopes.last, animated: true,),
+                                            slope: widget.activityDataProvider
+                                                .route.slopes.last,
+                                            animated: true,
+                                          ),
                                         const SizedBox(width: 16),
                                         if (widget.activityDataProvider.route
                                             .slopes.isNotEmpty)
@@ -197,10 +201,11 @@ class _MapPageState extends State<MapPage> {
                                                               .contrast),
                                                     ],
                                                   ),
-                                                  ActivityDisplay.buildSlopeName(widget
-                                                      .activityDataProvider
-                                                      .route
-                                                      .slopes[index]),
+                                                  ActivityDisplay
+                                                      .buildSlopeName(widget
+                                                          .activityDataProvider
+                                                          .route
+                                                          .slopes[index]),
                                                   Row(
                                                     children: [
                                                       Utils.buildText(
@@ -266,9 +271,7 @@ class _MapPageState extends State<MapPage> {
 
 class MapPageSummary extends StatefulWidget {
   const MapPageSummary(
-      {super.key,
-        required this.route,
-        required this.activityMap});
+      {super.key, required this.route, required this.activityMap});
 
   final ActivityRoute route;
 
@@ -287,8 +290,7 @@ class _MapPageSummaryState extends State<MapPageSummary> {
       appBar: CustomAppBarDesign.appBar(title: 'Map'),
       body: Stack(
         children: [
-          if (widget.route.slopes.isEmpty)
-            widget.activityMap,
+          if (widget.route.slopes.isEmpty) widget.activityMap,
           if (widget.route.slopes.isNotEmpty)
             CustomScrollView(
               controller: _scrollController,
@@ -317,9 +319,9 @@ class _MapPageSummaryState extends State<MapPageSummary> {
                               color: ColorTheme.background,
                               borderRadius: BorderRadius.only(
                                 topLeft:
-                                Radius.circular(Status.heightBarContainer),
+                                    Radius.circular(Status.heightBarContainer),
                                 topRight:
-                                Radius.circular(Status.heightBarContainer),
+                                    Radius.circular(Status.heightBarContainer),
                               ),
                             ),
                             alignment: Alignment.center,
@@ -329,7 +331,7 @@ class _MapPageSummaryState extends State<MapPageSummary> {
                               decoration: BoxDecoration(
                                 color: ColorTheme.grey,
                                 borderRadius:
-                                BorderRadius.circular(Status.heightBar / 2),
+                                    BorderRadius.circular(Status.heightBar / 2),
                               ),
                             ),
                           ),
@@ -350,93 +352,85 @@ class _MapPageSummaryState extends State<MapPageSummary> {
                                     controller: _scrollController,
                                     shrinkWrap: true,
                                     reverse: true,
-                                    itemCount: widget.route
-                                        .slopes.length,
+                                    itemCount: widget.route.slopes.length,
                                     itemBuilder: (context, index) {
-                                        return Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: ColorTheme.secondary,
-                                            borderRadius:
-                                            BorderRadius.circular(16),
-                                          ),
-                                          child: Row(
-                                            crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                            children: [
-                                              CurrentSlope(
-                                                  slope: widget
-                                                      .route
-                                                      .slopes[index]),
-                                              const SizedBox(width: 16),
-                                              Column(
-                                                crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      Utils.buildText(
-                                                          text: 'Start: ',
-                                                          fontSize:
-                                                          FontTheme.size -
-                                                              4,
-                                                          color:
-                                                          ColorTheme.grey,
-                                                          caps: false),
-                                                      const SizedBox(width: 4),
-                                                      Utils.buildText(
-                                                          text: Utils.durationStringToString(widget
-                                                              .route
-                                                              .slopes[index]
-                                                              .startTime
-                                                              .toString())[1],
-                                                          caps: false,
-                                                          fontSize:
-                                                          FontTheme.size -
-                                                              4,
-                                                          color: ColorTheme
-                                                              .contrast),
-                                                    ],
-                                                  ),
-                                                  ActivityDisplay.buildSlopeName(widget
-                                                      .route
-                                                      .slopes[index]),
-                                                  Row(
-                                                    children: [
-                                                      Utils.buildText(
-                                                          text: 'Duration: ',
-                                                          fontSize:
-                                                          FontTheme.size -
-                                                              4,
-                                                          color:
-                                                          ColorTheme.grey,
-                                                          caps: false),
-                                                      const SizedBox(width: 4),
-                                                      Utils.buildText(
-                                                          text: Utils.formatDuration(widget
-                                                              .route
-                                                              .slopes[index]
-                                                              .endTime
-                                                              .difference(widget
-                                                              .route
-                                                              .slopes[
-                                                          index]
-                                                              .startTime)) +
-                                                              ' min',
-                                                          caps: false,
-                                                          fontSize:
-                                                          FontTheme.size -
-                                                              4,
-                                                          color: ColorTheme
-                                                              .contrast),
-                                                    ],
-                                                  ),
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        );
-                                      },
+                                      return Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: ColorTheme.secondary,
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                        ),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            CurrentSlope(
+                                                slope:
+                                                    widget.route.slopes[index]),
+                                            const SizedBox(width: 16),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Utils.buildText(
+                                                        text: 'Start: ',
+                                                        fontSize:
+                                                            FontTheme.size - 4,
+                                                        color: ColorTheme.grey,
+                                                        caps: false),
+                                                    const SizedBox(width: 4),
+                                                    Utils.buildText(
+                                                        text: Utils
+                                                            .durationStringToString(widget
+                                                                .route
+                                                                .slopes[index]
+                                                                .startTime
+                                                                .toString())[1],
+                                                        caps: false,
+                                                        fontSize:
+                                                            FontTheme.size - 4,
+                                                        color: ColorTheme
+                                                            .contrast),
+                                                  ],
+                                                ),
+                                                ActivityDisplay.buildSlopeName(
+                                                    widget.route.slopes[index]),
+                                                Row(
+                                                  children: [
+                                                    Utils.buildText(
+                                                        text: 'Duration: ',
+                                                        fontSize:
+                                                            FontTheme.size - 4,
+                                                        color: ColorTheme.grey,
+                                                        caps: false),
+                                                    const SizedBox(width: 4),
+                                                    Utils.buildText(
+                                                        text: Utils.formatDuration(widget
+                                                                .route
+                                                                .slopes[index]
+                                                                .endTime
+                                                                .difference(widget
+                                                                    .route
+                                                                    .slopes[
+                                                                        index]
+                                                                    .startTime)) +
+                                                            ' min',
+                                                        caps: false,
+                                                        fontSize:
+                                                            FontTheme.size - 4,
+                                                        color: ColorTheme
+                                                            .contrast),
+                                                  ],
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ],
                               )),
@@ -463,7 +457,8 @@ class ActivityMap extends StatefulWidget {
   const ActivityMap(
       {super.key,
       this.staticMap = false,
-      this.route = const ActivityRoute(coordinates: [], slopes: []), this.activityLocations = const ActivityLocations()});
+      this.route = const ActivityRoute(coordinates: [], slopes: []),
+      this.activityLocations = const ActivityLocations()});
 
   final bool staticMap;
   final ActivityRoute route;
@@ -476,7 +471,7 @@ class ActivityMap extends StatefulWidget {
 class _ActivityMapState extends State<ActivityMap>
     with TickerProviderStateMixin {
   static const double zoomLevel = 14.0;
-  static const double zoomOverview = 12.0;
+  static const double zoomOverview = 14.0;
   static const double maxZoom = 18.49;
   static const double minZoom = 4.0;
   static const Color backgroundColor = Color(0xFF777777);
@@ -498,8 +493,8 @@ class _ActivityMapState extends State<ActivityMap>
   @override
   void initState() {
     super.initState();
-    if(widget.route.coordinates.isNotEmpty) {
-      if(widget.staticMap) {
+    if (widget.route.coordinates.isNotEmpty) {
+      if (widget.staticMap) {
         _middlePoint = _calculateMiddlePoint(widget.route.coordinates);
         _route = _buildPolyline(widget.route);
       } else {
@@ -531,7 +526,8 @@ class _ActivityMapState extends State<ActivityMap>
 
   void _isInPreviewMode() {
     final route = ModalRoute.of(context);
-    _previewMode = route?.settings.name != '/fullscreen' && route?.settings.name != '/fullscreenSummary';
+    _previewMode = route?.settings.name != '/fullscreen' &&
+        route?.settings.name != '/fullscreenSummary';
   }
 
   void _startTimer() {
@@ -546,28 +542,28 @@ class _ActivityMapState extends State<ActivityMap>
   }
 
   LatLng _calculateMiddlePoint(List<List<double>> coordinates) {
-  double minLatitude = double.infinity;
-  double maxLatitude = -double.infinity;
-  double minLongitude = double.infinity;
-  double maxLongitude = -double.infinity;
+    double minLatitude = double.infinity;
+    double maxLatitude = -double.infinity;
+    double minLongitude = double.infinity;
+    double maxLongitude = -double.infinity;
 
 // Find the minimum and maximum latitude and longitude
-  for (List<double> coordinate in coordinates) {
-  double latitude = coordinate[0];
-  double longitude = coordinate[1];
+    for (List<double> coordinate in coordinates) {
+      double latitude = coordinate[0];
+      double longitude = coordinate[1];
 
-  minLatitude = latitude < minLatitude ? latitude : minLatitude;
-  maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
-  minLongitude = longitude < minLongitude ? longitude : minLongitude;
-  maxLongitude = longitude > maxLongitude ? longitude : maxLongitude;
-  }
+      minLatitude = latitude < minLatitude ? latitude : minLatitude;
+      maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
+      minLongitude = longitude < minLongitude ? longitude : minLongitude;
+      maxLongitude = longitude > maxLongitude ? longitude : maxLongitude;
+    }
 
 // Calculate the middle point
-  double middleLatitude = (maxLatitude + minLatitude) / 2;
-  double middleLongitude = (maxLongitude + minLongitude) / 2;
+    double middleLatitude = (maxLatitude + minLatitude) / 2;
+    double middleLongitude = (maxLongitude + minLongitude) / 2;
 
 // The middle point
-  return LatLng(middleLongitude, middleLatitude);
+    return LatLng(middleLongitude, middleLatitude);
   }
 
   TileLayer _tileLayer() {
@@ -595,8 +591,10 @@ class _ActivityMapState extends State<ActivityMap>
   TileLayer _pisteLayer() {
     String pistesOnlyOverlayUrl = "https://tiles.opensnowmap.org/pistes/";
     return TileLayer(
-      urlTemplate: '$pistesOnlyOverlayUrl{z}/{x}/{y}.png',
-    );
+        urlTemplate: '$pistesOnlyOverlayUrl{z}/{x}/{y}.png',
+        additionalOptions: const {
+          'referer': 'com.example.ski_tracker',
+        });
   }
 
   Widget _buildMarker({required LatLng point, required IconData icon}) {
@@ -625,15 +623,24 @@ class _ActivityMapState extends State<ActivityMap>
   }
 
   Widget _fastestPosition() {
-    return _buildMarker(point: LatLng(_activityLocations.fastestLocation[1], _activityLocations.fastestLocation[0]), icon: Icons.speed_rounded);
+    return _buildMarker(
+        point: LatLng(_activityLocations.fastestLocation[1],
+            _activityLocations.fastestLocation[0]),
+        icon: Icons.speed_rounded);
   }
 
   Widget _startPosition() {
-    return _buildMarker(point: LatLng(_activityLocations.startLocation[1], _activityLocations.startLocation[0]), icon: Icons.play_arrow_rounded);
+    return _buildMarker(
+        point: LatLng(_activityLocations.startLocation[1],
+            _activityLocations.startLocation[0]),
+        icon: Icons.play_arrow_rounded);
   }
 
   Widget _endPosition() {
-    return _buildMarker(point: LatLng(_activityLocations.endLocation[1], _activityLocations.endLocation[0]), icon: Icons.flag_rounded);
+    return _buildMarker(
+        point: LatLng(_activityLocations.endLocation[1],
+            _activityLocations.endLocation[0]),
+        icon: Icons.flag_rounded);
   }
 
   @override
@@ -657,15 +664,101 @@ class _ActivityMapState extends State<ActivityMap>
         // Layers are drawn in the order they are defined
         children: [
           _tileLayer(),
-          if(!widget.staticMap || (!_previewMode && widget.staticMap)) _pisteLayer(),
-          if (!_previewMode  || widget.staticMap) PolylineLayer(polylines: _route),
-          if((!_previewMode || widget.staticMap) && _activityLocations.startLocation[0] != 0.0) _startPosition(),
-          if((!_previewMode || widget.staticMap) && _activityLocations.endLocation[0] != 0.0) _endPosition(),
-          if((!_previewMode || widget.staticMap) && _activityLocations.fastestLocation[0] != 0.0) _fastestPosition(),
+          if (!widget.staticMap || (!_previewMode && widget.staticMap))
+            _pisteLayer(),
+          if (!_previewMode || widget.staticMap)
+            PolylineLayer(polylines: _route),
+          if ((!_previewMode || widget.staticMap) &&
+              _activityLocations.startLocation[0] != 0.0)
+            _startPosition(),
+          if ((!_previewMode || widget.staticMap) &&
+              _activityLocations.endLocation[0] != 0.0)
+            _endPosition(),
+          if ((!_previewMode || widget.staticMap) &&
+              _activityLocations.fastestLocation[0] != 0.0)
+            _fastestPosition(),
           if (!_previewMode && !widget.staticMap) _markerLayer(),
         ],
       ),
+      if (!_previewMode)
+        Align(
+          alignment: Alignment.topRight,
+          child: GestureDetector(
+            onTap: () {
+              _showCreditsDialog(context);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Utils.buildText(
+                      text: 'opensnowmap.org',
+                      caps: false,
+                      color: ColorTheme.contrast,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14),
+                  const SizedBox(width: 8),
+                  Container(
+                    height: 28,
+                    width: 28,
+                    decoration: BoxDecoration(
+                      color: ColorTheme.contrast.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    alignment: Alignment.center,
+                    child: Utils.buildText(
+                        text: 'c',
+                        fontWeight: FontWeight.bold,
+                        color: ColorTheme.grey,
+                        fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
     ]);
+  }
+
+  void _showCreditsDialog(BuildContext context) {
+    String credit =
+        "Map data provided by opensnowmap.org. Ski resort slopes used with kind permission. Data (c) www.openstreetmap.org & contributors ODBL and www.opensnowmap.org CC-BY-SA.";
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: ColorTheme.background,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 8),
+              Utils.buildText(
+                  text: credit,
+                  caps: false,
+                  color: ColorTheme.contrast,
+                  fontWeight: FontWeight.normal,
+                  fontSize: 16,
+                  align: TextAlign.left),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Utils.buildText(
+                  text: 'OK',
+                  caps: false,
+                  color: ColorTheme.contrast,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   List<Polyline> _buildPolyline(ActivityRoute route) {
@@ -691,7 +784,7 @@ class _ActivityMapState extends State<ActivityMap>
 
   @override
   void dispose() {
-    if(!widget.staticMap) {
+    if (!widget.staticMap) {
       _timer.cancel();
     }
     mapController.dispose();

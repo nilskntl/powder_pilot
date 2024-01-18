@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ski_tracker/activity/activity.dart';
+import 'package:ski_tracker/utils/activity_database.dart';
 
 import '../main.dart';
 import '../route.dart';
@@ -66,7 +67,7 @@ class _ActivityDisplayState extends State<ActivityDisplay> {
       _scrollController = activityDataProvider.status != ActivityStatus.inactive
           ? ScrollController(
               initialScrollOffset: MediaQuery.sizeOf(context).height - 420)
-          : ScrollController();
+          : ScrollController(initialScrollOffset: 1);
       _scrollControllerInitialized = true;
     }
 
@@ -458,7 +459,7 @@ class _BlinkingDotState extends State<BlinkingDot> {
 }
 
 class Status extends StatefulWidget {
-  Status(
+  const Status(
       {super.key,
       required this.activityDataProvider,
       required this.scrollController});
@@ -478,7 +479,7 @@ class Status extends StatefulWidget {
   static const String finished = 'Finished';
   static const String inactive = 'Inactive';
 
-  late final ActivityMap activityMap = const ActivityMap(staticMap: false);
+  final ActivityMap activityMap = const ActivityMap(staticMap: false);
 
   @override
   State<StatefulWidget> createState() => _StatusState();
@@ -531,6 +532,8 @@ class _StatusState extends State<Status> {
     return Expanded(
       child: GestureDetector(
         onTap: () {
+          DummyActivities dummyActivities = DummyActivities();
+          dummyActivities.createDummyActivityDatabase();
           if (widget.activityDataProvider.currentLatitude != 0.0) {
             Navigator.push(
               context,
@@ -1201,7 +1204,7 @@ class _GraphState extends State<Graph> {
     }
   }
 
-  List<FlSpot> _convertIntToFlSpots(List<List<int>> integerLists) {
+  List<FlSpot> _convertIntToFlSpots(List<List<int>> integerLists, double factor) {
     if (!_differentEntries) {
       hasDifferentEntry(integerLists);
     }
@@ -1210,14 +1213,14 @@ class _GraphState extends State<Graph> {
     for (List<int> integers in integerLists) {
       // Annahme: Die Liste hat genau zwei Elemente (x und y).
       if (integers.length == 2) {
-        flSpots.add(FlSpot(integers[0].toDouble(), integers[1].toDouble()));
+        flSpots.add(FlSpot(integers[0].toDouble(), integers[1].toDouble() * factor));
       }
     }
 
     return flSpots;
   }
 
-  List<FlSpot> _convertDoubleToFlSpots(List<List<double>> doubleList) {
+  List<FlSpot> _convertDoubleToFlSpots(List<List<double>> doubleList, double factor) {
     if (!_differentEntries) {
       hasDifferentEntry(doubleList);
     }
@@ -1226,7 +1229,7 @@ class _GraphState extends State<Graph> {
     for (List<double> doubles in doubleList) {
       // Annahme: Die Liste hat genau zwei Elemente (x und y).
       if (doubles.length == 2) {
-        flSpots.add(FlSpot(doubles[0], doubles[1]));
+        flSpots.add(FlSpot(doubles[0], doubles[1] * factor));
       }
     }
 
@@ -1356,11 +1359,11 @@ class _GraphState extends State<Graph> {
                 children: [
                   _buildLineChart(
                     color: ColorTheme.primary,
-                    flSpots: _convertIntToFlSpots(widget.dataAltitudes),
+                    flSpots: _convertIntToFlSpots(widget.dataAltitudes, Info.altitudeFactor),
                   ),
                   _buildLineChart(
                     color: ColorTheme.contrast,
-                    flSpots: _convertDoubleToFlSpots(widget.dataSpeeds),
+                    flSpots: _convertDoubleToFlSpots(widget.dataSpeeds, Info.speedFactor),
                   ),
                 ],
               ),

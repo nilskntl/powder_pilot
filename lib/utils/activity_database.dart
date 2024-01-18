@@ -340,3 +340,44 @@ class ActivityDatabase {
     );
   }
 }
+
+class DummyActivities {
+
+  void createDummyActivityDatabase() {
+    ActivityDatabase activityDatabase = const ActivityDatabase(
+      areaName: 'Austria, Kitzbühel',
+      maxSpeed: 23.2,
+      startTime: '2024-01-22 08:59:00',
+      endTime: '2024-01-22 15:49:00',
+      distance: 92600,
+      elapsedTime: '06:50:00',
+
+      // Initialize the rest with 0
+      averageSpeed: 0,
+      totalRuns: 0,
+      longestRun: 0,
+      maxAltitude: 0,
+      minAltitude: 0,
+      avgAltitude: 0,
+      maxSlope: 0,
+      avgSlope: 0,
+      distanceDownhill: 0,
+      distanceUphill: 0,
+      elapsedDownhillTime: '00:00:00',
+      elapsedUphillTime: '00:00:00',
+      elapsedPauseTime: '00:00:00',
+      route: '',
+      altitudes: '',
+      speeds: '',
+      speedLocation: '',
+      startLocation: '',
+      endLocation: '',
+    );
+
+    ActivityDatabaseHelper.insertActivity(activityDatabase);
+
+  }
+
+
+
+}

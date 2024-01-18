@@ -284,11 +284,6 @@ class ActivityLocation extends ActivityUtils {
           maxSpeed = speed;
         }
 
-        speeds.add([
-          elapsedTime.inSeconds.toDouble(),
-          double.parse(speed.toStringAsFixed(1))
-        ]);
-
         if (speed < 0.6) {
           speed = 0.0;
         } else {
@@ -297,6 +292,12 @@ class ActivityLocation extends ActivityUtils {
           totalSpeed += speed;
           avgSpeed = totalSpeed / _numberOfSpeedUpdates;
         }
+
+        speeds.add([
+          elapsedTime.inSeconds.toDouble(),
+          double.parse(speed.toStringAsFixed(1))
+        ]);
+
       }
     }
 

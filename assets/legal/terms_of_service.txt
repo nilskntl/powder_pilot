@@ -31,25 +31,3 @@ Nils Knittel reserves the right to terminate the use of the App by a user at any
 8. Applicable Law and Jurisdiction
 
 These T&C are governed by the law of Nils Knittel. The place of jurisdiction for all disputes is the registered office of Nils Knittel.
-
-9. Miscellaneous Provisions
-
-Additional provisions can be added [here if specific regulations are necessary].
-
-Privacy Policy for the SkiTracker App:
-
-1. Data Sources and Types
-
-The App uses data from the Overpass API  for a slope analysis and the Flutter Geocode Library for location determination. Nils Knittel does not collect personal data from users.
-
-2. Data Usage and Disclosure
-
-The data obtained from the Overpass API and the Flutter Geocode Library is solely for the purpose of location determination in the App. Nils Knittel has no control over the data collection and processing by these external sources.
-
-3. Security
-
-Nils Knittel implements appropriate security measures to ensure the integrity and security of the data.
-
-4. Changes to the Privacy Policy
-
-Nils Knittel reserves the right to update this Privacy Policy. Changes will be published within the App.

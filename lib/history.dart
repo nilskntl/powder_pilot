@@ -54,6 +54,10 @@ class HistoryState extends State<History> {
   late final ScrollController _scrollController = ScrollController(
       initialScrollOffset: MediaQuery.sizeOf(context).height - 420);
 
+  void update() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(

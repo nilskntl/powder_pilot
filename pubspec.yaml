@@ -78,6 +78,8 @@ flutter:
     - assets/images/welcome_pages/stats.png
     - assets/images/welcome_pages/activity.png
     - assets/images/welcome_pages/battery_optimization.png
+    - assets/legal/terms_of_service.txt
+    - assets/legal/privacy_policy.txt
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

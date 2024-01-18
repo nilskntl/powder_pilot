@@ -33,8 +33,7 @@ class ActivitySummaryPage extends StatelessWidget {
                   activityDatabase,
                   () {
                     Navigator.pop(context);
-                    // Set state to update the list
-                    historyState.setState(() {});
+                    historyState.update();
                   },
                 );
                 break;
