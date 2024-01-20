@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 
 import '../activity/activity.dart';
 import '../activity/activity_data_provider.dart';
-import '../activity/activity_database.dart';
 import '../activity/activity_map.dart';
 import '../activity/route.dart';
 import '../activity/slopes.dart';
@@ -533,8 +532,6 @@ class _StatusState extends State<Status> {
       flex: 4,
       child: GestureDetector(
         onTap: () {
-          DummyActivities dummyActivities = DummyActivities();
-          dummyActivities.createDummyActivityDatabase();
           if (widget.activityDataProvider.currentLatitude != 0.0) {
             Navigator.push(
               context,
