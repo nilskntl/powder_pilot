@@ -530,6 +530,7 @@ class _StatusState extends State<Status> {
 
   Widget _right() {
     return Expanded(
+      flex: 4,
       child: GestureDetector(
         onTap: () {
           DummyActivities dummyActivities = DummyActivities();
@@ -631,6 +632,7 @@ class _StatusState extends State<Status> {
 
   Widget _left() {
     return Expanded(
+      flex: 5,
       child: Container(
         padding: const EdgeInsets.fromLTRB(
             Status.padding, Status.padding, Status.padding, Status.padding),
@@ -741,10 +743,10 @@ class _StatusState extends State<Status> {
     Widget buildIconButton(IconData icon, Color color, Function() onPressed) {
       return Container(
         padding: const EdgeInsets.all(0.0),
-        height: 40,
-        width: 40,
+        height: 48,
+        width: 48,
         child: IconButton(
-          iconSize: 32,
+          iconSize: 48,
           padding: const EdgeInsets.all(0.0),
           onPressed: onPressed,
           icon: Icon(
