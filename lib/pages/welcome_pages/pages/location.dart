@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
@@ -39,6 +41,10 @@ class _LocationPageButtonState extends State<LocationButton> {
     }
     _isLocationEnabled = permissionStatus == PermissionStatus.granted ||
         permissionStatus == PermissionStatus.grantedLimited;
+    if(Platform.isIOS) {
+      Location location = Location();
+      location.enableBackgroundMode(enable: true);
+    }
     setState(() {
       if (_isLocationEnabled) {
         buttonText = 'Next';
