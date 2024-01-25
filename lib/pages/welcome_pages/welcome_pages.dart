@@ -46,7 +46,7 @@ class _WelcomePagesState extends State<WelcomePages> {
             WelcomePage(
               title: 'Enable Background Mode',
               subtitle:
-                  'In order for ${PowderPilot.appName} to work properly when the screen is switched off, the background restrictions must be disabled.',
+                  'Enable background mode of your device to allow proper work of ${PowderPilot.appName} when screen is switched off.',
               image: 'assets/images/welcome_pages/battery_optimization.png',
               buttonText: 'Open Settings',
               pageController: _pageController,
