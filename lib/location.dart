@@ -36,7 +36,7 @@ class LocationService {
   /// Constructor to initialize the LocationService.
   LocationService() {
     _initSettings();
-    _permissionCheck();
+    askForPermission();
     startPassiveLocationStream();
   }
 
@@ -48,7 +48,7 @@ class LocationService {
         forceLocationManager: true,
         foregroundNotificationConfig: const ForegroundNotificationConfig(
           notificationText:
-          "Your ski journey is being tracked in the background. Enjoy the ride!",
+              "Your ski journey is being tracked in the background. Enjoy the ride!",
           notificationTitle: "Activity in progress",
           enableWakeLock: true,
           notificationIcon: AndroidResource(
@@ -80,8 +80,18 @@ class LocationService {
     }
   }
 
-  /// Performs a permission check for location services.
-  static void _permissionCheck() async {
+  /// Opens the location permission settings for the app
+  static void openSettings() {
+    Geolocator.openLocationSettings();
+  }
+
+  /// Checks the current location permission status.
+  static Future<LocationPermission> checkPermission() async {
+    return await Geolocator.checkPermission();
+  }
+
+  /// Performs a permission check and asks for location services.
+  static Future<bool> askForPermission() async {
     bool serviceEnabled;
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -90,19 +100,16 @@ class LocationService {
       return Future.error('Location services are disabled.');
     }
 
-    _permission = await Geolocator.checkPermission();
+    _permission = await checkPermission();
     if (_permission == LocationPermission.denied) {
       _permission = await Geolocator.requestPermission();
       if (_permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
+        _permission = await Geolocator.requestPermission();
       }
     }
 
-    if (_permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
+    return _permission == LocationPermission.always ||
+        _permission == LocationPermission.whileInUse;
   }
 
   /// Adds an external listener for location updates.
@@ -129,14 +136,14 @@ class LocationService {
     // Simulate location updates
     _locationSubscription =
         Geolocator.getPositionStream(locationSettings: _activeSettings).listen(
-                (Position position) {
-              _handleLocationUpdate(position);
-              _notifyListeners(position);
-            }, onError: (error) {
-          if (kDebugMode) {
-            print('Error in location stream: $error');
-          }
-        });
+            (Position position) {
+      _handleLocationUpdate(position);
+      _notifyListeners(position);
+    }, onError: (error) {
+      if (kDebugMode) {
+        print('Error in location stream: $error');
+      }
+    });
   }
 
   /// Starts the stream of passive location updates.
@@ -145,14 +152,14 @@ class LocationService {
     // Simulate location updates
     _locationSubscription =
         Geolocator.getPositionStream(locationSettings: _passiveSettings).listen(
-                (Position position) {
-              _handleLocationUpdate(position);
-              _notifyListeners(position);
-            }, onError: (error) {
-          if (kDebugMode) {
-            print('Error in location stream: $error');
-          }
-        });
+            (Position position) {
+      _handleLocationUpdate(position);
+      _notifyListeners(position);
+    }, onError: (error) {
+      if (kDebugMode) {
+        print('Error in location stream: $error');
+      }
+    });
   }
 
   /// Stops the current location stream.
