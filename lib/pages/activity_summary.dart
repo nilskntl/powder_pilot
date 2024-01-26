@@ -8,9 +8,10 @@ import '../activity/route.dart';
 import '../main.dart';
 import '../utils/app_bar.dart';
 import '../utils/general_utils.dart';
-import 'activity_display.dart';
+import 'activity_page.dart';
 import 'history.dart';
 
+/// A stateful widget for displaying a summary dialog of an activity.
 class SummaryDialog extends StatefulWidget {
   const SummaryDialog({super.key, required this.activityDatabase});
 
@@ -84,12 +85,15 @@ class _SummaryDialogState extends State<SummaryDialog>
   }
 }
 
+/// A stateless widget for displaying a summary page of an activity.
 class SummaryPage extends StatelessWidget {
-  const SummaryPage(
-      {super.key, required this.activityDatabase, required this.historyState});
+  const SummaryPage({
+    super.key,
+    required this.activityDatabase,
+    required this.historyState,
+  });
 
   final HistoryState historyState;
-
   final ActivityDatabase activityDatabase;
 
   @override
@@ -119,7 +123,7 @@ class SummaryPage extends StatelessWidget {
                 value: 'delete',
                 child: Utils.buildText(text: 'Delete', caps: false),
               ),
-              // Weitere PopupMenuItems hinzufügen, falls benötigt
+              // Add more PopupMenuItems if needed
             ];
           },
         ),
@@ -129,14 +133,17 @@ class SummaryPage extends StatelessWidget {
   }
 }
 
+/// A stateful widget for displaying the summary of an activity.
 class ActivitySummary extends StatefulWidget {
-  const ActivitySummary(
-      {super.key, required this.activityDatabase, this.small = false});
+  const ActivitySummary({
+    super.key,
+    required this.activityDatabase,
+    this.small = false,
+  });
 
   static const iconSize = 32.0;
 
   final bool small;
-
   final ActivityDatabase activityDatabase;
 
   @override
@@ -353,8 +360,7 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                ActivityDisplay.buildSlopeName(
-                                    route.slopes[index],
+                                ActivityPage.buildSlopeName(route.slopes[index],
                                     size: FontTheme.size - minus),
                                 Utils.buildText(
                                     text: Utils.durationStringToString(route

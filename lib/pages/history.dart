@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import '../activity/activity_database.dart';
 import '../main.dart';
 import '../utils/general_utils.dart';
-import 'activity_display.dart';
+import 'activity_page.dart';
 import 'activity_summary.dart';
 
 class History extends StatefulWidget {
   const History({super.key});
 
   static const historyTitle = 'History';
-  static const expandedHeight = ActivityDisplay.expandedHeight;
+  static const expandedHeight = ActivityPage.expandedHeight;
 
   static const double iconHeight = 64.0;
 
@@ -371,7 +371,7 @@ class HistoryState extends State<History> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ActivitySummaryPage(
+            builder: (context) => SummaryPage(
               activityDatabase: activity,
               historyState: this,
             ),
@@ -426,16 +426,6 @@ class HistoryState extends State<History> {
                           size: History.iconHeight - 36,
                         ),
                       ),
-                      /*
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16.0),
-                          child: Image.asset(
-                            'assets/images/background.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                         */
                       const SizedBox(width: 8.0),
                       Expanded(
                         child: Column(

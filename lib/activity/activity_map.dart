@@ -8,7 +8,7 @@ import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../main.dart';
-import '../pages/activity_display.dart';
+import '../pages/activity_page.dart';
 import '../utils/app_bar.dart';
 import '../utils/general_utils.dart';
 import 'activity.dart';
@@ -120,7 +120,7 @@ class _MapPageState extends State<MapPage> {
                                         const SizedBox(width: 16),
                                         if (widget.activityDataProvider.route
                                             .slopes.isNotEmpty)
-                                          ActivityDisplay.buildSlopeName(widget
+                                          ActivityPage.buildSlopeName(widget
                                               .activityDataProvider
                                               .route
                                               .slopes
@@ -201,8 +201,8 @@ class _MapPageState extends State<MapPage> {
                                                               .contrast),
                                                     ],
                                                   ),
-                                                  ActivityDisplay
-                                                      .buildSlopeName(widget
+                                                  ActivityPage.buildSlopeName(
+                                                      widget
                                                           .activityDataProvider
                                                           .route
                                                           .slopes[index]),
@@ -396,7 +396,7 @@ class _MapPageSummaryState extends State<MapPageSummary> {
                                                             .contrast),
                                                   ],
                                                 ),
-                                                ActivityDisplay.buildSlopeName(
+                                                ActivityPage.buildSlopeName(
                                                     widget.route.slopes[index]),
                                                 Row(
                                                   children: [
@@ -498,7 +498,7 @@ class _ActivityMapState extends State<ActivityMap>
         _middlePoint = _calculateMiddlePoint(widget.route.coordinates);
         _route = _buildPolyline(widget.route);
       } else {
-        _activityLocations = PowderPilot.getActivity().activityLocations;
+        _activityLocations = PowderPilot.activity.activityLocations;
       }
     }
     mapController = AnimatedMapController(
@@ -517,8 +517,8 @@ class _ActivityMapState extends State<ActivityMap>
     setState(() {
       if (!_previewMode) {
         if (!widget.staticMap) {
-          _activityLocations = PowderPilot.getActivity().activityLocations;
-          _route = _buildPolyline(PowderPilot.getActivity().route);
+          _activityLocations = PowderPilot.activity.activityLocations;
+          _route = _buildPolyline(PowderPilot.activity.route);
         }
       }
     });
@@ -532,10 +532,10 @@ class _ActivityMapState extends State<ActivityMap>
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
-      if (_previewMode && PowderPilot.getActivity().currentLatitude != 0.0) {
+      if (_previewMode && PowderPilot.activity.currentLatitude != 0.0) {
         mapController.animateTo(
-          dest: LatLng(PowderPilot.getActivity().currentLatitude,
-              PowderPilot.getActivity().currentLongitude),
+          dest: LatLng(PowderPilot.activity.currentLatitude,
+              PowderPilot.activity.currentLongitude),
         );
       }
     });
@@ -578,8 +578,8 @@ class _ActivityMapState extends State<ActivityMap>
         Marker(
           width: markerSize,
           height: markerSize,
-          point: LatLng(PowderPilot.getActivity().currentLatitude,
-              PowderPilot.getActivity().currentLongitude),
+          point: LatLng(PowderPilot.activity.currentLatitude,
+              PowderPilot.activity.currentLongitude),
           child: CustomPaint(
             painter: LocationMark(),
           ),
@@ -652,8 +652,8 @@ class _ActivityMapState extends State<ActivityMap>
           backgroundColor: backgroundColor,
           initialCenter: widget.staticMap
               ? _middlePoint
-              : LatLng(PowderPilot.getActivity().currentLatitude,
-                  PowderPilot.getActivity().currentLongitude),
+              : LatLng(PowderPilot.activity.currentLatitude,
+                  PowderPilot.activity.currentLongitude),
           initialZoom: widget.staticMap ? zoomOverview : zoomLevel,
           interactionOptions: const InteractionOptions(
             flags: InteractiveFlag.all & ~InteractiveFlag.rotate,

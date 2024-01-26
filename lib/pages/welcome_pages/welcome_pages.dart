@@ -5,6 +5,7 @@ import 'package:powder_pilot/pages/welcome_pages/welcome_page.dart';
 
 import '../../main.dart';
 
+/// A widget representing a set of welcome pages for onboarding.
 class WelcomePages extends StatefulWidget {
   const WelcomePages({super.key});
 
@@ -12,8 +13,12 @@ class WelcomePages extends StatefulWidget {
   State<WelcomePages> createState() => _WelcomePagesState();
 }
 
+/// The state for the WelcomePages widget.
 class _WelcomePagesState extends State<WelcomePages> {
+  /// Controller for the page view.
   final PageController _pageController = PageController(initialPage: 0);
+
+  /// The index of the current page.
   int _currentPage = 0;
 
   @override
@@ -49,7 +54,7 @@ class _WelcomePagesState extends State<WelcomePages> {
           WelcomePage(
             title: 'Location Access',
             subtitle:
-            'To track your activity ${PowderPilot.appName} needs access to your gps location',
+                'To track your activity ${PowderPilot.appName} needs access to your GPS location',
             image: 'assets/images/welcome_pages/location.png',
             buttonText: 'Enable Location',
             pageController: _pageController,
@@ -59,7 +64,7 @@ class _WelcomePagesState extends State<WelcomePages> {
             WelcomePage(
               title: 'Enable Background Mode',
               subtitle:
-              'Enable background mode of your device to allow proper work of ${PowderPilot.appName} when screen is switched off.',
+                  'Enable background mode of your device to allow proper work of ${PowderPilot.appName} when the screen is switched off.',
               image: 'assets/images/welcome_pages/battery_optimization.png',
               buttonText: 'Open Settings',
               pageController: _pageController,

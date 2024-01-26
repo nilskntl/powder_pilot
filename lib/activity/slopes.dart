@@ -79,7 +79,7 @@ class SlopeMap {
       const double metersConversionFactor = degreesToKilometers * 1000.0;
 
       return math.sqrt((longitude - projectedX) * (longitude - projectedX) +
-          (latitude - projectedY) * (latitude - projectedY)) *
+              (latitude - projectedY) * (latitude - projectedY)) *
           metersConversionFactor;
     }
 
@@ -108,7 +108,7 @@ class SlopeMap {
       double y2 = slope.coordinates[secondIndex][0];
 
       double distanceToLine =
-      calculateDistanceToLine(latitude, longitude, x1, y1, x2, y2);
+          calculateDistanceToLine(latitude, longitude, x1, y1, x2, y2);
 
       if (distanceToLine < minDistance) {
         minDistance = distanceToLine;
@@ -123,7 +123,7 @@ class SlopeMap {
       if (((!slope.lift && !lift) || (slope.lift && lift)) &&
           slope.coordinates.isNotEmpty) {
         List<double> distanceToSlope =
-        calculateSlopeDistance(slope, longitude, latitude);
+            calculateSlopeDistance(slope, longitude, latitude);
         int indexOfNearestPoint = distanceToSlope[1].toInt();
         double slopeDistanceToPoint = distanceToSlope[0];
 
@@ -253,7 +253,8 @@ class Slope {
           }
         }
       }
-    }  }
+    }
+  }
 
   /// Removes duplicate coordinates from the slope.
   void removeDuplicates() {
@@ -288,15 +289,16 @@ class Slope {
   bool get lift => _lift;
 
   @override
+
   /// Gets the hash code of the slope.
   int get hashCode => ref.hashCode + type.hashCode + lift.hashCode;
 
   @override
+
   /// Checks if the slope is equal to another object.
   bool operator ==(Object other) {
     return other is Slope && hashCode == other.hashCode;
   }
-
 }
 
 /// A class representing additional information about a slope, including name, type, start time, and end time.
@@ -388,4 +390,3 @@ class SlopeInfo {
     return jsonEncode(toJson());
   }
 }
-

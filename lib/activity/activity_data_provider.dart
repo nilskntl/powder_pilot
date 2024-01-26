@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'activity.dart';
 import 'route.dart';
 
+/// A provider class responsible for managing and updating activity data.
 class ActivityDataProvider extends ChangeNotifier {
   // Speed
   double speed = 0.0;
@@ -68,6 +69,7 @@ class ActivityDataProvider extends ChangeNotifier {
   late final ActivityLocations activityLocations;
   bool _activityLocationsLoaded = false;
 
+  /// Method to update the activity data.
   void updateData({
     required double newSpeed,
     required double newMaxSpeed,
@@ -130,11 +132,15 @@ class ActivityDataProvider extends ChangeNotifier {
       _activityLocationsLoaded = true;
     }
 
+    // Notify listeners about the data changes
     notifyListeners();
   }
 
+  /// Method to update the internet status.
   void updateInternetStatus({required bool newInternetStatus}) {
     internetStatus = newInternetStatus;
+
+    // Notify listeners about the internet status change
     notifyListeners();
   }
 }

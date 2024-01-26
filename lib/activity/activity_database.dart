@@ -5,37 +5,46 @@ import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+/// A helper class for managing the SQLite database for activity data.
 class ActivityDatabaseHelper {
-  // This is the actual database filename that is saved in the docs directory.
+  /// The actual database filename saved in the docs directory.
   static const _databaseName = "activity_database.db";
 
-  // Table name
+  /// The table name for storing activity data.
   static const _tableName = "activity";
 
-  // Increment this version when you need to change the schema.
+  /// Increment this version when changing the database schema.
   static const _databaseVersion = 1;
 
-  // Make this a singleton class.
+  /// Make this a singleton class.
   ActivityDatabaseHelper._privateConstructor();
 
+  /// Singleton instance of the [ActivityDatabaseHelper].
   static final ActivityDatabaseHelper instance =
       ActivityDatabaseHelper._privateConstructor();
 
-  // Only allow a single open connection to the database.
+  /// Only allow a single open connection to the database.
   static late Database _database;
+
+  /// Flag indicating whether the database has been initialized.
   static bool _initialized = false;
 
+  /// Initialize the database if not already initialized.
+  ///
+  /// @return Future<Database> Returns a future with the initialized database instance.
   static Future<Database> _initDatabase() async {
-    // Avoid errors caused by flutter upgrade.
-    // Importing 'package:flutter/widgets.dart' is required.
+    /// Avoid errors caused by flutter upgrade.
+    /// Importing 'package:flutter/widgets.dart' is required.
     WidgetsFlutterBinding.ensureInitialized();
-    // Open the database and store the reference.
+
+    /// Open the database and store the reference.
     Database db = await openDatabase(
-      // Set the path to the database. Note: Using the `join` function from the
-      // `path` package is best practice to ensure the path is correctly
-      // constructed for each platform.
+      /// Set the path to the database. Note: Using the `join` function from the
+      /// `path` package is best practice to ensure the path is correctly
+      /// constructed for each platform.
       join(await getDatabasesPath(), _databaseName),
-      // When the database is first created, create a table to store activitys.
+
+      /// When the database is first created, create a table to store activitys.
       version: _databaseVersion,
       onCreate: (db, version) {
         _onCreate(db, version);
@@ -45,63 +54,73 @@ class ActivityDatabaseHelper {
     return db;
   }
 
+  /// Create the activity table during database creation.
+  ///
+  /// @param db The database instance.
+  /// @param version The database version.
   static Future _onCreate(Database db, int version) async {
     await db.execute('''
-              CREATE TABLE activity(
-                id INTEGER PRIMARY KEY,
-                areaName TEXT,
-                maxSpeed REAL,
-                averageSpeed REAL,
-                totalRuns INTEGER,
-                longestRun REAL,
-                maxAltitude REAL,
-                minAltitude REAL,
-                avgAltitude REAL,
-                maxSlope REAL,
-                avgSlope REAL,
-                distance REAL,
-                distanceDownhill REAL,
-                distanceUphill REAL,
-                elapsedTime TEXT,
-                elapsedDownhillTime TEXT,
-                elapsedUphillTime TEXT,
-                elapsedPauseTime TEXT,
-                route TEXT,
-                startTime TEXT,
-                endTime TEXT,
-                altitudes TEXT,
-                speeds TEXT,
-                speedLocation TEXT,
-                startLocation TEXT,
-                endLocation TEXT,
-                image BLOB
-              )
-              ''');
+      CREATE TABLE $_tableName(
+        id INTEGER PRIMARY KEY,
+        areaName TEXT,
+        maxSpeed REAL,
+        averageSpeed REAL,
+        totalRuns INTEGER,
+        longestRun REAL,
+        maxAltitude REAL,
+        minAltitude REAL,
+        avgAltitude REAL,
+        maxSlope REAL,
+        avgSlope REAL,
+        distance REAL,
+        distanceDownhill REAL,
+        distanceUphill REAL,
+        elapsedTime TEXT,
+        elapsedDownhillTime TEXT,
+        elapsedUphillTime TEXT,
+        elapsedPauseTime TEXT,
+        route TEXT,
+        startTime TEXT,
+        endTime TEXT,
+        altitudes TEXT,
+        speeds TEXT,
+        speedLocation TEXT,
+        startLocation TEXT,
+        endLocation TEXT,
+        image BLOB
+      )
+    ''');
   }
 
+  /// Get the initialized database instance.
+  ///
+  /// @return Future<Database> Returns a future with the initialized database instance.
   static Future<Database> get database async {
     if (_initialized) return _database;
     _database = await _initDatabase();
     return _database;
   }
 
-  // Define a function that inserts activities into the database
+  /// Insert an activity into the database.
+  ///
+  /// @param activityDatabase The activity to be inserted.
+  /// @return Future<void>
   static Future<void> insertActivity(ActivityDatabase activityDatabase) async {
-    // Get a reference to the database.
+    /// Get a reference to the database.
     Database db = await database;
 
-    // Check if the id is -1, if so, generate a new unique id.
+    /// Check if the id is -1, if so, generate a new unique id.
     if (activityDatabase.id == -1) {
-      // Query the maximum existing id in the database.
+      /// Query the maximum existing id in the database.
       List<Map<String, dynamic>> result =
           await db.rawQuery('SELECT MAX(id) as maxId FROM $_tableName');
       int maxId = (result.first['maxId'] ?? 0) as int;
 
-      // Generate a new unique id.
+      /// Generate a new unique id.
       activityDatabase = activityDatabase.copyWith(newId: maxId + 1);
     }
 
-    // Insert the Activity
+    /// Insert the Activity
     await db.insert(
       _tableName,
       {
@@ -112,15 +131,17 @@ class ActivityDatabaseHelper {
     );
   }
 
-  // A method that retrieves all the activities from the activity table.
+  /// Get a list of all activities from the activity table.
+  ///
+  /// @return Future<List<ActivityDatabase>> Returns a future with the list of activities.
   static Future<List<ActivityDatabase>> activities() async {
-    // Get a reference to the database.
+    /// Get a reference to the database.
     final db = await database;
 
-    // Query the table for all The Activities.
+    /// Query the table for all The Activities.
     final List<Map<String, dynamic>> maps = await db.query(_tableName);
 
-    // Convert the List<Map<String, dynamic> into a List<Activity>.
+    /// Convert the List<Map<String, dynamic> into a List<Activity>.
     return List.generate(maps.length, (i) {
       return ActivityDatabase(
         id: maps[i]['id'] as int,
@@ -154,131 +175,148 @@ class ActivityDatabaseHelper {
     });
   }
 
+  /// Update an activity in the database.
+  ///
+  /// @param activityDatabase The activity to be updated.
+  /// @return Future<void>
   static Future<void> updateActivity(ActivityDatabase activityDatabase) async {
-    // Get a reference to the database.
+    /// Get a reference to the database.
     final db = await database;
 
-    // Update the given Activity,
+    /// Update the given Activity,
     await db.update(
       _tableName,
       {
         ...activityDatabase.toMap(),
         if (activityDatabase.image != null) 'image': activityDatabase.image,
       },
-      // Ensure that the Activity has a matching id.
+
+      /// Ensure that the Activity has a matching id.
       where: 'id = ?',
-      // Pass the Activity's id as a whereArg to prevent SQL injection.
+
+      /// Pass the Activity's id as a whereArg to prevent SQL injection.
       whereArgs: [activityDatabase.id],
     );
   }
 
+  /// Delete an activity from the database.
+  ///
+  /// @param id The id of the activity to be deleted.
+  /// @return Future<void>
   static Future<void> deleteActivity(int id) async {
-    // Get a reference to the database.
+    /// Get a reference to the database.
     final db = await database;
 
-    // Remove the Activity from the database.
+    /// Remove the Activity from the database.
     await db.delete(
       _tableName,
-      // Use a `where` clause to delete a specific Activity.
+
+      /// Use a `where` clause to delete a specific Activity.
       where: 'id = ?',
-      // Pass the Activity's id as a whereArg to prevent SQL injection.
+
+      /// Pass the Activity's id as a whereArg to prevent SQL injection.
       whereArgs: [id],
     );
   }
 
+  /// Delete the entire database.
+  ///
+  /// @return Future<void>
   static deleteDatabase() async {
     final db = await database;
     await db.delete(_tableName);
   }
 }
 
+/// Represents an activity entry in the database.
 class ActivityDatabase {
-  // Unique ID
+  /// Unique ID
   final int id;
 
-  // Area
+  /// Area
   final String areaName;
 
-  // Speed
+  /// Speed
   final double maxSpeed;
   final double averageSpeed;
 
-  // Runs
+  /// Runs
   final int totalRuns;
   final double longestRun;
 
-  // Altitude
+  /// Altitude
   final double maxAltitude;
   final double minAltitude;
   final double avgAltitude;
 
-  // Slope
+  /// Slope
   final double maxSlope;
   final double avgSlope;
 
-  // Distance
+  /// Distance
   final double distance;
   final double distanceDownhill;
   final double distanceUphill;
 
-  // Duration
+  /// Duration
   final String elapsedTime;
   final String elapsedDownhillTime;
   final String elapsedUphillTime;
   final String elapsedPauseTime;
 
-  // Route
+  /// Route
   final String route;
 
-  // Start time
+  /// Start time
   final String startTime;
   final String endTime;
 
-  // List of altitudes
+  /// List of altitudes
   final String altitudes;
 
-  // List of speeds
+  /// List of speeds
   final String speeds;
 
-  // Image
+  /// Image
   final Uint8List? image;
 
-  // Important locations
+  /// Important locations
   final String speedLocation;
   final String startLocation;
   final String endLocation;
 
-  const ActivityDatabase(
-      {required this.areaName,
-      required this.maxSpeed,
-      required this.averageSpeed,
-      required this.totalRuns,
-      required this.longestRun,
-      required this.maxAltitude,
-      required this.minAltitude,
-      required this.avgAltitude,
-      required this.maxSlope,
-      required this.avgSlope,
-      required this.distance,
-      required this.distanceDownhill,
-      required this.distanceUphill,
-      required this.elapsedTime,
-      required this.elapsedDownhillTime,
-      required this.elapsedUphillTime,
-      required this.elapsedPauseTime,
-      required this.route,
-      required this.startTime,
-      required this.endTime,
-      this.image,
-      this.id = -1,
-      required this.altitudes,
-      required this.speeds,
-      required this.speedLocation,
-      required this.startLocation,
-      required this.endLocation});
+  const ActivityDatabase({
+    this.id = -1,
+    required this.areaName,
+    required this.maxSpeed,
+    required this.averageSpeed,
+    required this.totalRuns,
+    required this.longestRun,
+    required this.maxAltitude,
+    required this.minAltitude,
+    required this.avgAltitude,
+    required this.maxSlope,
+    required this.avgSlope,
+    required this.distance,
+    required this.distanceDownhill,
+    required this.distanceUphill,
+    required this.elapsedTime,
+    required this.elapsedDownhillTime,
+    required this.elapsedUphillTime,
+    required this.elapsedPauseTime,
+    required this.route,
+    required this.startTime,
+    required this.endTime,
+    required this.altitudes,
+    required this.speeds,
+    required this.speedLocation,
+    required this.startLocation,
+    required this.endLocation,
+    this.image,
+  });
 
-  // Convert a Activity into a Map. The keys must correspond to the names of the
-  // columns in the database.
+  /// Convert a Activity into a Map. The keys must correspond to the names of the
+  /// columns in the database.
   Map<String, dynamic> toMap() {
     final map = {
       'id': id,
@@ -312,13 +350,17 @@ class ActivityDatabase {
     return map;
   }
 
-  // Implement toString to make it easier to see information about
-  // each Activity when using the print statement.
+  /// Implement toString to make it easier to see information about
+  /// each Activity when using the print statement.
   @override
   String toString() {
     return 'Activity{id: $id, areaName: $areaName, maxSpeed: $maxSpeed, averageSpeed: $averageSpeed, totalRuns: $totalRuns, longestRun: $longestRun, maxAltitude: $maxAltitude, minAltitude: $minAltitude, avgAltitude: $avgAltitude, maxSlope: $maxSlope, avgSlope: $avgSlope, distance: $distance, distanceDownhill: $distanceDownhill, distanceUphill: $distanceUphill, elapsedTime: $elapsedTime, elapsedDownhillTime: $elapsedDownhillTime, elapsedUphillTime: $elapsedUphillTime, elapsedPauseTime: $elapsedPauseTime, route: $route, startTime: $startTime, endTime: $endTime, altitudes: $altitudes, speeds: $speeds, image: $image, speedLocation: $speedLocation, startLocation: $startLocation, endLocation: $endLocation}';
   }
 
+  /// Copy the [ActivityDatabase] with a new ID.
+  ///
+  /// @param newId The new ID for the copied activity.
+  /// @return ActivityDatabase
   ActivityDatabase copyWith({required int newId}) {
     return ActivityDatabase(
       id: newId,
@@ -349,41 +391,5 @@ class ActivityDatabase {
       startLocation: startLocation,
       endLocation: endLocation,
     );
-  }
-}
-
-class DummyActivities {
-  void createDummyActivityDatabase() {
-    ActivityDatabase activityDatabase = const ActivityDatabase(
-      areaName: 'Austria, Kitzbühel',
-      maxSpeed: 23.2,
-      startTime: '2024-01-22 08:59:00',
-      endTime: '2024-01-22 15:49:00',
-      distance: 92600,
-      elapsedTime: '06:50:00',
-
-      // Initialize the rest with 0
-      averageSpeed: 0,
-      totalRuns: 0,
-      longestRun: 0,
-      maxAltitude: 0,
-      minAltitude: 0,
-      avgAltitude: 0,
-      maxSlope: 0,
-      avgSlope: 0,
-      distanceDownhill: 0,
-      distanceUphill: 0,
-      elapsedDownhillTime: '00:00:00',
-      elapsedUphillTime: '00:00:00',
-      elapsedPauseTime: '00:00:00',
-      route: '',
-      altitudes: '',
-      speeds: '',
-      speedLocation: '',
-      startLocation: '',
-      endLocation: '',
-    );
-
-    ActivityDatabaseHelper.insertActivity(activityDatabase);
   }
 }

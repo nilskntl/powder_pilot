@@ -8,10 +8,9 @@ import 'package:powder_pilot/location.dart';
 
 import '../main.dart';
 import '../pages/activity_summary.dart';
-import '../utils/app_bar.dart';
-import '../utils/fetch_slope_data.dart';
 import '../utils/general_utils.dart';
 import '../utils/shared_preferences.dart';
+import '../utils/slope_data.dart';
 import 'activity_database.dart';
 import 'route.dart';
 import 'slopes.dart';
@@ -72,8 +71,7 @@ class Activity extends ActivityLocation {
     _running = true;
     _active = true;
     startTime = DateTime.now();
-    _startStopwatch(callback: () {
-    });
+    _startStopwatch(callback: () {});
     if (Utils.calculateHaversineDistance(
             LatLng(currentLatitude, currentLongitude),
             LatLng(_latitudeWhenDownloaded, _longitudeWhenDownloaded)) >
@@ -117,9 +115,9 @@ class Activity extends ActivityLocation {
 
     PowderPilot.locationService.startPassiveLocationStream();
 
-    try{
+    try {
       PowderPilot.locationService.removeListener(_locationCallback);
-    } catch(e) {
+    } catch (e) {
       if (kDebugMode) {
         print(e);
       }
@@ -174,8 +172,7 @@ class Activity extends ActivityLocation {
       _mapDownloaded = false;
       _downloadMap();
     }
-    _resumeStopwatch(callback: () {
-    });
+    _resumeStopwatch(callback: () {});
     PowderPilot.locationService.startActiveLocationStream();
     updateData();
   }
@@ -391,13 +388,15 @@ class ActivityLocation extends ActivityUtils {
         }
         updateData();
       }
-      if (_numberOfLocationUpdates % 15 == 0 && (PowderPilot.connectionStatus == true || _numberOfLocationUpdates == 0)) {
-          if (!_mapDownloaded) {
-            _downloadMap();
-          }
+      if (_numberOfLocationUpdates % 15 == 0 &&
+          (PowderPilot.connectionStatus == true ||
+              _numberOfLocationUpdates == 0)) {
+        if (!_mapDownloaded) {
+          _downloadMap();
+        }
       }
       String areaNameTemp = PowderPilot.locationService.areaName;
-      if(areaNameTemp != areaName) {
+      if (areaNameTemp != areaName) {
         areaName = areaNameTemp;
         updateData();
       }
@@ -407,7 +406,6 @@ class ActivityLocation extends ActivityUtils {
 
     _locationCallback = onLocationUpdate;
     PowderPilot.locationService.addListener(_locationCallback);
-    
   }
 
   Future<void> _updateNearestSlope() async {
@@ -446,7 +444,6 @@ class ActivityLocation extends ActivityUtils {
     }
     _isDownloadRunning = false;
   }
-  
 }
 
 class ActivityTimer extends ActivityData {

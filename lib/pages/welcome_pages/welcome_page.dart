@@ -12,6 +12,7 @@ import '../../main.dart';
 import '../../utils/general_utils.dart';
 import '../../utils/shared_preferences.dart';
 
+/// Widget representing an individual welcome page in the onboarding process.
 class WelcomePage extends StatefulWidget {
   const WelcomePage({
     super.key,
@@ -40,16 +41,15 @@ class WelcomePage extends StatefulWidget {
   State<WelcomePage> createState() => _WelcomePageState();
 }
 
+/// The state for the WelcomePage widget.
 class _WelcomePageState extends State<WelcomePage> {
   late final double _imageHeight = MediaQuery.of(context).size.height * 0.39;
   final int _pages = Platform.isAndroid ? 6 : 5;
-
   final Color _smartphoneColor = ColorTheme.black;
-
   late String _buttonText = widget.buttonText;
-
   bool _accepted = true;
 
+  /// Checks the location permission and updates the UI accordingly.
   void _checkLocationPermission() async {
     LocationPermission status = await LocationService.checkPermission();
     if (status == LocationPermission.whileInUse ||
@@ -61,6 +61,7 @@ class _WelcomePageState extends State<WelcomePage> {
     }
   }
 
+  /// Asks for location permission and updates the UI accordingly.
   void _askForLocation() async {
     _accepted = await LocationService.askForPermission();
     if (_accepted) {
@@ -78,6 +79,7 @@ class _WelcomePageState extends State<WelcomePage> {
     }
   }
 
+  /// Opens battery optimization settings on Android.
   void _openBatterySettings() async {
     try {
       AppSettings.openAppSettings(type: AppSettingsType.batteryOptimization);
@@ -287,6 +289,7 @@ class _WelcomePageState extends State<WelcomePage> {
     );
   }
 
+  /// Builds the terms widget for the last page.
   Widget _buildTermsWidget() {
     return Row(
       children: [
@@ -347,6 +350,7 @@ class _WelcomePageState extends State<WelcomePage> {
     );
   }
 
+  /// Shows a dialog with legal text.
   void _showDialog({required BuildContext context, required String asset}) {
     showDialog(
       context: context,
@@ -357,6 +361,7 @@ class _WelcomePageState extends State<WelcomePage> {
   }
 }
 
+/// Dialog widget to display legal text.
 class LegalDialog extends StatefulWidget {
   const LegalDialog({super.key, required this.asset});
 
@@ -366,24 +371,21 @@ class LegalDialog extends StatefulWidget {
   State<LegalDialog> createState() => _LegalDialogState();
 }
 
+/// The state for the LegalDialog widget.
 class _LegalDialogState extends State<LegalDialog>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
-
   List<String> arr = [];
 
   @override
   void initState() {
     super.initState();
-
     loadTextFromAssets();
-
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
-
     _scaleAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
@@ -393,10 +395,10 @@ class _LegalDialogState extends State<LegalDialog>
         curve: Curves.easeInOut,
       ),
     );
-
     _controller.forward();
   }
 
+  /// Loads text from assets.
   Future<void> loadTextFromAssets() async {
     String text = await rootBundle.loadString(widget.asset);
     List<String> paragraphs =
@@ -412,53 +414,63 @@ class _LegalDialogState extends State<LegalDialog>
     return ScaleTransition(
       scale: _scaleAnimation,
       child: Dialog(
-          insetPadding: const EdgeInsets.all(16.0),
-          backgroundColor: ColorTheme.background,
-          child: Container(
-            padding: const EdgeInsets.all(16.0),
-            child: ListView(
-              children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(
-                      Icons.close,
-                      color: ColorTheme.contrast,
-                    ),
+        insetPadding: const EdgeInsets.all(16.0),
+        backgroundColor: ColorTheme.background,
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          child: ListView(
+            children: [
+              Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(
+                    Icons.close,
+                    color: ColorTheme.contrast,
                   ),
                 ),
-                if (arr.isNotEmpty)
-                  _buildDialogText(
-                      text: arr.first, fontWeight: FontWeight.bold),
-                const SizedBox(height: 12),
-                ...arr
-                    .skip(1)
-                    .map((paragraph) => _buildDialogText(text: paragraph)),
-              ],
-            ),
-          )),
+              ),
+              if (arr.isNotEmpty)
+                _buildDialogText(
+                  text: arr.first,
+                  fontWeight: FontWeight.bold,
+                ),
+              const SizedBox(height: 12),
+              ...arr.skip(1).map(
+                    (paragraph) => _buildDialogText(
+                      text: paragraph,
+                    ),
+                  ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildDialogText(
-      {required String text, FontWeight fontWeight = FontWeight.normal}) {
+  /// Builds the text for the dialog.
+  Widget _buildDialogText({
+    required String text,
+    FontWeight fontWeight = FontWeight.normal,
+  }) {
     return Flexible(
-        child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Utils.buildText(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Utils.buildText(
             text: text,
             fontSize: FontTheme.size,
             fontWeight: fontWeight,
             color: ColorTheme.contrast,
             align: TextAlign.left,
-            caps: false),
-        const SizedBox(height: 12),
-      ],
-    ));
+            caps: false,
+          ),
+          const SizedBox(height: 12),
+        ],
+      ),
+    );
   }
 
   @override

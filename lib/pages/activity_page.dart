@@ -5,13 +5,12 @@ import 'package:provider/provider.dart';
 import '../activity/activity.dart';
 import '../activity/activity_data_provider.dart';
 import '../activity/activity_map.dart';
-import '../activity/route.dart';
 import '../activity/slopes.dart';
 import '../main.dart';
 import '../utils/general_utils.dart';
 
-class ActivityDisplay extends StatefulWidget {
-  const ActivityDisplay({super.key});
+class ActivityPage extends StatefulWidget {
+  const ActivityPage({super.key});
 
   static const Duration animationDuration = Duration(milliseconds: 500);
   static const double expandedHeight = 200.0;
@@ -47,10 +46,10 @@ class ActivityDisplay extends StatefulWidget {
   }
 
   @override
-  State<ActivityDisplay> createState() => _ActivityDisplayState();
+  State<ActivityPage> createState() => _ActivityPageState();
 }
 
-class _ActivityDisplayState extends State<ActivityDisplay> {
+class _ActivityPageState extends State<ActivityPage> {
   late final ScrollController _scrollController;
   bool _scrollControllerInitialized = false;
 
@@ -405,7 +404,7 @@ class _BlinkingDotState extends State<BlinkingDot> {
     return GestureDetector(
       onTap: () {
         if (widget.activityDataProvider.status != ActivityStatus.inactive) {
-          PowderPilot.getActivity().stopActivity(context);
+          PowderPilot.activity.stopActivity(context);
         }
       },
       child: Stack(
@@ -584,29 +583,14 @@ class _StatusState extends State<Status> {
                     ),
                   ),
                 ),
-                if (widget.activityDataProvider.currentLatitude != 0.0)
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 500),
-                    height: widget.activityDataProvider.status ==
-                            ActivityStatus.running
-                        ? 20
-                        : 0,
-                    decoration: BoxDecoration(
-                      color: ColorTheme.primary.withOpacity(0.5),
-                      borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(8.0),
-                          bottomRight: Radius.circular(8.0)),
-                    ),
-                    alignment: Alignment.center,
-                    child: widget.activityDataProvider.status ==
-                            ActivityStatus.running
-                        ? Utils.buildText(
-                            text: 'Click for more info',
-                            fontSize: FontTheme.size - 4,
-                            color: ColorTheme.secondary,
-                            fontWeight: FontWeight.bold)
-                        : Container(),
+                const Positioned(
+                  top: 4,
+                  right: 4,
+                  child: Icon(
+                    Icons.ads_click_rounded,
+                    color: ColorTheme.contrast,
                   ),
+                ),
                 if (widget.activityDataProvider.currentLatitude != 0.0 &&
                     widget.activityDataProvider.status ==
                         ActivityStatus.running &&
@@ -764,19 +748,19 @@ class _StatusState extends State<Status> {
                 : Icons.play_arrow_rounded,
             ColorTheme.contrast, () {
           if (widget.activityDataProvider.status == ActivityStatus.inactive) {
-            PowderPilot.getActivity().startActivity();
+            PowderPilot.activity.startActivity();
             double targetPosition = MediaQuery.of(context).size.height - 200;
             widget.scrollController.animateTo(
               targetPosition,
               curve: Curves.easeOut,
-              duration: ActivityDisplay.animationDuration,
+              duration: ActivityPage.animationDuration,
             );
           } else if (widget.activityDataProvider.status ==
               ActivityStatus.paused) {
-            PowderPilot.getActivity().resumeActivity();
+            PowderPilot.activity.resumeActivity();
           } else if (widget.activityDataProvider.status ==
               ActivityStatus.running) {
-            PowderPilot.getActivity().pauseActivity();
+            PowderPilot.activity.pauseActivity();
           }
         }),
       ],

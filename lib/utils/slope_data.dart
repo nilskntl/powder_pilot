@@ -6,9 +6,16 @@ import 'package:http/http.dart' as http;
 import '../activity/slopes.dart';
 import '../main.dart';
 
+/// A utility class for fetching slope data from Overpass API.
 class SlopeFetcher {
+  /// Flag indicating whether data is currently being fetched.
   static bool currentlyFetching = false;
 
+  /// Fetches slope and lift data based on the given latitude and longitude.
+  ///
+  /// @param latitude The latitude coordinate.
+  /// @param longitude The longitude coordinate.
+  /// @return A Future that completes when data fetching is done.
   static Future<void> fetchData(double latitude, double longitude) async {
     if (currentlyFetching) {
       return;
@@ -47,6 +54,13 @@ class SlopeFetcher {
     currentlyFetching = false;
   }
 
+  /// Fetches lift data based on the given latitude, longitude, Overpass type, and value.
+  ///
+  /// @param latitude The latitude coordinate.
+  /// @param longitude The longitude coordinate.
+  /// @param type The Overpass type (way or relation).
+  /// @param value The Overpass value to filter the query.
+  /// @return A Future<bool> indicating the success of the fetch operation.
   static Future<bool> _fetchLiftDataHelper(
       double latitude, double longitude, String type, String value) async {
     const distance = 20000;
@@ -75,6 +89,12 @@ class SlopeFetcher {
     return false;
   }
 
+  /// Fetches slope data based on the given latitude, longitude, Overpass type, and value.
+  ///
+  /// @param latitude The latitude coordinate.
+  /// @param longitude The longitude coordinate.
+  /// @param type The Overpass type (way or relation).
+  /// @return A Future<bool> indicating the success of the fetch operation.
   static Future<bool> _fetchDataHelper(
       double latitude, double longitude, String type) async {
     const distance = 20000;
@@ -103,6 +123,11 @@ class SlopeFetcher {
     return false;
   }
 
+  /// Parses the fetched data and adds slope objects to the SlopeMap.
+  ///
+  /// @param data The map containing the fetched data.
+  /// @param lift A flag indicating whether the fetched data is for a lift.
+  /// @return A Future<bool> indicating the success of the parse operation.
   static Future<bool> parseData(Map<String, dynamic> data,
       {bool lift = false}) async {
     for (final element in data['elements']) {

@@ -38,10 +38,10 @@ class WeatherManager {
   Future<void> init() async {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!locationLoaded) {
-        if (PowderPilot.getActivity().currentLatitude != 0.0 &&
-            PowderPilot.getActivity().currentLongitude != 0.0) {
-          fetchData(PowderPilot.getActivity().currentLatitude,
-              PowderPilot.getActivity().currentLongitude);
+        if (PowderPilot.activity.currentLatitude != 0.0 &&
+            PowderPilot.activity.currentLongitude != 0.0) {
+          fetchData(PowderPilot.activity.currentLatitude,
+              PowderPilot.activity.currentLongitude);
           locationLoaded = true;
         }
         if (!weatherLoaded) {
@@ -102,8 +102,8 @@ class WeatherManager {
 
   void updateCurrentTemperature() async {
     if (DateTime.now().hour != lastFetchTime.hour) {
-      await fetchData(PowderPilot.getActivity().currentLatitude,
-          PowderPilot.getActivity().currentLongitude);
+      await fetchData(PowderPilot.activity.currentLatitude,
+          PowderPilot.activity.currentLongitude);
       lastFetchTime = DateTime.now();
     }
   }

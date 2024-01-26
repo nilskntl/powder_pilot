@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:powder_pilot/pages/welcome_pages/pages/legal.dart';
+import 'package:powder_pilot/pages/welcome_pages/welcome_page.dart';
 
 import '../main.dart';
 import '../utils/app_bar.dart';
 import '../utils/general_utils.dart';
 import '../utils/shared_preferences.dart';
-import 'activity_display.dart';
+import 'activity_page.dart';
 
+/// Widget representing the settings page.
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
@@ -16,6 +17,7 @@ class SettingsPage extends StatefulWidget {
   State<SettingsPage> createState() => _SettingsPageState();
 }
 
+/// The state for the SettingsPage widget.
 class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
@@ -77,6 +79,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  /// Shows the language selection dialog.
   _showLanguageSelectionDialog() {
     showDialog(
       context: context,
@@ -84,7 +87,7 @@ class _SettingsPageState extends State<SettingsPage> {
         return Dialog(
           child: Container(
             padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-            height: 150, // Hier die gewünschte Breite setzen
+            height: 150, // Set the desired width here
             child: ListView(
               children: [
                 _buildLanguageOption("Metric (km/h)"),
@@ -97,6 +100,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  /// Shows a legal text dialog.
   void _showDialog({required BuildContext context, required String asset}) {
     showDialog(
       context: context,
@@ -106,6 +110,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  /// Builds a language option ListTile.
   Widget _buildLanguageOption(String unit) {
     return ListTile(
       title: Text(unit),

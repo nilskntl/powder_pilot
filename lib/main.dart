@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:powder_pilot/location.dart';
 import 'package:powder_pilot/pages/welcome_pages/welcome_pages.dart';
 import 'package:powder_pilot/utils/connectivity_controller.dart';
 import 'package:powder_pilot/utils/shared_preferences.dart';
@@ -8,23 +9,9 @@ import 'package:provider/provider.dart';
 
 import 'activity/activity.dart';
 import 'activity/activity_data_provider.dart';
-import 'pages/activity_display.dart';
+import 'pages/activity_page.dart';
 import 'pages/history.dart';
 import 'utils/app_bar.dart';
-
-/*
-Key names
-
-Number of total activities
-'numActivities' (int)
-
-Already did welcome screen
-'welcome' (bool)
-
-Units
-'units' (String) ("metric" or "imperial")
-
- */
 
 void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
@@ -37,15 +24,15 @@ void main() {
 }
 
 void init() async {
-  bool welcome = await SharedPref.readBool('welcome');
-  String units = await SharedPref.readString('units');
+  bool welcome = await SharedPref.readBool(PowderPilot.welcomeKey);
+  String units = await SharedPref.readString(PowderPilot.unitsKey);
   if (units == '') {
     units = 'metric';
-    SharedPref.saveString('units', units);
+    SharedPref.saveString(PowderPilot.unitsKey, units);
   } else if (units == 'imperial') {
     Info.setUnits(units);
   } else if (units != 'metric') {
-    SharedPref.saveString('units', 'metric');
+    SharedPref.saveString(PowderPilot.unitsKey, 'metric');
   }
 
   runApp(
@@ -70,6 +57,9 @@ class ColorTheme {
   static const Color blue = Color(0xff3498db);
   static const Color black = Color(0xff000000);
   static const Color darkGrey = Color(0xff2f2f2f);
+
+  static const Color backgroundGradient1 = Color(0xffcddcf7);
+  static const Color backgroundGradient2 = Color(0xff9bc9f6);
 }
 
 class FontTheme {
@@ -101,7 +91,15 @@ class Start extends StatelessWidget {
 class PowderPilot extends StatelessWidget {
   const PowderPilot({super.key});
 
+  /// Key names
+  static const String numActivitiesKey = 'numActivities';
+  static const String activityKey = 'activity';
+  static const String welcomeKey = 'welcome';
+  static const String unitsKey = 'units';
+
   static const String appName = 'Powder Pilot';
+
+  static final LocationService _locationService = LocationService();
 
   static int _activityId = 0;
   static Activity _activity = Activity(id: _activityId);
@@ -117,9 +115,9 @@ class PowderPilot extends StatelessWidget {
     return const MyHomePage(title: 'Flutter Demo Home Page');
   }
 
-  static Activity getActivity() {
-    return _activity;
-  }
+  static Activity get activity => _activity;
+
+  static LocationService get locationService => _locationService;
 
   static ConnectivityController get connectivityController =>
       _connectivityController;
@@ -138,7 +136,6 @@ class PowderPilot extends StatelessWidget {
       bool mapDownloaded = false}) {
     _activity = Activity(
         id: ++_activityId,
-        areaName: areaName,
         currentPosition: currentPosition,
         mapDownloaded: mapDownloaded);
     _activity.init();
@@ -160,7 +157,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final ActivityDisplay _activity = const ActivityDisplay();
+  final ActivityPage _activity = const ActivityPage();
   final History _history = const History();
 
   final PageController _pageController = PageController();

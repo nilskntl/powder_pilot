@@ -4,7 +4,13 @@ import '../main.dart';
 import '../pages/settings.dart';
 import 'general_utils.dart';
 
+/// A utility class for creating custom Material app bars.
 class CustomMaterialAppBar {
+  /// Generates a custom AppBar with a specified title and optional child widget.
+  ///
+  /// @param title The title to be displayed in the AppBar.
+  /// @param child An optional widget to be displayed as a child in the AppBar.
+  /// @return An AppBar with the specified properties.
   static AppBar appBar(
       {required String title, Widget child = const SizedBox()}) {
     return AppBar(
@@ -19,12 +25,17 @@ class CustomMaterialAppBar {
   }
 }
 
+/// A custom stateless widget representing a custom app bar.
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({super.key});
 
   static const barHeight = 64.0;
   static const itemsSize = 40.0;
 
+  /// Gets the status bar height for the current device.
+  ///
+  /// @param context The build context.
+  /// @return The height of the status bar.
   static double getStatusBarHeight(BuildContext context) {
     return MediaQuery.of(context).padding.top;
   }
@@ -76,7 +87,6 @@ class CustomAppBar extends StatelessWidget {
                   const SizedBox(width: itemsSize),
                   GestureDetector(
                     onTap: () {
-                      // Open Settings page
                       Navigator.push(
                           context,
                           MaterialPageRoute(

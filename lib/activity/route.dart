@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:powder_pilot/activity/slopes.dart';
 
 /// A class representing an activity route with coordinates and associated slopes.
