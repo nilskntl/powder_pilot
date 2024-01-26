@@ -1,14 +1,12 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:geocode/geocode.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:location/location.dart';
+import 'package:powder_pilot/location.dart';
 
 import '../main.dart';
-import '../pages/activity_display.dart';
 import '../pages/activity_summary.dart';
 import '../utils/app_bar.dart';
 import '../utils/fetch_slope_data.dart';
@@ -42,85 +40,11 @@ enum GpsAccuracy {
   high,
 }
 
-class CustomDialog extends StatefulWidget {
-  const CustomDialog({super.key, required this.activityDatabase});
-
-  final ActivityDatabase activityDatabase;
-
-  @override
-  State<CustomDialog> createState() => _CustomDialogState();
-}
-
-class _CustomDialogState extends State<CustomDialog>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-
-    _scaleAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOut,
-      ),
-    );
-
-    _controller.forward();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _scaleAnimation,
-      child: Dialog(
-        insetPadding: const EdgeInsets.all(16.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16.0),
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            appBar: CustomMaterialAppBar.appBar(title: 'Summary'),
-            body: Container(
-              width: double.infinity,
-              height: double.infinity,
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16.0),
-                color: ColorTheme.background,
-              ),
-              child: ActivitySummary(
-                activityDatabase: widget.activityDatabase,
-                small: true,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-}
-
 class Activity extends ActivityLocation {
   final int id;
 
   Activity(
       {required this.id,
-      String areaName = '',
       LatLng currentPosition = const LatLng(0.0, 0.0),
       bool mapDownloaded = false}) {
     currentLatitude = currentPosition.latitude;
@@ -130,21 +54,13 @@ class Activity extends ActivityLocation {
       _latitudeWhenDownloaded = currentLatitude;
       _longitudeWhenDownloaded = currentLongitude;
     }
-    if (areaName != '' || areaName != 'Unknown') {
-      this.areaName = areaName;
-    }
+    areaName = PowderPilot.locationService.areaName;
   }
 
   void init() {
     if (kDebugMode) {
       print('Activity $id initialized');
     }
-    _requestPermission();
-    location.changeSettings(
-      accuracy: LocationAccuracy.high,
-      interval: 1000,
-    );
-    location.enableBackgroundMode(enable: false);
     _activityInitialized = true;
     _locationStream();
   }
@@ -157,7 +73,6 @@ class Activity extends ActivityLocation {
     _active = true;
     startTime = DateTime.now();
     _startStopwatch(callback: () {
-      _setNotification();
     });
     if (Utils.calculateHaversineDistance(
             LatLng(currentLatitude, currentLongitude),
@@ -166,8 +81,8 @@ class Activity extends ActivityLocation {
       _mapDownloaded = false;
       _downloadMap();
     }
+    PowderPilot.locationService.startActiveLocationStream();
     updateData();
-    _locationSettings();
   }
 
   void stopActivity(BuildContext context) {
@@ -178,6 +93,7 @@ class Activity extends ActivityLocation {
     slope = 0.0;
     activityLocations =
         activityLocations.setEndLocation([currentLongitude, currentLatitude]);
+    route.addCoordinates([currentLongitude, currentLatitude]);
     _running = false;
     endTime = DateTime.now();
     _active = false;
@@ -185,7 +101,6 @@ class Activity extends ActivityLocation {
     _statusUphill = false;
     _statusPause = true;
     _stopStopwatch();
-    _locationSubscription?.cancel();
     _activityInitialized = false;
     if (route.slopes.isNotEmpty) {
       route.slopes.last.endTime = DateTime.now();
@@ -200,8 +115,17 @@ class Activity extends ActivityLocation {
 
     _elapsedTime = Duration.zero;
 
+    PowderPilot.locationService.startPassiveLocationStream();
+
+    try{
+      PowderPilot.locationService.removeListener(_locationCallback);
+    } catch(e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+
     PowderPilot.createNewActivity(
-        areaName: areaName,
         currentPosition: LatLng(currentLatitude, currentLongitude),
         mapDownloaded: _mapDownloaded);
   }
@@ -211,7 +135,7 @@ class Activity extends ActivityLocation {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return CustomDialog(
+        return SummaryDialog(
           activityDatabase: activityDatabase,
         );
       },
@@ -235,6 +159,7 @@ class Activity extends ActivityLocation {
     _statusPause = true;
     _altitudeBuffer.clear();
     _pauseStopwatch();
+    PowderPilot.locationService.startPassiveLocationStream();
   }
 
   void resumeActivity() {
@@ -250,54 +175,30 @@ class Activity extends ActivityLocation {
       _downloadMap();
     }
     _resumeStopwatch(callback: () {
-      _setNotification();
     });
+    PowderPilot.locationService.startActiveLocationStream();
     updateData();
   }
 }
 
 class ActivityLocation extends ActivityUtils {
-  Location location = Location();
-  StreamSubscription<LocationData>? _locationSubscription;
-
   int _numberOfDistanceUpdates = 0;
   int _numberOfSpeedUpdates = 0;
   int _numberOfSlopeUpdates = 0;
   int _numberOfAltitudeUpdates = 0;
   int _numberOfLocationUpdates = 0;
 
-  Future<bool> _requestPermission() async {
-    bool serviceEnabled;
-    PermissionStatus permissionGranted;
-
-    serviceEnabled = await location.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await location.requestService();
-      if (!serviceEnabled) {
-        if (kDebugMode) {
-          print('Service enabled: $serviceEnabled');
-        }
-      }
-    }
-
-    permissionGranted = await location.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await location.requestPermission();
-    }
-
-    return permissionGranted == PermissionStatus.granted;
-  }
-
   void _locationStream() {
     double currentRunLength = 0.0;
 
-    void updateSpeed(LocationData location) {
-      if (location.speed! < 55) {
-        speed = location.speed!;
+    void updateSpeed(Position position) {
+      if (position.speed < 55) {
+        speed = position.speed;
 
         if (speed > maxSpeed) {
           activityLocations = activityLocations
               .setFastestLocation([currentLongitude, currentLatitude]);
+          route.addCoordinates([currentLongitude, currentLatitude]);
           maxSpeed = speed;
         }
 
@@ -317,10 +218,10 @@ class ActivityLocation extends ActivityUtils {
       }
     }
 
-    void updateAltitude(LocationData location) {
+    void updateAltitude(Position position) {
       _numberOfAltitudeUpdates++;
 
-      altitude = _smoothAltitude(location.altitude!);
+      altitude = _smoothAltitude(position.altitude);
       maxAltitude = altitude > maxAltitude ? altitude : maxAltitude;
       if (minAltitude == 0.0) {
         minAltitude = altitude;
@@ -332,11 +233,11 @@ class ActivityLocation extends ActivityUtils {
       altitudes.add([elapsedTime.inSeconds, altitude.round()]);
     }
 
-    void updateDistance(LocationData location) {
+    void updateDistance(Position position) {
       // Update distance
       double calculatedDistance = Utils.calculateHaversineDistance(
-          LatLng(_lastLocation.latitude!, _lastLocation.longitude!),
-          LatLng(location.latitude!, location.longitude!));
+          LatLng(_lastLocation.latitude, _lastLocation.longitude),
+          LatLng(position.latitude, position.longitude));
 
       _numberOfDistanceUpdates++;
 
@@ -347,7 +248,7 @@ class ActivityLocation extends ActivityUtils {
         route.addCoordinates([currentLongitude, currentLatitude]);
         distance += calculatedDistance;
         _tempDistance += calculatedDistance;
-        _lastLocation = location;
+        _lastLocation = position;
       }
 
       // Update uphill & downhill distance
@@ -389,24 +290,24 @@ class ActivityLocation extends ActivityUtils {
       }
     }
 
-    void updateSlope(LocationData location) {
+    void updateSlope(Position position) {
       // Update slope
       if (!_statusPause) {
         double difference = (_tempAltitude - altitude).abs();
         if (difference > 125) {
           _tempAltitude = altitude;
-          _tempLocation = location;
+          _tempLocation = position;
           difference = 0.0;
         }
         if (difference > 10) {
-          if (_tempLocation.latitude == location.latitude &&
-              _tempLocation.longitude == location.longitude) {
+          if (_tempLocation.latitude == position.latitude &&
+              _tempLocation.longitude == position.longitude) {
             return;
           }
           if (_tempAltitude - altitude > 0) {
             double horizontalDistance = Utils.calculateHaversineDistance(
-                LatLng(_tempLocation.latitude!, _tempLocation.longitude!),
-                LatLng(location.latitude!, location.longitude!));
+                LatLng(_tempLocation.latitude, _tempLocation.longitude),
+                LatLng(position.latitude, position.longitude));
 
             double verticalDistance = _tempAltitude - altitude;
 
@@ -419,33 +320,34 @@ class ActivityLocation extends ActivityUtils {
             slope = 0.0;
           }
           _tempAltitude = altitude;
-          _tempLocation = location;
+          _tempLocation = position;
         }
       }
     }
 
-    void initializeLocation(LocationData location) {
-      _lastLocation = location;
-      altitude = location.altitude!;
+    void initializeLocation(Position position) {
+      _lastLocation = position;
+      altitude = position.altitude;
       _currentExtrema = altitude;
       _tempAltitude = altitude;
-      _tempLocation = location;
+      _tempLocation = position;
       activityLocations = activityLocations
           .setStartLocation([currentLongitude, currentLatitude]);
+      route.addCoordinates([currentLongitude, currentLatitude]);
       if ((route.slopes.isEmpty || route.slopes.last.name == 'Unknown') &&
           _mapDownloaded == true) {
         _updateNearestSlope();
       }
     }
 
-    _locationSubscription =
-        location.onLocationChanged.listen((LocationData location) {
-      currentLatitude = location.latitude!;
-      currentLongitude = location.longitude!;
+    void onLocationUpdate(Position position) {
+      currentLatitude = position.latitude;
+      currentLongitude = position.longitude;
+
       if (_running) {
-        if (location.accuracy! < 10) {
+        if (position.accuracy < 10) {
           gpsAccuracy = GpsAccuracy.high;
-        } else if (location.accuracy! < 25) {
+        } else if (position.accuracy < 25) {
           gpsAccuracy = GpsAccuracy.medium;
         } else {
           gpsAccuracy = GpsAccuracy.low;
@@ -454,21 +356,21 @@ class ActivityLocation extends ActivityUtils {
         if (gpsAccuracy == GpsAccuracy.high ||
             gpsAccuracy == GpsAccuracy.medium) {
           if (!_locationInitialized) {
-            initializeLocation(location);
+            initializeLocation(position);
             route.addCoordinates([currentLongitude, currentLatitude]);
           }
 
           // Update speed
-          updateSpeed(location);
+          updateSpeed(position);
 
           // Update altitude
-          updateAltitude(location);
+          updateAltitude(position);
 
           // Update distance
-          updateDistance(location);
+          updateDistance(position);
 
           // Update slope
-          updateSlope(location);
+          updateSlope(position);
 
           if (_numberOfLocationUpdates % 5 == 0) {
             _updateNearestSlope();
@@ -487,30 +389,25 @@ class ActivityLocation extends ActivityUtils {
         if (PowderPilot.connectionStatus == true && !_mapDownloaded) {
           _downloadMap();
         }
-
         updateData();
       }
-      _numberOfLocationUpdates++;
-      if (_numberOfLocationUpdates % 15 == 0) {
-        if (PowderPilot.connectionStatus == true) {
-          if (areaName == '' || areaName == 'Unknown') {
-            _updateAddress();
-          }
-          if (_numberOfLocationUpdates % 120 == 0) {
-            _updateAddress();
-          }
+      if (_numberOfLocationUpdates % 15 == 0 && (PowderPilot.connectionStatus == true || _numberOfLocationUpdates == 0)) {
           if (!_mapDownloaded) {
             _downloadMap();
           }
-        }
+      }
+      String areaNameTemp = PowderPilot.locationService.areaName;
+      if(areaNameTemp != areaName) {
+        areaName = areaNameTemp;
+        updateData();
       }
 
-      /*
-       if(_numberOfLocationUpdates % 100 == 0) {
-        _updateAddress();
-      }
-       */
-    });
+      _numberOfLocationUpdates++;
+    }
+
+    _locationCallback = onLocationUpdate;
+    PowderPilot.locationService.addListener(_locationCallback);
+    
   }
 
   Future<void> _updateNearestSlope() async {
@@ -549,44 +446,7 @@ class ActivityLocation extends ActivityUtils {
     }
     _isDownloadRunning = false;
   }
-
-  Future<void> _updateAddress() async {
-    if (kDebugMode) {}
-    try {
-
-      //  For data protection reasons: Randomise the location to 100m radius
-      double lat = currentLatitude + Random().nextDouble() * 0.001;
-      double lon = currentLongitude + Random().nextDouble() * 0.001;
-
-      var address = await GeoCode().reverseGeocoding(
-          latitude: lat, longitude: lon);
-      areaName = '${address.countryName!}, ${address.city!}';
-      updateData();
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error while trying to fetch Adress Data $e');
-      }
-    }
-  }
-
-  void _setNotification() {
-    location.changeNotificationOptions(
-      title: 'Activity is running',
-      subtitle: elapsedTime.toString().substring(0, 7),
-      onTapBringToFront: true,
-      color: ColorTheme.secondary,
-      description: 'Distance: ${(distance / 1000).toStringAsFixed(1)} km\n'
-          'Speed: ${(maxSpeed * Info.speedFactor).toStringAsFixed(1)} km/h\n'
-          'Altitude: ${altitude.toStringAsFixed(0)} m\n'
-          'Runs: $totalRuns\n',
-      iconName: 'assets/images/icon_256.png',
-    );
-  }
-
-  void _locationSettings() {
-    location.enableBackgroundMode(enable: true);
-    _setNotification();
-  }
+  
 }
 
 class ActivityTimer extends ActivityData {
@@ -728,6 +588,7 @@ class ActivityData extends ActivityDataTemp {
   // Route
   // ignore: prefer_const_constructors
   final ActivityRoute route =
+      // ignore: prefer_const_constructors
       ActivityRoute(slopes: [], coordinates: []); // Don't define as const
 
   // List of altitudes
@@ -814,16 +675,18 @@ class ActivityData extends ActivityDataTemp {
 class ActivityDataTemp {
   bool _locationInitialized = false;
 
+  late LocationCallback _locationCallback;
+
   double _latitudeWhenDownloaded = 0.0;
   double _longitudeWhenDownloaded = 0.0;
 
   double _currentExtrema = 0.0;
   double _tempDistance = 0.0;
 
-  late LocationData _lastLocation;
+  late Position _lastLocation;
 
   double _tempAltitude = 0.0;
-  late LocationData _tempLocation;
+  late Position _tempLocation;
 
   bool _running = false;
   bool _active = false;
