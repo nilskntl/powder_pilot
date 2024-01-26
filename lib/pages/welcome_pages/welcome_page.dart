@@ -226,7 +226,7 @@ class _WelcomePageState extends State<WelcomePage> {
                                   MaterialPageRoute(
                                       builder: (context) =>
                                           const PowderPilot()));
-                              SharedPref.saveBool(PowderPilot.welcomeKey, true);
+                              SharedPref.saveBool(PowderPilot.startKey, true);
                             } else {
                               widget.pageController.animateToPage(
                                 widget.currentPage + 1,

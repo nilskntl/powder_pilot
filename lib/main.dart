@@ -24,7 +24,7 @@ void main() {
 }
 
 void init() async {
-  bool welcome = await SharedPref.readBool(PowderPilot.welcomeKey);
+  bool welcome = await SharedPref.readBool(PowderPilot.startKey);
   String units = await SharedPref.readString(PowderPilot.unitsKey);
   if (units == '') {
     units = 'metric';
@@ -94,7 +94,7 @@ class PowderPilot extends StatelessWidget {
   /// Key names
   static const String numActivitiesKey = 'numActivities';
   static const String activityKey = 'activity';
-  static const String welcomeKey = 'welcome';
+  static const String startKey = 'start';
   static const String unitsKey = 'units';
 
   static const String appName = 'Powder Pilot';
