@@ -26,27 +26,40 @@ class _WelcomePagesState extends State<WelcomePages> {
         children: [
           WelcomePage(
             title: 'Welcome to ${PowderPilot.appName}',
-            subtitle: 'The best app to track your skiing activity',
-            image: 'assets/images/background.png',
+            subtitle: 'Track your skiing activity with ${PowderPilot.appName}',
+            image: 'assets/images/welcome_pages/activity.png',
             pageController: _pageController,
             currentPage: _currentPage,
-            isLastPage: false,
+            imageAlignment: Alignment.topCenter,
+          ),
+          WelcomePage(
+            title: 'Welcome to ${PowderPilot.appName}',
+            subtitle: 'See your stats and improve your skiing',
+            image: 'assets/images/welcome_pages/stats.png',
+            pageController: _pageController,
+            currentPage: _currentPage,
+          ),
+          WelcomePage(
+            title: 'Welcome to ${PowderPilot.appName}',
+            subtitle: 'Analyse your ski day',
+            image: 'assets/images/welcome_pages/slope_info.png',
+            pageController: _pageController,
+            currentPage: _currentPage,
           ),
           WelcomePage(
             title: 'Location Access',
             subtitle:
-                '${PowderPilot.appName} needs access to your location to track your activity',
+            'To track your activity ${PowderPilot.appName} needs access to your gps location',
             image: 'assets/images/welcome_pages/location.png',
             buttonText: 'Enable Location',
             pageController: _pageController,
             currentPage: _currentPage,
-            isLastPage: false,
           ),
           if (Platform.isAndroid)
             WelcomePage(
               title: 'Enable Background Mode',
               subtitle:
-                  'Enable background mode of your device to allow proper work of ${PowderPilot.appName} when screen is switched off.',
+              'Enable background mode of your device to allow proper work of ${PowderPilot.appName} when screen is switched off.',
               image: 'assets/images/welcome_pages/battery_optimization.png',
               buttonText: 'Open Settings',
               pageController: _pageController,
