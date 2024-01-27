@@ -1,11 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'activity.dart';
 import 'data.dart';
+import 'route.dart';
 import 'state.dart';
 import 'timer.dart';
-import 'route.dart';
 
 /// A provider class responsible for managing and updating activity data.
 class ActivityDataProvider extends ChangeNotifier {
