@@ -2,12 +2,33 @@ Privacy Policy:
 
 1. Data Sources and Types
 
-The App uses data from the Overpass API for a slope analysis, from opensnowmap.org for the map and the Flutter Geocode Library for location determination. Nils Knittel does not collect personal data from users.
+The app utilizes data from the Overpass API for slope analysis, opensnowmap.org for mapping, and Geocoding services provided by iOS and Android platforms for location determination. Nils Knittel does not collect personal data from users.
 
 2. Data Usage and Disclosure
 
-The data obtained from the Overpass API, opensnowmap.org and the Flutter Geocode Library is solely for the purpose of location determination in the App. Nils Knittel has no control over the data collection and processing by these external sources.
+Data obtained from Geocoding services provided by iOS and Android platforms is solely used for location determination within the app. Data from the Overpass API (slope and lift detection) and opensnowmap.org (displaying slopes and lifts on the map) are exclusively utilized for app features. Nils Knittel has no control over the data collection and processing by these external sources.
 
-4. Changes to the Privacy Policy
+3. App Operator
 
-Nils Knittel reserves the right to update this Privacy Policy. Changes will be published within the App.
+The "Powder Pilot" app is operated by Nils Knittel. For questions or concerns regarding privacy, you can contact Nils Knittel. Contact information is provided at the end of this Privacy Policy.
+
+4. Access Permissions
+
+The app requires specific access permissions on your device to perform the mentioned functions. This includes location data, and network access for API requests. These access permissions are used solely for the operation of the app and not for the collection of personal data.
+
+5. User Rights
+
+In accordance with applicable data protection laws, you, as a user, have the right to request the deletion, blocking, and correction of your data. However, since the app does not collect personal data, such requests are not applicable. Nils Knittel is, however, available to address any concerns or questions regarding your privacy.
+
+6. Third-Party Disclosure
+
+The app does not transmit personal data to third parties. However, during API requests, location data, device information, and IP addresses may be transmitted to the respective services. Nils Knittel has no control over the data processing by these external services.
+
+7. Changes to the Privacy Policy
+
+Nils Knittel reserves the right to update this Privacy Policy. Changes will be published within the app. It is recommended to regularly review the Privacy Policy for any updates.
+
+For questions or concerns regarding privacy, please contact:
+
+Nils Knittel
+luminoapps@gmail.com

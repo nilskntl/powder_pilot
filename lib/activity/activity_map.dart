@@ -11,8 +11,9 @@ import '../main.dart';
 import '../pages/activity_page.dart';
 import '../utils/app_bar.dart';
 import '../utils/general_utils.dart';
-import 'activity.dart';
+import 'activity_data.dart';
 import 'activity_data_provider.dart';
+import 'activity_state.dart';
 import 'route.dart';
 import 'slopes.dart';
 
@@ -532,10 +533,10 @@ class _ActivityMapState extends State<ActivityMap>
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
-      if (_previewMode && PowderPilot.activity.currentLatitude != 0.0) {
+      if (_previewMode && PowderPilot.activity.latitude != 0.0) {
         mapController.animateTo(
-          dest: LatLng(PowderPilot.activity.currentLatitude,
-              PowderPilot.activity.currentLongitude),
+          dest: LatLng(
+              PowderPilot.activity.latitude, PowderPilot.activity.longitude),
         );
       }
     });
@@ -578,8 +579,8 @@ class _ActivityMapState extends State<ActivityMap>
         Marker(
           width: markerSize,
           height: markerSize,
-          point: LatLng(PowderPilot.activity.currentLatitude,
-              PowderPilot.activity.currentLongitude),
+          point: LatLng(
+              PowderPilot.activity.latitude, PowderPilot.activity.longitude),
           child: CustomPaint(
             painter: LocationMark(),
           ),
@@ -652,8 +653,8 @@ class _ActivityMapState extends State<ActivityMap>
           backgroundColor: backgroundColor,
           initialCenter: widget.staticMap
               ? _middlePoint
-              : LatLng(PowderPilot.activity.currentLatitude,
-                  PowderPilot.activity.currentLongitude),
+              : LatLng(PowderPilot.activity.latitude,
+                  PowderPilot.activity.longitude),
           initialZoom: widget.staticMap ? zoomOverview : zoomLevel,
           interactionOptions: const InteractionOptions(
             flags: InteractiveFlag.all & ~InteractiveFlag.rotate,

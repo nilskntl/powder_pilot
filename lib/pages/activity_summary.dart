@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../activity/activity.dart';
+import '../activity/activity_data.dart';
 import '../activity/activity_database.dart';
 import '../activity/activity_map.dart';
 import '../activity/route.dart';

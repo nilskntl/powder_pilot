@@ -2,9 +2,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../activity/activity.dart';
+import '../activity/activity_data.dart';
 import '../activity/activity_data_provider.dart';
 import '../activity/activity_map.dart';
+import '../activity/activity_state.dart';
 import '../activity/slopes.dart';
 import '../main.dart';
 import '../utils/general_utils.dart';
@@ -531,7 +532,7 @@ class _StatusState extends State<Status> {
       flex: 4,
       child: GestureDetector(
         onTap: () {
-          if (widget.activityDataProvider.currentLatitude != 0.0) {
+          if (widget.activityDataProvider.latitude != 0.0) {
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -555,7 +556,7 @@ class _StatusState extends State<Status> {
             borderRadius: BorderRadius.circular(16.0),
             child: Stack(
               children: [
-                if (widget.activityDataProvider.currentLatitude != 0.0)
+                if (widget.activityDataProvider.latitude != 0.0)
                   widget.activityMap,
                 Positioned(
                   top: 0,
@@ -591,7 +592,7 @@ class _StatusState extends State<Status> {
                     color: ColorTheme.contrast,
                   ),
                 ),
-                if (widget.activityDataProvider.currentLatitude != 0.0 &&
+                if (widget.activityDataProvider.latitude != 0.0 &&
                     widget.activityDataProvider.status ==
                         ActivityStatus.running &&
                     SlopeMap.slopes.isNotEmpty)
@@ -683,7 +684,7 @@ class _StatusState extends State<Status> {
       children: [
         const SizedBox(width: 4),
         Utils.buildText(
-            text: widget.activityDataProvider.elapsedTime
+            text: widget.activityDataProvider.duration.total
                 .toString()
                 .substring(0, 7),
             fontSize: FontTheme.sizeSubHeader,
@@ -841,9 +842,9 @@ class _InfoState extends State<Info> {
                 BlinkingGps(activityDataProvider: widget.activityDataProvider),
                 const SizedBox(width: 8),
                 ElapsedTime(
-                  downhillTime: widget.activityDataProvider.elapsedDownhillTime,
-                  uphillTime: widget.activityDataProvider.elapsedUphillTime,
-                  pauseTime: widget.activityDataProvider.elapsedPauseTime,
+                  downhillTime: widget.activityDataProvider.duration.downhill,
+                  uphillTime: widget.activityDataProvider.duration.uphill,
+                  pauseTime: widget.activityDataProvider.duration.pause,
                 ),
               ],
             ),
@@ -852,11 +853,14 @@ class _InfoState extends State<Info> {
               icon: Icons.speed_rounded,
               title: 'Speed',
               unit: Info.unitSpeed,
-              value1: (widget.activityDataProvider.speed * Info.speedFactor)
+              value1: (widget.activityDataProvider.speed.currentSpeed *
+                      Info.speedFactor)
                   .toStringAsFixed(1),
-              value2: (widget.activityDataProvider.maxSpeed * Info.speedFactor)
+              value2: (widget.activityDataProvider.speed.maxSpeed *
+                      Info.speedFactor)
                   .toStringAsFixed(1),
-              value3: (widget.activityDataProvider.avgSpeed * Info.speedFactor)
+              value3: (widget.activityDataProvider.speed.avgSpeed *
+                      Info.speedFactor)
                   .toStringAsFixed(1),
               titleValue1: 'Current',
               titleValue2: 'Max',
@@ -865,17 +869,18 @@ class _InfoState extends State<Info> {
             icon: Icons.terrain_rounded,
             title: 'Altitude',
             unit: Info.unitAltitude,
-            value1: (widget.activityDataProvider.altitude * Info.altitudeFactor)
+            value1: (widget.activityDataProvider.altitude.currentAltitude *
+                    Info.altitudeFactor)
                 .round()
                 .toString(),
-            value2:
-                (widget.activityDataProvider.maxAltitude * Info.altitudeFactor)
-                    .round()
-                    .toString(),
-            value3:
-                (widget.activityDataProvider.minAltitude * Info.altitudeFactor)
-                    .round()
-                    .toString(),
+            value2: (widget.activityDataProvider.altitude.maxAltitude *
+                    Info.altitudeFactor)
+                .round()
+                .toString(),
+            value3: (widget.activityDataProvider.altitude.minAltitude *
+                    Info.altitudeFactor)
+                .round()
+                .toString(),
             titleValue1: 'Current',
             titleValue2: 'Max',
             titleValue3: 'Min',
@@ -884,15 +889,15 @@ class _InfoState extends State<Info> {
             icon: Icons.map_rounded,
             title: 'Distance',
             unit: Info.unitDistance,
-            value1: (widget.activityDataProvider.distance *
+            value1: (widget.activityDataProvider.distance.totalDistance *
                     Info.distanceFactor /
                     1000)
                 .toStringAsFixed(1),
-            value2: (widget.activityDataProvider.distanceDownhill *
+            value2: (widget.activityDataProvider.distance.distanceDownhill *
                     Info.distanceFactor /
                     1000)
                 .toStringAsFixed(1),
-            value3: (widget.activityDataProvider.distanceUphill *
+            value3: (widget.activityDataProvider.distance.distanceUphill *
                     Info.distanceFactor /
                     1000)
                 .toStringAsFixed(1),
@@ -904,32 +909,20 @@ class _InfoState extends State<Info> {
               icon: Icons.line_axis_rounded,
               title: 'Slope',
               unit: Info.unitSlope,
-              value1: widget.activityDataProvider.slope.round().toString(),
-              value2: widget.activityDataProvider.maxSlope.round().toString(),
-              value3: widget.activityDataProvider.avgSlope.round().toString(),
+              value1: widget.activityDataProvider.slope.currentSlope
+                  .round()
+                  .toString(),
+              value2:
+                  widget.activityDataProvider.slope.maxSlope.round().toString(),
+              value3:
+                  widget.activityDataProvider.slope.avgSlope.round().toString(),
               titleValue1: 'Current',
               titleValue2: 'Max',
               titleValue3: 'Avg'),
           Graph(
-            dataAltitudes: widget.activityDataProvider.altitudes,
-            dataSpeeds: widget.activityDataProvider.speeds,
+            dataAltitudes: widget.activityDataProvider.altitude.altitudes,
+            dataSpeeds: widget.activityDataProvider.speed.speeds,
           ),
-          /*_buildActivityDisplay(
-              icon: Icons.timer_rounded,
-              title: 'Time',
-              unit: Info.unitTime,
-              value1: widget.activityDataProvider.elapsedTime
-                  .toString()
-                  .substring(0, 7),
-              value2: widget.activityDataProvider.elapsedDownhillTime
-                  .toString()
-                  .substring(0, 7),
-              value3: widget.activityDataProvider.elapsedUphillTime
-                  .toString()
-                  .substring(0, 7),
-              titleValue1: 'Total',
-              titleValue2: 'Downhill',
-              titleValue3: 'Uphill'),*/
         ],
       ),
     );
@@ -1384,8 +1377,8 @@ class _ElapsedTimeState extends State<ElapsedTime> {
 
     if (flexPause == 0 && flexDownhill == 0 && flexUphill == 0) {
       flexPause = 1;
-      flexDownhill = 1;
-      flexUphill = 1;
+      flexDownhill = 0;
+      flexUphill = 0;
     }
 
     return Row(

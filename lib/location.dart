@@ -48,7 +48,7 @@ class LocationService {
         forceLocationManager: true,
         foregroundNotificationConfig: const ForegroundNotificationConfig(
           notificationText:
-              "Your ski journey is being tracked in the background. Enjoy the ride!",
+          "Your ski journey is being tracked in the background. Enjoy the ride!",
           notificationTitle: "Activity in progress",
           enableWakeLock: true,
           notificationIcon: AndroidResource(
@@ -56,9 +56,11 @@ class LocationService {
             defType: 'mipmap',
           ),
         ),
+        useMSLAltitude: true,
       );
       _passiveSettings = AndroidSettings(
         intervalDuration: const Duration(seconds: 1),
+        useMSLAltitude: true,
       );
     } else if (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.macOS) {
@@ -136,14 +138,14 @@ class LocationService {
     // Simulate location updates
     _locationSubscription =
         Geolocator.getPositionStream(locationSettings: _activeSettings).listen(
-            (Position position) {
-      _handleLocationUpdate(position);
-      _notifyListeners(position);
-    }, onError: (error) {
-      if (kDebugMode) {
-        print('Error in location stream: $error');
-      }
-    });
+                (Position position) {
+              _handleLocationUpdate(position);
+              _notifyListeners(position);
+            }, onError: (error) {
+          if (kDebugMode) {
+            print('Error in location stream: $error');
+          }
+        });
   }
 
   /// Starts the stream of passive location updates.
@@ -152,14 +154,14 @@ class LocationService {
     // Simulate location updates
     _locationSubscription =
         Geolocator.getPositionStream(locationSettings: _passiveSettings).listen(
-            (Position position) {
-      _handleLocationUpdate(position);
-      _notifyListeners(position);
-    }, onError: (error) {
-      if (kDebugMode) {
-        print('Error in location stream: $error');
-      }
-    });
+                (Position position) {
+              _handleLocationUpdate(position);
+              _notifyListeners(position);
+            }, onError: (error) {
+          if (kDebugMode) {
+            print('Error in location stream: $error');
+          }
+        });
   }
 
   /// Stops the current location stream.
