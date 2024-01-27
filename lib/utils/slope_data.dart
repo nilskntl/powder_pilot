@@ -23,19 +23,20 @@ class SlopeFetcher {
     if (currentlyFetching) {
       return;
     }
+
     /// Set currentlyFetching to true to prevent multiple fetch operations.
     currentlyFetching = true;
 
     /// Make location inaccurate for privacy reasons (+- 100m)
     latitude = latitude + Random().nextDouble() * 0.001;
     longitude = longitude + Random().nextDouble() * 0.001;
-    
+
     try {
       await _fetchSlopeDataHelper(latitude, longitude, 'way');
       await _fetchSlopeDataHelper(latitude, longitude, 'relation');
     } catch (e) {
       if (kDebugMode) {
-        print(e);
+        print('Error while trying to fetch slope data: $e');
       }
     }
     String tBar = '"aerialway"="t-bar"';
@@ -44,20 +45,16 @@ class SlopeFetcher {
     String platter = '"aerialway"="platter"';
     String dragLift = '"aerialway"="drag_lift"';
 
-    try {
-      await _fetchLiftDataHelper(latitude, longitude, 'way', tBar);
-      await _fetchLiftDataHelper(latitude, longitude, 'relation', tBar);
-      await _fetchLiftDataHelper(latitude, longitude, 'way', chairLift);
-      await _fetchLiftDataHelper(latitude, longitude, 'relation', chairLift);
-      await _fetchLiftDataHelper(latitude, longitude, 'way', gondola);
-      await _fetchLiftDataHelper(latitude, longitude, 'relation', gondola);
-      await _fetchLiftDataHelper(latitude, longitude, 'way', platter);
-      await _fetchLiftDataHelper(latitude, longitude, 'relation', platter);
-      await _fetchLiftDataHelper(latitude, longitude, 'way', dragLift);
-      await _fetchLiftDataHelper(latitude, longitude, 'relation', dragLift);
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
+    List<String> liftTypes = [tBar, chairLift, gondola, platter, dragLift];
+
+    for (String liftType in liftTypes) {
+      try {
+        await _fetchLiftDataHelper(latitude, longitude, 'way', liftType);
+        await _fetchLiftDataHelper(latitude, longitude, 'relation', liftType);
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error while trying to fetch lift data: $e');
+        }
       }
     }
     currentlyFetching = false;
