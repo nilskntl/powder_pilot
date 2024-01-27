@@ -45,14 +45,14 @@ class LocationService {
     if (defaultTargetPlatform == TargetPlatform.android) {
       _activeSettings = AndroidSettings(
         intervalDuration: const Duration(seconds: 1),
-        forceLocationManager: true,
+        forceLocationManager: false,
         foregroundNotificationConfig: const ForegroundNotificationConfig(
           notificationText:
           "Your ski journey is being tracked in the background. Enjoy the ride!",
           notificationTitle: "Activity in progress",
           enableWakeLock: true,
           notificationIcon: AndroidResource(
-            name: 'mipmap/ic_launcher',
+            name: 'ic_launcher',
             defType: 'mipmap',
           ),
         ),
