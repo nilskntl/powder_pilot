@@ -651,7 +651,7 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                 const SizedBox(width: 8),
                 Utils.buildText(
                     text: title,
-                    fontSize: FontTheme.sizeSubHeader - minus * 2,
+                    fontSize: widget.small ? FontTheme.sizeSubHeader - minus * 2 : FontTheme.sizeSubHeader - minus,
                     color: ColorTheme.grey,
                     fontWeight: FontWeight.bold),
               ],
