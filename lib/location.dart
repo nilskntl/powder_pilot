@@ -121,7 +121,13 @@ class LocationService {
 
   /// Removes an external listener for location updates.
   void removeListener(LocationCallback listener) {
-    _externalListeners.remove(listener);
+    try {
+      _externalListeners.remove(listener);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error while trying to remove listener: $e');
+      }
+    }
   }
 
   /// Notifies all external listeners about a location update.
