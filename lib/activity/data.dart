@@ -1,9 +1,9 @@
 import 'package:powder_pilot/activity/route.dart';
 
 import '../main.dart';
-import 'activity_database.dart';
-import 'activity_state.dart';
-import 'activity_timer.dart';
+import 'database.dart';
+import 'state.dart';
+import 'timer.dart';
 
 /// Enum to represent GPS accuracy levels.
 enum GpsAccuracy {

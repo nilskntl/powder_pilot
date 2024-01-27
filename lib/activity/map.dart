@@ -11,9 +11,9 @@ import '../main.dart';
 import '../pages/activity_page.dart';
 import '../utils/app_bar.dart';
 import '../utils/general_utils.dart';
-import 'activity_data.dart';
-import 'activity_data_provider.dart';
-import 'activity_state.dart';
+import 'data.dart';
+import 'data_provider.dart';
+import 'state.dart';
 import 'route.dart';
 import 'slopes.dart';
 

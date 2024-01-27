@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'activity.dart';
-import 'activity_data.dart';
-import 'activity_state.dart';
-import 'activity_timer.dart';
+import 'data.dart';
+import 'state.dart';
+import 'timer.dart';
 import 'route.dart';
 
 /// A provider class responsible for managing and updating activity data.

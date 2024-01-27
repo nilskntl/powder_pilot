@@ -2,10 +2,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../activity/activity_data.dart';
-import '../activity/activity_data_provider.dart';
-import '../activity/activity_map.dart';
-import '../activity/activity_state.dart';
+import '../activity/data.dart';
+import '../activity/data_provider.dart';
+import '../activity/map.dart';
+import '../activity/state.dart';
 import '../activity/slopes.dart';
 import '../main.dart';
 import '../utils/general_utils.dart';

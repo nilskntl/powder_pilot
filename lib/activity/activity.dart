@@ -11,9 +11,9 @@ import '../pages/activity_summary.dart';
 import '../utils/general_utils.dart';
 import '../utils/shared_preferences.dart';
 import '../utils/slope_data.dart';
-import 'activity_data.dart';
-import 'activity_database.dart';
-import 'activity_state.dart';
+import 'data.dart';
+import 'database.dart';
+import 'state.dart';
 import 'slopes.dart';
 
 /// Enum to represent the type of location service used.

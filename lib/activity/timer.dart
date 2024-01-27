@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import 'activity_data.dart';
-import 'activity_state.dart';
+import 'data.dart';
+import 'state.dart';
 
 /// Class representing a timer for tracking activity duration.
 class ActivityTimer {

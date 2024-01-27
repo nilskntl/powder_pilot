@@ -8,7 +8,7 @@ import 'package:powder_pilot/utils/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
 import 'activity/activity.dart';
-import 'activity/activity_data_provider.dart';
+import 'activity/data_provider.dart';
 import 'pages/activity_page.dart';
 import 'pages/history.dart';
 import 'utils/app_bar.dart';

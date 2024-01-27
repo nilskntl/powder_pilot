@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../activity/activity_database.dart';
+import '../activity/database.dart';
 import '../main.dart';
 import '../utils/general_utils.dart';
 import 'activity_page.dart';
