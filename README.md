@@ -1,4 +1,4 @@
-# Powder Pilot
+# Powder Pilot - Ski Tracker
 
 Embark on a thrilling skiing journey like never before with "Powder Pilot," the ultimate SkiTracker App designed to redefine your alpine adventures. Immerse yourself in a world of precision tracking and insightful analytics that elevate your skiing experience to new heights.
 
