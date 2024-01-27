@@ -12,7 +12,6 @@ class Utils {
   /// @param text The text to display.
   /// @param fontSize The font size of the text.
   /// @param color The color of the text.
-  /// @param softWrap Whether the text should wrap to the next line.
   /// @param fontWeight The font weight of the text.
   /// @param caps Whether the text should be in uppercase.
   /// @param align The alignment of the text.
@@ -22,7 +21,6 @@ class Utils {
     required String text,
     double fontSize = FontTheme.size,
     Color color = ColorTheme.contrast,
-    bool softWrap = false,
     FontWeight fontWeight = FontWeight.normal,
     bool caps = true,
     TextAlign align = TextAlign.center,
