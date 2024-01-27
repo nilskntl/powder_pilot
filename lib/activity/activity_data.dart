@@ -30,7 +30,7 @@ class ActivityData {
   final ActivityMapData _mapData = ActivityMapData();
 
   /// Route of the activity.
-  /// Don't define as const, because it is mutable
+  /// Don't define as const, because it is mutable.
   final ActivityRoute _route =
       // ignore: prefer_const_constructors
       ActivityRoute(slopes: [], coordinates: []);
