@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../activity/database.dart';
-import '../main.dart';
+import '../theme.dart';
 import '../utils/general_utils.dart';
 import 'activity_page.dart';
 import 'activity_summary.dart';

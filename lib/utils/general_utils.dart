@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../main.dart';
+import '../theme.dart';
 
 /// A utility class containing various helper methods and widgets.
 class Utils {
@@ -100,7 +100,9 @@ class Utils {
     double lon1 = pos1.longitude;
     double lon2 = pos2.longitude;
 
-    const R = 6371000.0; /// Earth radius in meters
+    const R = 6371000.0;
+
+    /// Earth radius in meters
 
     final dLat = toRadians(lat2 - lat1);
     final dLon = toRadians(lon2 - lon1);
@@ -149,9 +151,15 @@ class DrawDottedHorizontalLine extends CustomPainter {
   final Paint _paint = Paint();
 
   DrawDottedHorizontalLine() {
-    _paint.color = Colors.black; ///dots color
-    _paint.strokeWidth = 2; ///dots thickness
-    _paint.strokeCap = StrokeCap.square; ///dots corner edges
+    _paint.color = Colors.black;
+
+    ///dots color
+    _paint.strokeWidth = 2;
+
+    ///dots thickness
+    _paint.strokeCap = StrokeCap.square;
+
+    ///dots corner edges
   }
 
   @override

@@ -5,7 +5,7 @@ import '../activity/data.dart';
 import '../activity/database.dart';
 import '../activity/map.dart';
 import '../activity/route.dart';
-import '../main.dart';
+import '../theme.dart';
 import '../utils/app_bar.dart';
 import '../utils/general_utils.dart';
 import 'activity_page.dart';

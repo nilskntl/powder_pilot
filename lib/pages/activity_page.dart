@@ -5,9 +5,10 @@ import 'package:provider/provider.dart';
 import '../activity/data.dart';
 import '../activity/data_provider.dart';
 import '../activity/map.dart';
-import '../activity/state.dart';
 import '../activity/slopes.dart';
+import '../activity/state.dart';
 import '../main.dart';
+import '../theme.dart';
 import '../utils/general_utils.dart';
 
 class ActivityPage extends StatefulWidget {

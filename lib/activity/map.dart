@@ -9,13 +9,14 @@ import 'package:latlong2/latlong.dart';
 
 import '../main.dart';
 import '../pages/activity_page.dart';
+import '../theme.dart';
 import '../utils/app_bar.dart';
 import '../utils/general_utils.dart';
 import 'data.dart';
 import 'data_provider.dart';
-import 'state.dart';
 import 'route.dart';
 import 'slopes.dart';
+import 'state.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage(
