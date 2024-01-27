@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'activity_data.dart';
 import 'activity_state.dart';
 
+/// Class representing a timer for tracking activity duration.
 class ActivityTimer {
   late final Stopwatch _stopwatch = Stopwatch();
 
@@ -16,32 +17,48 @@ class ActivityTimer {
 
   final ElapsedDuration _duration = ElapsedDuration();
 
+  /// Getter for the elapsed duration.
   ElapsedDuration get duration => _duration;
 
-  // Timestamp
+  /// Timestamp
   DateTime startTime = DateTime.now();
   DateTime endTime = DateTime.now();
 
-  ActivityTimer(
-      {required ActivityData activity, required ActivityState state}) {
+  /// Constructor to initialize the ActivityTimer with the associated activity and state.
+  ActivityTimer({required ActivityData activity, required ActivityState state}) {
     _activity = activity;
     _state = state;
   }
 
+  /// Start or stop the stopwatch based on its current state and execute a callback function.
+  ///
+  /// Stops the stopwatch if it is already running, then starts it and sets up a periodic timer to update the elapsed duration.
+  ///
+  /// @param callback Function to be executed periodically.
   void startStopwatch({required Function() callback}) {
-    /// Stop the stopwatch if it is already running
     try {
+      /// Cancel any existing timer and stop the stopwatch.
       _timer.cancel();
       _stopwatch.stop();
     } catch (e) {
+      /// Handle errors if debugging mode is enabled.
       if (kDebugMode) {
         print(e);
       }
     }
+
+    /// Start the stopwatch.
     _stopwatch.start();
+
+    /// Initialize pause time.
     Duration pauseTime = const Duration(seconds: 0);
+
+    /// Start a timer that fires every second.
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      /// Update total duration.
       duration.total = _stopwatch.elapsed;
+
+      /// Update downhill or uphill duration based on the running status.
       if (_state.runningStatus == RunningStatus.downhill) {
         duration.downhill += const Duration(seconds: 1);
       } else if (_state.runningStatus == RunningStatus.uphill) {
@@ -49,12 +66,16 @@ class ActivityTimer {
       } else {
         duration.pause += const Duration(seconds: 1);
       }
+
+      /// Handle pause conditions.
       if (_state.runningStatus != RunningStatus.pause) {
         if (_activity.speed.currentSpeed == 0.0) {
           pauseTime += const Duration(seconds: 1);
         } else {
           pauseTime = const Duration(seconds: 0);
         }
+
+        /// If pause time exceeds 5 seconds, set running status to 'pause'.
         if (pauseTime > const Duration(seconds: 5)) {
           if (_state.runningStatus == RunningStatus.downhill) {
             duration.downhill -= pauseTime;
@@ -65,12 +86,16 @@ class ActivityTimer {
           pauseTime = const Duration(seconds: 0);
         }
       }
+
+      /// Execute the provided callback function.
       callback();
-      // Update UI periodically
+
+      /// Update UI periodically.
       _activity.updateData();
     });
   }
 
+  /// Stop the stopwatch and cancel the periodic timer.
   void stopStopwatch() {
     _stopwatch.stop();
     _timer.cancel();
@@ -78,6 +103,7 @@ class ActivityTimer {
     _activity.updateData();
   }
 
+  /// Pause the stopwatch and cancel the periodic timer.
   void pauseStopwatch() {
     _stopwatch.stop();
     _timer.cancel();
@@ -85,10 +111,14 @@ class ActivityTimer {
     _activity.updateData();
   }
 
+  /// Resume the stopwatch and restart the periodic timer.
+  ///
+  /// @param callback Function to be executed periodically.
   void resumeStopwatch({required Function() callback}) {
     startStopwatch(callback: callback);
   }
 
+  /// Reset the elapsed duration to zero.
   void resetTimer() {
     duration.total = Duration.zero;
     duration.pause = Duration.zero;
