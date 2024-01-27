@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -17,13 +18,21 @@ class SlopeFetcher {
   /// @param longitude The longitude coordinate.
   /// @return A Future that completes when data fetching is done.
   static Future<void> fetchData(double latitude, double longitude) async {
+    /// If data is currently being fetched, return.
+    /// Only allow one fetch operation at a time.
     if (currentlyFetching) {
       return;
     }
+    /// Set currentlyFetching to true to prevent multiple fetch operations.
     currentlyFetching = true;
+
+    /// Make location inaccurate for privacy reasons (+- 100m)
+    latitude = latitude + Random().nextDouble() * 0.001;
+    longitude = longitude + Random().nextDouble() * 0.001;
+    
     try {
-      await _fetchDataHelper(latitude, longitude, 'way');
-      await _fetchDataHelper(latitude, longitude, 'relation');
+      await _fetchSlopeDataHelper(latitude, longitude, 'way');
+      await _fetchSlopeDataHelper(latitude, longitude, 'relation');
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -95,7 +104,7 @@ class SlopeFetcher {
   /// @param longitude The longitude coordinate.
   /// @param type The Overpass type (way or relation).
   /// @return A Future<bool> indicating the success of the fetch operation.
-  static Future<bool> _fetchDataHelper(
+  static Future<bool> _fetchSlopeDataHelper(
       double latitude, double longitude, String type) async {
     const distance = 20000;
 

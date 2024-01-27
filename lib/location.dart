@@ -194,9 +194,9 @@ class LocationService {
   void _updateArea(Position position) {
     Future<void> update() async {
       try {
-        // Make location inaccurate for privacy reasons (+- 50m)
-        double lat = position.latitude + Random().nextDouble() * 0.0005;
-        double lon = position.longitude + Random().nextDouble() * 0.0005;
+        /// Make location inaccurate for privacy reasons (+- 100m)
+        double lat = position.latitude + Random().nextDouble() * 0.001;
+        double lon = position.longitude + Random().nextDouble() * 0.001;
         List<Placemark> places = await placemarkFromCoordinates(lat, lon);
 
         Placemark place = places[0];
