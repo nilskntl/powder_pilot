@@ -173,7 +173,7 @@ class HistoryState extends State<History> {
                                             ),
                                           ),
                                           child: const Icon(
-                                            Icons.calendar_month_rounded,
+                                            LogoTheme.history,
                                             color: ColorTheme.secondary,
                                             size: History.iconHeight - 24,
                                           ),
@@ -227,7 +227,7 @@ class HistoryState extends State<History> {
                                             ),
                                           ),
                                           child: const Icon(
-                                            Icons.calendar_month_rounded,
+                                            LogoTheme.history,
                                             color: ColorTheme.secondary,
                                             size: History.iconHeight - 24,
                                           ),
@@ -395,7 +395,7 @@ class HistoryState extends State<History> {
                   Row(
                     children: [
                       const Icon(
-                        Icons.location_on_rounded,
+                        LogoTheme.gps,
                         color: ColorTheme.primary,
                         size: History.iconHeight / 4,
                       ),
@@ -421,7 +421,7 @@ class HistoryState extends State<History> {
                               Radius.circular(16.0),
                             )),
                         child: const Icon(
-                          Icons.downhill_skiing_rounded,
+                          LogoTheme.activity,
                           color: ColorTheme.secondary,
                           size: History.iconHeight - 36,
                         ),

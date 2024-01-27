@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:app_settings/app_settings.dart';
@@ -382,7 +383,6 @@ class _LegalDialogState extends State<LegalDialog>
   @override
   void initState() {
     super.initState();
-    loadTextFromAssets();
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
@@ -401,17 +401,33 @@ class _LegalDialogState extends State<LegalDialog>
 
   /// Loads text from assets.
   Future<void> loadTextFromAssets() async {
-    String text = await rootBundle.loadString(widget.asset);
-    List<String> paragraphs =
-        text.split('\n').where((paragraph) => paragraph.isNotEmpty).toList();
+    try {
+      /// Load the text from the asset bundle in bytes.
+      ByteData data = await rootBundle.load(widget.asset);
 
-    setState(() {
-      arr = paragraphs;
-    });
+      /// Convert the bytes to a string.
+      String text = utf8.decode(data.buffer.asUint8List());
+      List<String> paragraphs =
+          text.split('\n').where((paragraph) => paragraph.isNotEmpty).toList();
+
+      setState(() {
+        arr = paragraphs;
+      });
+    } catch (e) {
+      setState(() {
+        arr = ['Error while trying to load text from assets: $e'];
+      });
+      if (kDebugMode) {
+        print('Error while trying to load text from assets: $e');
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    /// Load it here and not in initState because setState() might be called
+    /// before the widget is mounted.
+    loadTextFromAssets();
     return ScaleTransition(
       scale: _scaleAnimation,
       child: Dialog(
@@ -424,6 +440,7 @@ class _LegalDialogState extends State<LegalDialog>
               Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
+                  iconSize: 32,
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -439,11 +456,12 @@ class _LegalDialogState extends State<LegalDialog>
                   fontWeight: FontWeight.bold,
                 ),
               const SizedBox(height: 12),
-              ...arr.skip(1).map(
-                    (paragraph) => _buildDialogText(
-                      text: paragraph,
+              if (arr.length > 1)
+                ...arr.skip(1).map(
+                      (paragraph) => _buildDialogText(
+                        text: paragraph,
+                      ),
                     ),
-                  ),
             ],
           ),
         ),
@@ -456,21 +474,19 @@ class _LegalDialogState extends State<LegalDialog>
     required String text,
     FontWeight fontWeight = FontWeight.normal,
   }) {
-    return Flexible(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Utils.buildText(
-            text: text,
-            fontSize: FontTheme.size,
-            fontWeight: fontWeight,
-            color: ColorTheme.contrast,
-            align: TextAlign.left,
-            caps: false,
-          ),
-          const SizedBox(height: 12),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Utils.buildText(
+          text: text,
+          fontSize: FontTheme.size,
+          fontWeight: fontWeight,
+          color: ColorTheme.contrast,
+          align: TextAlign.left,
+          caps: false,
+        ),
+        const SizedBox(height: 12),
+      ],
     );
   }
 

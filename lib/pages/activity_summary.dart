@@ -402,7 +402,7 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const Icon(Icons.location_on_rounded,
+                          const Icon(LogoTheme.gps,
                               color: ColorTheme.primary,
                               size: ActivitySummary.iconSize),
                           const SizedBox(width: 4.0),
@@ -421,14 +421,6 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          /*
-                          Expanded(
-                            flex: 3,
-                            child: ImageFile(
-                              small: widget.small,
-                            ),
-                          ),
-                          */
                           Expanded(
                               flex: 4,
                               child: Column(
@@ -517,7 +509,7 @@ class _ActivitySummaryState extends State<ActivitySummary> {
           Row(
             children: [
               _buildActivityDisplay(
-                  icon: Icons.speed_rounded,
+                  icon: LogoTheme.speed,
                   title: 'Speed',
                   unit: Info.unitSpeed,
                   value1: (widget.activityDatabase.maxSpeed * Info.speedFactor)
@@ -528,7 +520,7 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                           .toStringAsFixed(1),
                   titleValue2: 'Avg'),
               _buildActivityDisplay(
-                  icon: Icons.line_axis_rounded,
+                  icon: LogoTheme.slope,
                   title: 'Slope',
                   unit: Info.unitSlope,
                   value1: widget.activityDatabase.maxSlope.toStringAsFixed(1),
@@ -543,7 +535,7 @@ class _ActivitySummaryState extends State<ActivitySummary> {
           Row(
             children: [
               _buildActivityDisplay(
-                  icon: Icons.height_rounded,
+                  icon: LogoTheme.altitude,
                   title: 'Altitude',
                   unit: Info.unitAltitude,
                   value1: (widget.activityDatabase.maxAltitude *
@@ -562,7 +554,7 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                       .toString(),
                   titleValue3: 'Avg'),
               _buildActivityDisplay(
-                  icon: Icons.directions_walk_rounded,
+                  icon: LogoTheme.distance,
                   title: 'Distance',
                   unit: Info.unitDistance,
                   value1: (widget.activityDatabase.distance *

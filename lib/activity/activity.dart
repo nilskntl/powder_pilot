@@ -235,9 +235,6 @@ class LocationHandler extends ActivityData {
 
   /// Method to start handling location updates.
   void _locationStream() {
-    /// Temporary location variable to store the last location.
-    late Position lastLocation;
-
     /// Temporary variable to store the current run length.
     double currentRunLength = 0.0;
 
@@ -318,7 +315,25 @@ class LocationHandler extends ActivityData {
     }
 
     /// Temporary distance variable.
+    /// Used to calculate distance.
     double tempDistance = 0.0;
+
+    /// Temporary location variable to store the last location.
+    /// Used to calculate distance.
+    /// Initialized to 0, 0 to prevent errors.
+    Position lastLocation = Position(
+        longitude: 0.0,
+        latitude: 0.0,
+        accuracy: 0.0,
+        altitude: 0.0,
+        speed: 0.0,
+        speedAccuracy: 0.0,
+        heading: 0.0,
+        altitudeAccuracy: 0.0,
+        timestamp: DateTime.now(),
+        isMocked: false,
+        headingAccuracy: 0.0,
+        floor: 0);
 
     /// Update distance based on the received location data.
     ///

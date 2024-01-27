@@ -97,7 +97,7 @@ class CustomAppBar extends StatelessWidget {
                       width: itemsSize,
                       height: itemsSize,
                       child: Icon(
-                        Icons.settings_rounded,
+                        LogoTheme.settings,
                         color: ColorTheme.contrast,
                       ),
                     ),

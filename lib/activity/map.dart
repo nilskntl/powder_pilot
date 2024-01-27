@@ -628,21 +628,21 @@ class _ActivityMapState extends State<ActivityMap>
     return _buildMarker(
         point: LatLng(_activityLocations.fastestLocation[1],
             _activityLocations.fastestLocation[0]),
-        icon: Icons.speed_rounded);
+        icon: LogoTheme.speed);
   }
 
   Widget _startPosition() {
     return _buildMarker(
         point: LatLng(_activityLocations.startLocation[1],
             _activityLocations.startLocation[0]),
-        icon: Icons.play_arrow_rounded);
+        icon: LogoTheme.start);
   }
 
   Widget _endPosition() {
     return _buildMarker(
         point: LatLng(_activityLocations.endLocation[1],
             _activityLocations.endLocation[0]),
-        icon: Icons.flag_rounded);
+        icon: LogoTheme.end);
   }
 
   @override

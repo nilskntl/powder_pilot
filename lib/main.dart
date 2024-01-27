@@ -216,7 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                   child: _buildBottomBarContainer(
-                      iconData: Icons.downhill_skiing_rounded,
+                      iconData: LogoTheme.activity,
                       text: 'Activity',
                       page: 0),
                 ),
@@ -232,7 +232,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                   child: _buildBottomBarContainer(
-                      iconData: Icons.calendar_month_rounded,
+                      iconData: LogoTheme.history,
                       text: 'History',
                       page: 1),
                 ),

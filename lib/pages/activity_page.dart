@@ -214,7 +214,7 @@ class _CurrentSlopeState extends State<CurrentSlope> {
           width: widget.size / 3 * 2, height: widget.size / 3 * 2);
     } else {
       return Icon(
-        Icons.downhill_skiing_rounded,
+        LogoTheme.activity,
         color: ColorTheme.secondary,
         size: widget.size / 3 * 2,
       );
@@ -316,10 +316,10 @@ class _BlinkingGpsState extends State<BlinkingGps> {
                 bottom: 0,
                 child: Icon(
                   accuracy == GpsAccuracy.medium
-                      ? Icons.signal_cellular_alt_2_bar_rounded
+                      ? LogoTheme.gpsMedium
                       : accuracy == GpsAccuracy.low
-                          ? Icons.signal_cellular_alt_1_bar_rounded
-                          : Icons.signal_cellular_alt_rounded,
+                          ? LogoTheme.gpsLow
+                          : LogoTheme.gpsHigh,
                   size: Info.iconSize + 8,
                   color: accuracy == GpsAccuracy.medium
                       ? ColorTheme.yellow
@@ -351,17 +351,17 @@ class _BlinkingGpsState extends State<BlinkingGps> {
                   child: Stack(
                     children: [
                       const Icon(
-                        Icons.signal_cellular_alt_rounded,
+                        LogoTheme.gpsHigh,
                         size: Info.iconSize,
                         color: ColorTheme.grey,
                       ),
                       if (accuracy != GpsAccuracy.none)
                         Icon(
                             accuracy == GpsAccuracy.medium
-                                ? Icons.signal_cellular_alt_2_bar_rounded
+                                ? LogoTheme.gpsMedium
                                 : accuracy == GpsAccuracy.low
-                                    ? Icons.signal_cellular_alt_1_bar_rounded
-                                    : Icons.signal_cellular_alt_rounded,
+                                ? LogoTheme.gpsLow
+                                : LogoTheme.gpsHigh,
                             size: Info.iconSize,
                             color: accuracy == GpsAccuracy.medium
                                 ? ColorTheme.yellow
@@ -589,7 +589,7 @@ class _StatusState extends State<Status> {
                   top: 4,
                   right: 4,
                   child: Icon(
-                    Icons.ads_click_rounded,
+                    LogoTheme.click,
                     color: ColorTheme.contrast,
                   ),
                 ),
@@ -653,8 +653,8 @@ class _StatusState extends State<Status> {
         const SizedBox(width: 4),
         Icon(
           !widget.activityDataProvider.internetStatus
-              ? Icons.signal_cellular_connected_no_internet_0_bar_rounded
-              : Icons.location_on_rounded,
+              ? LogoTheme.noInternet
+              : LogoTheme.gps,
           size: FontTheme.sizeSubHeader,
           color: widget.activityDataProvider.area != ''
               ? ColorTheme.primary
@@ -746,8 +746,8 @@ class _StatusState extends State<Status> {
         BlinkingDot(activityDataProvider: widget.activityDataProvider),
         buildIconButton(
             widget.activityDataProvider.status == ActivityStatus.running
-                ? Icons.pause_rounded
-                : Icons.play_arrow_rounded,
+                ? LogoTheme.pause
+                : LogoTheme.start,
             ColorTheme.contrast, () {
           if (widget.activityDataProvider.status == ActivityStatus.inactive) {
             PowderPilot.activity.startActivity();
@@ -851,7 +851,7 @@ class _InfoState extends State<Info> {
             ),
           ),
           _buildActivityDisplay(
-              icon: Icons.speed_rounded,
+              icon: LogoTheme.speed,
               title: 'Speed',
               unit: Info.unitSpeed,
               value1: (widget.activityDataProvider.speed.currentSpeed *
@@ -867,7 +867,7 @@ class _InfoState extends State<Info> {
               titleValue2: 'Max',
               titleValue3: 'Avg'),
           _buildActivityDisplay(
-            icon: Icons.terrain_rounded,
+            icon: LogoTheme.altitude,
             title: 'Altitude',
             unit: Info.unitAltitude,
             value1: (widget.activityDataProvider.altitude.currentAltitude *
@@ -887,7 +887,7 @@ class _InfoState extends State<Info> {
             titleValue3: 'Min',
           ),
           _buildActivityDisplay(
-            icon: Icons.map_rounded,
+            icon: LogoTheme.distance,
             title: 'Distance',
             unit: Info.unitDistance,
             value1: (widget.activityDataProvider.distance.totalDistance *
@@ -907,7 +907,7 @@ class _InfoState extends State<Info> {
             titleValue3: 'Uphill',
           ),
           _buildActivityDisplay(
-              icon: Icons.line_axis_rounded,
+              icon: LogoTheme.slope,
               title: 'Slope',
               unit: Info.unitSlope,
               value1: widget.activityDataProvider.slope.currentSlope
