@@ -1,4 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -360,8 +361,8 @@ class _BlinkingGpsState extends State<BlinkingGps> {
                             accuracy == GpsAccuracy.medium
                                 ? LogoTheme.gpsMedium
                                 : accuracy == GpsAccuracy.low
-                                ? LogoTheme.gpsLow
-                                : LogoTheme.gpsHigh,
+                                    ? LogoTheme.gpsLow
+                                    : LogoTheme.gpsHigh,
                             size: Info.iconSize,
                             color: accuracy == GpsAccuracy.medium
                                 ? ColorTheme.yellow
@@ -1154,6 +1155,7 @@ class _InfoState extends State<Info> {
   }
 }
 
+/// Widget to display the Graph of altitude and speed
 class Graph extends StatefulWidget {
   const Graph(
       {super.key,
@@ -1161,16 +1163,20 @@ class Graph extends StatefulWidget {
       required this.dataSpeeds,
       this.small = false});
 
+  /// The data of the altitude
   final List<List<int>> dataAltitudes;
 
+  /// The data of the speed
   final List<List<double>> dataSpeeds;
 
+  /// Flag to display a small graph
   final bool small;
 
   @override
   State<Graph> createState() => _GraphState();
 }
 
+/// State of the Graph widget
 class _GraphState extends State<Graph> {
   @override
   void initState() {
@@ -1181,84 +1187,71 @@ class _GraphState extends State<Graph> {
     }
   }
 
-  List<FlSpot> _convertIntToFlSpots(
-      List<List<int>> integerLists, double factor) {
+  /// Convert a list of generic lists to FlSpots
+  ///
+  /// @param dataList The list of generic lists (T can be int or double)
+  /// @param factor The factor to multiply the values with
+  List<FlSpot> _convertToFlSpots<T>(
+      {required List<List<T>> list, double factor = 1.0}) {
     if (!_differentEntries) {
-      hasDifferentEntry(integerLists);
+      hasDifferentEntry(list);
     }
+
     List<FlSpot> flSpots = [];
 
-    for (List<int> integers in integerLists) {
-      // Annahme: Die Liste hat genau zwei Elemente (x und y).
-      if (integers.length == 2) {
-        flSpots.add(
-            FlSpot(integers[0].toDouble(), integers[1].toDouble() * factor));
+    /// Iterate through the list of T
+    for (List<T> data in list) {
+      /// Only add the FlSpot if the list has two elements
+      if (data.length == 2) {
+        /// Get the values of the list (x, y)
+        double x =
+            data[0] is int ? (data[0] as int).toDouble() : data[0] as double;
+        double y =
+            data[1] is int ? (data[1] as int).toDouble() : data[1] as double;
+
+        /// Try to add the FlSpot to the list of FlSpots
+        /// If the value is not a double, the value is not added
+        /// If the value is a double, the value is rounded to one decimal place
+        try {
+          flSpots.add(FlSpot(x, double.parse((y * factor).toStringAsFixed(1))));
+        } catch (e) {
+          if (kDebugMode) {
+            print('Cant add FlSpot: $e');
+          }
+        }
       }
     }
 
     return flSpots;
   }
 
-  List<FlSpot> _convertDoubleToFlSpots(
-      List<List<double>> doubleList, double factor) {
-    if (!_differentEntries) {
-      hasDifferentEntry(doubleList);
-    }
-    List<FlSpot> flSpots = [];
-
-    for (List<double> doubles in doubleList) {
-      // Annahme: Die Liste hat genau zwei Elemente (x und y).
-      if (doubles.length == 2) {
-        flSpots.add(FlSpot(doubles[0], doubles[1] * factor));
-      }
-    }
-
-    return flSpots;
-  }
-
+  /// Flag to check if the list has different entries at position 2
   bool _differentEntries = false;
 
+  /// Check if one of the list has different entries at position 2 to
+  /// change the size of the graph dynamically
+  ///
+  /// @param list The list of lists
   bool hasDifferentEntry<T>(List<List<T>> list) {
-    // Check if the list has at least one element
+    /// Check if the list has at least one element
     if (list.isEmpty) {
       return false;
     }
 
-    // Get the value at position 2 of the first list
+    /// Get the value at position 2 of the first list
     T referenceValue = list[0][1];
 
-    // Iterate through the rest of the lists and check if the value at position 2 is different
+    /// Iterate through the rest of the lists and check if the value at position 2 is different
     for (int i = 1; i < list.length; i++) {
       if (list[i][1] != referenceValue) {
+        /// Found a different entry at position 2
         _differentEntries = true;
-        return true; // Found a different entry at position 2
+        return true;
       }
     }
-    return false; // All entries at position 2 are the same
-  }
 
-  Widget _buildLineChart(
-      {required Color color, required List<FlSpot> flSpots}) {
-    return LineChart(
-      LineChartData(
-        lineBarsData: [
-          LineChartBarData(
-            isCurved: true,
-            color: color,
-            barWidth: 2,
-            isStrokeCapRound: true,
-            dotData: const FlDotData(show: false),
-            belowBarData:
-                BarAreaData(show: true, color: color.withOpacity(0.4)),
-            spots: flSpots,
-            curveSmoothness: 0.01,
-          ),
-        ],
-        borderData: FlBorderData(show: false),
-        gridData: const FlGridData(show: false),
-        titlesData: const FlTitlesData(show: false),
-      ),
-    );
+    /// All entries at position 2 are the same
+    return false;
   }
 
   @override
@@ -1278,46 +1271,15 @@ class _GraphState extends State<Graph> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: Info.iconSize / 2,
-                        height: Info.iconSize / 2,
-                        decoration: BoxDecoration(
-                          color: ColorTheme.primary,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Utils.buildText(
-                        text: 'Altitude',
-                        fontSize:
-                            widget.small ? FontTheme.size - 9 : FontTheme.size,
-                        color: ColorTheme.grey,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Utils.buildText(
-                        text: 'Speed',
-                        fontSize:
-                            widget.small ? FontTheme.size - 9 : FontTheme.size,
-                        color: ColorTheme.grey,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        width: Info.iconSize / 2,
-                        height: Info.iconSize / 2,
-                        decoration: BoxDecoration(
-                          color: ColorTheme.contrast,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                    ],
-                  )
+                  _buildHeader(
+                      title: 'Altitude',
+                      icon: LogoTheme.altitude,
+                      color: ColorTheme.primary),
+                  _buildHeader(
+                      title: 'Speed',
+                      icon: LogoTheme.speed,
+                      color: ColorTheme.contrast,
+                      mirrored: true),
                 ],
               ),
             ),
@@ -1339,19 +1301,88 @@ class _GraphState extends State<Graph> {
                 children: [
                   _buildLineChart(
                     color: ColorTheme.primary,
-                    flSpots: _convertIntToFlSpots(
-                        widget.dataAltitudes, Info.altitudeFactor),
+                    list: widget.dataAltitudes,
+                    factor: Info.altitudeFactor,
                   ),
                   _buildLineChart(
                     color: ColorTheme.contrast,
-                    flSpots: _convertDoubleToFlSpots(
-                        widget.dataSpeeds, Info.speedFactor),
+                    list: widget.dataSpeeds,
+                    factor: Info.speedFactor,
                   ),
                 ],
               ),
             ),
           ],
         ));
+  }
+
+  /// Build the header of the graph
+  ///
+  /// @param title The title of the header
+  /// @param icon The icon of the header
+  /// @param color The color of the header
+  /// @param mirrored Flag to mirror the elements of the row
+  Widget _buildHeader(
+      {required String title,
+      required IconData icon,
+      required Color color,
+      bool mirrored = false}) {
+    Widget buildIcon() {
+      return Icon(
+        icon,
+        size: widget.small ? Info.iconSize - 12 : Info.iconSize - 8,
+        color: color,
+      );
+    }
+
+    return Row(
+      children: [
+        if (!mirrored) buildIcon(),
+        if (!mirrored) const SizedBox(width: 8),
+        Utils.buildText(
+          text: title,
+          fontSize: widget.small ? FontTheme.size - 2 : FontTheme.size,
+          color: color,
+          fontWeight: FontWeight.normal,
+        ),
+        if (mirrored) const SizedBox(width: 8),
+        if (mirrored) buildIcon(),
+      ],
+    );
+  }
+
+  /// Build the line chart
+  ///
+  /// @param color The color of the line
+  /// @param list The list of lists with the data (T can be int or double)
+  /// @param factor The factor to multiply the values with
+  Widget _buildLineChart<T>(
+      {required Color color,
+      required List<List<T>> list,
+      double factor = 1.0}) {
+    /// Convert the list to FlSpots
+    List<FlSpot> flSpots = _convertToFlSpots(list: list, factor: factor);
+
+    return LineChart(
+      LineChartData(
+        lineBarsData: [
+          LineChartBarData(
+            isCurved: true,
+            color: color,
+            barWidth: 2,
+            isStrokeCapRound: true,
+            dotData: const FlDotData(show: false),
+            belowBarData:
+                BarAreaData(show: true, color: color.withOpacity(0.4)),
+            spots: flSpots,
+            curveSmoothness: 0.01,
+          ),
+        ],
+        borderData: FlBorderData(show: false),
+        gridData: const FlGridData(show: false),
+        titlesData: const FlTitlesData(show: false),
+      ),
+    );
   }
 }
 

@@ -577,7 +577,7 @@ class _ActivitySummaryState extends State<ActivitySummary> {
           SizedBox(
             height: verticalPadding - minus / 2,
           ),
-          Graph(dataAltitudes: dataAltitudes, dataSpeeds: dataSpeeds),
+          Graph(dataAltitudes: dataAltitudes, dataSpeeds: dataSpeeds, small: true,),
           SizedBox(
             height: verticalPadding - minus / 2,
           ),
