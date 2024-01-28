@@ -50,6 +50,24 @@ class ActivityDataProvider extends ChangeNotifier {
   bool _activityLocationsLoaded = false;
 
   /// Method to update the activity data.
+  ///
+  /// This method is called by the [Activity] class.
+  /// It updates the current activity data with the provided data and
+  /// notifies the listeners about the data changes.
+  ///
+  /// @param newSpeed The new speed data.
+  /// @param newDistance The new distance data.
+  /// @param newAltitude The new altitude data.
+  /// @param newSlope The new slope data.
+  /// @param newElapsedDuration The new elapsed duration data.
+  /// @param newLatitude The new latitude data.
+  /// @param newLongitude The new longitude data.
+  /// @param newGpsAccuracy The new GPS accuracy data.
+  /// @param newRuns The new run data.
+  /// @param newRoute The new route data.
+  /// @param newStatus The new status data.
+  /// @param newArea The new area data.
+  /// @param newActivityLocations The new activity locations data.
   void updateData({
     required ActivitySpeed newSpeed,
     required ActivityDistance newDistance,
@@ -86,6 +104,8 @@ class ActivityDataProvider extends ChangeNotifier {
   }
 
   /// Method to update the internet status.
+  ///
+  /// @param newInternetStatus The new internet status.
   void updateInternetStatus({required bool newInternetStatus}) {
     internetStatus = newInternetStatus;
 
