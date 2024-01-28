@@ -75,7 +75,35 @@ class ActivityRoute {
   ///
   /// @param nearestSlope The nearest slope to add.
   void addSlope(Slope nearestSlope) {
-    // ... (implementation details explained in code)
+    if (slopes.isEmpty) {
+      slopes.add(SlopeInfo(
+        name: nearestSlope.ref,
+        type: nearestSlope.type,
+        startTime: DateTime.now(),
+      ));
+    } else {
+      if (slopes.last.name == nearestSlope.ref &&
+          slopes.last.type == nearestSlope.type) {
+        return;
+      }
+      slopes.last.endTime = DateTime.now();
+      /// Check if last slope was longer then 30s otherwise delete the slope
+      if (slopes.last.endTime.difference(slopes.last.startTime).inSeconds < 5) {
+        slopes.removeLast();
+      }
+      /// Check if its now the same slope
+      if (slopes.last.name == nearestSlope.ref &&
+          slopes.last.type == nearestSlope.type) {
+        return;
+      }
+      /// Set the end time of the last slope and add a new slope
+      slopes.last.endTime = DateTime.now();
+      slopes.add(SlopeInfo(
+        name: nearestSlope.ref,
+        type: nearestSlope.type,
+        startTime: DateTime.now(),
+      ));
+    }
   }
 
   /// Adds coordinates to the list of route coordinates.
