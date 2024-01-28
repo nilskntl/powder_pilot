@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:powder_pilot/theme.dart';
 
 import 'main.dart';
 
@@ -53,9 +55,10 @@ class LocationService {
           notificationTitle: "Activity in progress",
           enableWakeLock: true,
           notificationIcon: AndroidResource(
-            name: 'ic_launcher',
-            defType: 'mipmap',
+            name: 'splash',
+            defType: 'drawable',
           ),
+          color: ColorTheme.primary,
         ),
         useMSLAltitude: true,
       );
