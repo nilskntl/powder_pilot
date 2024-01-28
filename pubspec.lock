@@ -305,13 +305,14 @@ packages:
     source: hosted
     version: "10.1.0"
   geolocator_android:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: geolocator_android
-      sha256: "30ff8fa384ab6d35965aecc15dfc980e5ebc5f823352c1adfc87dc3d000e8e24"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.5.0"
+      path: geolocator_android
+      ref: "135277e44e8283bae5473691324405fe360c844e"
+      resolved-ref: "135277e44e8283bae5473691324405fe360c844e"
+      url: "https://github.com/Wackymax/flutter-geolocator.git"
+    source: git
+    version: "4.5.1"
   geolocator_apple:
     dependency: transitive
     description:
