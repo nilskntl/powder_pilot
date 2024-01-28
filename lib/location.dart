@@ -43,6 +43,7 @@ class LocationService {
   /// Initializes location settings based on the platform.
   void _initSettings() {
     if (defaultTargetPlatform == TargetPlatform.android) {
+      /// Android settings for active location updates
       _activeSettings = AndroidSettings(
         intervalDuration: const Duration(seconds: 1),
         forceLocationManager: false,
@@ -58,31 +59,36 @@ class LocationService {
         ),
         useMSLAltitude: true,
       );
+      /// Android settings for passive location updates
       _passiveSettings = AndroidSettings(
         intervalDuration: const Duration(seconds: 1),
         useMSLAltitude: true,
       );
     } else if (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.macOS) {
+      /// iOS settings for active location updates
       _activeSettings = AppleSettings(
         pauseLocationUpdatesAutomatically: false,
         showBackgroundLocationIndicator: true,
         allowBackgroundLocationUpdates: true,
       );
+      /// iOS settings for passive location updates
       _passiveSettings = AppleSettings(
         pauseLocationUpdatesAutomatically: true,
         showBackgroundLocationIndicator: false,
         allowBackgroundLocationUpdates: false,
       );
     } else {
+      /// Fallback settings for active location updates
       _activeSettings = const LocationSettings(
         accuracy: LocationAccuracy.high,
       );
+      /// Fallback settings for passive location updates
       _passiveSettings = const LocationSettings();
     }
   }
 
-  /// Opens the location permission settings for the app
+  /// Opens the location permission settings for the app.
   static void openSettings() {
     Geolocator.openLocationSettings();
   }
@@ -115,11 +121,15 @@ class LocationService {
   }
 
   /// Adds an external listener for location updates.
+  ///
+  /// @param listener The listener to add.
   void addListener(LocationCallback listener) {
     _externalListeners.add(listener);
   }
 
   /// Removes an external listener for location updates.
+  ///
+  /// @param listener The listener to remove.
   void removeListener(LocationCallback listener) {
     try {
       _externalListeners.remove(listener);
@@ -131,6 +141,8 @@ class LocationService {
   }
 
   /// Notifies all external listeners about a location update.
+  ///
+  /// @param position The position to notify about.
   void _notifyListeners(Position position) {
     // Notify external listeners
     for (var listener in _externalListeners) {
@@ -182,6 +194,8 @@ class LocationService {
   }
 
   /// Handles a location update by updating area information and incrementing the location count.
+  ///
+  /// @param position The position to handle.
   void _handleLocationUpdate(Position position) {
     _updateArea(position);
     _numOfLocations++;
@@ -191,6 +205,8 @@ class LocationService {
   bool _localityFound = false;
 
   /// Updates the area information based on the provided position.
+  ///
+  /// @param position The position to update the area information with.
   void _updateArea(Position position) {
     Future<void> update() async {
       try {
