@@ -62,9 +62,9 @@ class _ActivityPageState extends State<ActivityPage> {
   @override
   Widget build(BuildContext context) {
     PowderPilot.setActivityDataProvider(activityDataProvider);
-    // Check if scroll controller is initialized
+    /// Check if scroll controller is initialized
     if (!_scrollControllerInitialized) {
-      // Check if activity is running
+      /// Check if activity is running
       _scrollController = activityDataProvider.status != ActivityStatus.inactive
           ? ScrollController(
               initialScrollOffset: MediaQuery.sizeOf(context).height - 420)
@@ -76,7 +76,7 @@ class _ActivityPageState extends State<ActivityPage> {
       controller: _scrollController,
       slivers: [
         SliverAppBar(
-            // Set color to transparent
+            /// Set color to transparent
             backgroundColor: Colors.transparent,
             foregroundColor: Colors.transparent,
             shadowColor: Colors.transparent,

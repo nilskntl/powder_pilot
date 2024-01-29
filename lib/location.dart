@@ -147,7 +147,7 @@ class LocationService {
   ///
   /// @param position The position to notify about.
   void _notifyListeners(Position position) {
-    // Notify external listeners
+    /// Notify external listeners
     for (var listener in _externalListeners) {
       listener(position);
     }
@@ -156,7 +156,7 @@ class LocationService {
   /// Starts the stream of active location updates.
   void startActiveLocationStream() {
     _stopLocationStream();
-    // Simulate location updates
+    /// Simulate location updates
     _locationSubscription =
         Geolocator.getPositionStream(locationSettings: _activeSettings).listen(
                 (Position position) {
@@ -172,7 +172,7 @@ class LocationService {
   /// Starts the stream of passive location updates.
   void startPassiveLocationStream() {
     _stopLocationStream();
-    // Simulate location updates
+    /// Simulate location updates
     _locationSubscription =
         Geolocator.getPositionStream(locationSettings: _passiveSettings).listen(
                 (Position position) {

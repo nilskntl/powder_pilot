@@ -103,7 +103,7 @@ class _WelcomePageState extends State<WelcomePage> {
     if (widget.buttonText != WelcomePage.standardButtonText) {
       _accepted = false;
       if (widget.currentPage == 2) {
-        // Should be 3 but somehow it's 2
+        /// Should be 3 but somehow it's 2
         _checkLocationPermission();
       }
     }
@@ -195,8 +195,6 @@ class _WelcomePageState extends State<WelcomePage> {
                   ),
                 ),
                 Center(
-                    // right: 0,
-                    //left: 0,
                     child: Container(
                   width: 96,
                   height: 22,

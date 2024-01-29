@@ -87,7 +87,7 @@ class _SettingsPageState extends State<SettingsPage> {
         return Dialog(
           child: Container(
             padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-            height: 150, // Set the desired width here
+            height: 150, /// Set the desired width here
             child: ListView(
               children: [
                 _buildLanguageOption("Metric (km/h)"),
@@ -120,7 +120,7 @@ class _SettingsPageState extends State<SettingsPage> {
           SharedPref.saveString(
               'units', unit.contains("Metric") ? 'metric' : 'imperial');
         });
-        Navigator.pop(context); // Close the dialog
+        Navigator.pop(context); /// Close the dialog
       },
     );
   }

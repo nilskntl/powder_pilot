@@ -101,7 +101,7 @@ class _MapPageState extends State<MapPage> {
                               decoration: const BoxDecoration(
                                 color: ColorTheme.background,
                               ),
-                              // Make an entry for every route in the full route of widget.activityDataProvider.route except the last one
+                              /// Make an entry for every route in the full route of widget.activityDataProvider.route except the last one
                               child: Column(
                                 children: [
                                   Container(
@@ -347,7 +347,7 @@ class _MapPageSummaryState extends State<MapPageSummary> {
                               decoration: const BoxDecoration(
                                 color: ColorTheme.background,
                               ),
-                              // Make an entry for every route in the full route of widget.activityDataProvider.route except the last one
+                              /// Make an entry for every route in the full route of widget.activityDataProvider.route except the last one
                               child: Column(
                                 children: [
                                   ListView.builder(
@@ -663,7 +663,7 @@ class _ActivityMapState extends State<ActivityMap>
           maxZoom: maxZoom,
           minZoom: minZoom,
         ),
-        // Layers are drawn in the order they are defined
+        /// Layers are drawn in the order they are defined
         children: [
           _tileLayer(),
           if (!widget.staticMap || (!_previewMode && widget.staticMap))
@@ -776,7 +776,7 @@ class _ActivityMapState extends State<ActivityMap>
     Polyline polyline = Polyline(
       points: polylinePoints,
       color: polylineColor,
-      strokeWidth: 5.0, // Adjust this to your desired line width
+      strokeWidth: 5.0, /// Adjust this to your desired line width
     );
 
     polylines.add(polyline);
@@ -853,6 +853,6 @@ class LocationMark extends CustomPainter {
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
-    return true; // Repaint whenever the compass heading changes
+    return true; /// Repaint whenever the compass heading changes
   }
 }

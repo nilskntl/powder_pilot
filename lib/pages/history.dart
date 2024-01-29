@@ -137,20 +137,20 @@ class HistoryState extends State<History> {
                         color: ColorTheme.background,
                         padding: const EdgeInsets.all(8.0),
                         child: FutureBuilder<List<ActivityDatabase>>(
-                          // Assuming your activities() method returns a Future<List<ActivityDatabase>>
+                          /// Assuming your activities() method returns a Future<List<ActivityDatabase>>
                           future: ActivityDatabaseHelper.activities(),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              // While data is being fetched, display a loading indicator
+                              /// While data is being fetched, display a loading indicator
                               return const Center(
                                   child: CircularProgressIndicator());
                             } else if (snapshot.hasError) {
-                              // If there's an error, display an error message
+                              /// If there's an error, display an error message
                               return Center(
                                   child: Text('Error: ${snapshot.error}'));
                             } else {
-                              // If data is successfully fetched, build the Column
+                              /// If data is successfully fetched, build the Column
                               List<ActivityDatabase>? activities =
                                   snapshot.data;
 
@@ -205,7 +205,7 @@ class HistoryState extends State<History> {
                                   ],
                                 );
                               } else {
-                                // Sort activities based on startTime in descending order
+                                /// Sort activities based on startTime in descending order
                                 activities.sort((a, b) =>
                                     b.startTime.compareTo(a.startTime));
 
@@ -351,7 +351,7 @@ class HistoryState extends State<History> {
             ],
           ),
         ),
-        // Fill remaining space
+        /// Fill remaining space
         SliverFillRemaining(
           hasScrollBody: false,
           child: Container(color: ColorTheme.background),

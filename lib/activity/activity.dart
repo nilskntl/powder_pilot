@@ -346,16 +346,22 @@ class LocationHandler extends ActivityData {
       _numberOfDistanceUpdates++;
 
       if (_numberOfDistanceUpdates % 5 == 0 && calculatedDistance > 2) {
-        // Reset calculated distance if it's unrealistically high.
+        /// Reset calculated distance if it's unrealistically high.
         if (calculatedDistance > 400) {
           calculatedDistance = 0.0;
         }
+        /// Add current location to the route.
         route.addCoordinates([longitude, latitude]);
+        /// Update distance data.
         distance.totalDistance += calculatedDistance;
         tempDistance += calculatedDistance;
         lastLocation = position;
       }
 
+      /// If the status (downhill/uphill) changes, update the status and
+      /// reset the current run length.
+      ///
+      /// @param status: The new status.
       void updateDistanceHelper(RunningStatus status) {
         state.runningStatus = status;
         currentRunLength = 0.0;
