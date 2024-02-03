@@ -221,9 +221,12 @@ class StringPool {
   static String get LEGAL_TEXT_1 => Intl.message('I agree to the ',
       name: 'StringPool_LEGAL_TEXT_1', locale: PowderPilot.language[0]);
 
-  static String get LEGAL_TEXT_2 => Intl.message(' and ',
+  static String get LEGAL_TEXT_2 => Intl.message(' and the ',
+      name: 'StringPool_LEGAL_TEXT_2', locale: PowderPilot.language[0]);
+
+  static String get LEGAL_TEXT_3 => Intl.message('.',
       name: 'StringPool_LEGAL_TEXT_2', locale: PowderPilot.language[0]);
 
   static List<String> get LEGAL_TEXT =>
-      [LEGAL_TEXT_1, TERMS_OF_SERVICE, LEGAL_TEXT_2, PRIVACY_POLICY, '.'];
+      [LEGAL_TEXT_1, TERMS_OF_SERVICE, LEGAL_TEXT_2, PRIVACY_POLICY, LEGAL_TEXT_3];
 }
