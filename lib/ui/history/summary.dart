@@ -464,9 +464,10 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                 child: Column(
               children: [
                 _buildHeader(
-                    title: StringPool.SPEED,
-                    icon: LogoTheme.speed,
-                    color: ColorTheme.primary),
+                  title: StringPool.SPEED,
+                  icon: LogoTheme.speed,
+                  color: ColorTheme.primary,
+                ),
                 SingleGraph(
                   data: dataSpeeds,
                   factor: Measurement.speedFactor,
@@ -477,10 +478,10 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                   height: verticalPadding * 2 - minus / 2,
                 ),
                 _buildHeader(
-                    title: StringPool.ALTITUDE,
-                    icon: LogoTheme.altitude,
-                    color: ColorTheme.contrast,
-                    mirrored: true),
+                  title: StringPool.ALTITUDE,
+                  icon: LogoTheme.altitude,
+                  color: ColorTheme.contrast,
+                ),
                 SingleGraph(
                   data: dataAltitudes,
                   factor: Measurement.altitudeFactor,
@@ -492,6 +493,9 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                 ),
               ],
             )),
+          ),
+          SizedBox(
+            height: verticalPadding - minus / 2,
           ),
           Container(
             color: ColorTheme.background,
@@ -661,8 +665,8 @@ class _ActivitySummaryState extends State<ActivitySummary> {
         Utils.buildText(
           text: title,
           fontSize: widget.small ? FontTheme.size - 2 : FontTheme.size,
-          color: color,
-          fontWeight: FontWeight.normal,
+          color: ColorTheme.grey,
+          fontWeight: FontWeight.bold,
         ),
         if (mirrored) const SizedBox(width: 8),
         if (mirrored) buildIcon(),
