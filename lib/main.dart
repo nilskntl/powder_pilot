@@ -132,7 +132,9 @@ void _init() async {
     SharedPref.saveString(PowderPilot.unitsKey, 'metric');
   }
 
-  PowderPilot.locationService.init();
+  if(welcome) {
+    PowderPilot.locationService.init();
+  }
   PowderPilot.connectivityController.init();
 
   /// Run the app
