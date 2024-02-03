@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../main.dart';
-import '../pages/settings.dart';
-import '../theme.dart';
-import 'general_utils.dart';
+import '../../main.dart';
+import '../settings/settings.dart';
+import '../../theme.dart';
+import '../../utils/general_utils.dart';
 
 /// A utility class for creating custom Material app bars.
 class CustomMaterialAppBar {
-  /// Generates a custom AppBar with a specified title and optional child widget.
+  /// Generates a custom Material AppBar with a specified title and optional
+  ///  child widget.
   ///
   /// @param title The title to be displayed in the AppBar.
   /// @param child An optional widget to be displayed as a child in the AppBar.
@@ -15,22 +16,24 @@ class CustomMaterialAppBar {
   static AppBar appBar(
       {required String title, Widget child = const SizedBox()}) {
     return AppBar(
-      backgroundColor: ColorTheme.contrast,
-      foregroundColor: ColorTheme.secondary,
+      backgroundColor: ColorTheme.secondary,
+      foregroundColor: ColorTheme.contrast,
       title: Utils.buildText(
           text: title,
-          color: ColorTheme.secondary,
+          color: ColorTheme.contrast,
           fontSize: FontTheme.sizeSubHeader - 4),
       actions: [child],
     );
   }
 }
 
-/// A custom stateless widget representing a custom app bar.
+/// A custom stateless widget for the app bar that is used in the main screen.
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({super.key});
 
+  /// The height of the app bar.
   static const barHeight = 64.0;
+  /// The size of the items in the app bar.
   static const itemsSize = 40.0;
 
   /// Gets the status bar height for the current device.
@@ -70,6 +73,7 @@ class CustomAppBar extends StatelessWidget {
                 text: PowderPilot.appName,
                 fontSize: FontTheme.size,
                 fontWeight: FontWeight.bold,
+                color: ColorTheme.secondary,
               ),
               Row(
                 children: [
@@ -93,12 +97,12 @@ class CustomAppBar extends StatelessWidget {
                           MaterialPageRoute(
                               builder: (context) => const SettingsPage()));
                     },
-                    child: const SizedBox(
+                    child: SizedBox(
                       width: itemsSize,
                       height: itemsSize,
                       child: Icon(
                         LogoTheme.settings,
-                        color: ColorTheme.contrast,
+                        color: ColorTheme.secondary,
                       ),
                     ),
                   ),
