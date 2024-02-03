@@ -1,41 +1,141 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:powder_pilot/location.dart';
-import 'package:powder_pilot/pages/welcome_pages/welcome_pages.dart';
 import 'package:powder_pilot/theme.dart';
+import 'package:powder_pilot/ui/controller.dart';
+import 'package:powder_pilot/ui/scroll_view.dart';
+import 'package:powder_pilot/ui/welcome_pages/welcome_pages.dart';
+import 'package:powder_pilot/ui/widgets/bottom_bar.dart';
 import 'package:powder_pilot/utils/connectivity_controller.dart';
 import 'package:powder_pilot/utils/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
 import 'activity/activity.dart';
 import 'activity/data_provider.dart';
-import 'pages/activity_page.dart';
-import 'pages/history.dart';
-import 'utils/app_bar.dart';
+import 'l10n/messages_all_locales.dart';
+import 'ui/widgets/app_bar.dart';
 
 void main() {
+  _init();
+}
+
+void _init() async {
+  /// Set the error handler
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.dumpErrorToConsole(details);
   };
 
+  /// Ensure that that WidgetsBinding is initialized
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  init();
-}
 
-void init() async {
+  /// Set the orientation to portrait
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  /// Set the system UI overlay style
+  SystemUiOverlayStyle systemUiOverlayStyle = const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+    systemNavigationBarIconBrightness: Brightness.light,
+    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarDividerColor: Colors.transparent,
+    systemNavigationBarContrastEnforced: false,
+    systemStatusBarContrastEnforced: false,
+  );
+  SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+
+  /// Set the system UI mode
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.manual,
+    overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+  );
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky,
+      overlays: [SystemUiOverlay.bottom]);
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+  /// Read the welcome key from shared preferences
   bool welcome = await SharedPref.readBool(PowderPilot.startKey);
+
+  /// Read the language key from the shared preferences
+  String language = await SharedPref.readString(PowderPilot.languageKey);
+
+  /// Set the language to the system language
+  /// If the system language is not available, set it to English
+  Future<void> setLocaleLanguage() async {
+    /// Check if the system language is available
+    bool containsSystemLanguage(String l) {
+      for (List<String> lang in PowderPilot.availableLanguages) {
+        if (lang[0] == l) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    String locale = ui.window.locale.toString();
+    if (locale.contains('_')) {
+      locale = locale.split('_').first;
+    }
+    if (containsSystemLanguage(locale)) {
+      language = locale;
+    } else {
+      if (locale == 'at' || locale == 'ch' || locale == 'de') {
+        language = 'de';
+      } else {
+        language = 'en';
+      }
+    }
+    SharedPref.saveString(PowderPilot.languageKey, language);
+  }
+
+  /// Check if the language defined in the shared preferences is available
+  bool containsLanguage() {
+    for (List<String> lang in PowderPilot.availableLanguages) {
+      if (language == lang[0]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// If language was not set or is unavailable, set it to the system language
+  if (language == '' || !containsLanguage()) {
+    await setLocaleLanguage();
+  }
+
+  // Set the default locale
+  Intl.defaultLocale = language;
+  PowderPilot.setLanguage(language);
+  await initializeMessages(language);
+
+  /// Read the theme key from shared preferences and set the theme
+  String theme = await SharedPref.readString(PowderPilot.themeKey);
+  if (theme == '') {
+    theme = ThemeChanger.defaultTheme;
+  }
+  ThemeChanger.changeTheme(theme);
+
+  /// Read the units key from shared preferences and set the units
   String units = await SharedPref.readString(PowderPilot.unitsKey);
+
+  /// If units was not set, set it to metric
   if (units == '') {
     units = 'metric';
     SharedPref.saveString(PowderPilot.unitsKey, units);
   } else if (units == 'imperial') {
-    Info.setUnits(units);
+    Measurement.setUnits(units);
   } else if (units != 'metric') {
     SharedPref.saveString(PowderPilot.unitsKey, 'metric');
   }
 
+  PowderPilot.locationService.init();
+  PowderPilot.connectivityController.init();
+
+  /// Run the app
   runApp(
     ChangeNotifierProvider(
       create: (context) => ActivityDataProvider(),
@@ -54,6 +154,15 @@ class Start extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('de'),
+        Locale('en'),
+      ],
       title: PowderPilot.appName,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -65,32 +174,70 @@ class Start extends StatelessWidget {
   }
 }
 
-class PowderPilot extends StatelessWidget {
+class PowderPilot extends StatefulWidget {
   const PowderPilot({super.key});
 
-  /// Key names
+  /// App name
+  static const String appName = 'Powder Pilot';
+
+  /// Key names for SharedPreferences
   static const String numActivitiesKey = 'numActivities';
   static const String activityKey = 'activity';
   static const String startKey = 'start';
   static const String unitsKey = 'units';
+  static const String languageKey = 'language';
+  static const String themeKey = 'theme';
 
-  static const String appName = 'Powder Pilot';
+  static const List<List<String>> availableLanguages = [
+    ['de', 'Deutsch'],
+    ['en', 'English'],
+    ['es', 'Español'],
+    ['fr', 'Français'],
+    ['it', 'Italiano'],
+    ['nl', 'Nederlands'],
+    ['pl', 'Polski'],
+    ['pt', 'Português'],
+    ['ru', 'Русский'],
+  ];
 
+  /// Current language
+  static List<String> _language = ['en', 'English'];
+
+  static List<String> get language => _language;
+
+  /// Set the language
+  ///
+  /// @param lang The language to set (e.g. 'en')
+  static void setLanguage(String lang) {
+    for (List<String> l in availableLanguages) {
+      if (l[0] == lang) {
+        _language = l;
+        SharedPref.saveString(languageKey, lang);
+        return;
+      }
+    }
+  }
+
+  /// The location service (Location Stream)
   static final LocationService _locationService = LocationService();
 
-  static int _activityId = 0;
-  static Activity _activity = Activity(id: _activityId);
+  /// The current activity
+  static Activity _activity = Activity();
 
-  static late ActivityDataProvider _activityData;
+  /// The data provider for the activity
+  /// Initialized with a dummy to avoid null pointer exceptions
+  /// (used to notify listeners of changes)
+  static ActivityDataProvider dataProvider = ActivityDataProvider();
 
+  /// The connectivity controller for internet connection
   static final ConnectivityController _connectivityController =
       ConnectivityController();
 
-  @override
-  Widget build(BuildContext context) {
-    _activity.init();
-    return const MyHomePage(title: 'Flutter Demo Home Page');
-  }
+  /// The custom controller for the scroll view and page view
+  static final CustomController controller = CustomController();
+
+  /// Make a full reload of the state of the app
+  static void Function() reload = () {};
 
   static Activity get activity => _activity;
 
@@ -99,176 +246,50 @@ class PowderPilot extends StatelessWidget {
   static ConnectivityController get connectivityController =>
       _connectivityController;
 
-  static ActivityDataProvider getActivityDataProvider() {
-    return _activityData;
-  }
-
-  static void setActivityDataProvider(ActivityDataProvider activityData) {
-    _activityData = activityData;
-  }
-
   static void createNewActivity(
       {String areaName = '',
       LatLng currentPosition = const LatLng(0, 0),
       bool mapDownloaded = false}) {
     _activity = Activity(
-        id: ++_activityId,
-        currentPosition: currentPosition,
-        mapDownloaded: mapDownloaded);
-    _activity.init();
+        currentPosition: currentPosition, mapDownloaded: mapDownloaded);
   }
 
-  static bool get connectionStatus => _connectivityController.isConnected.value;
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  static const double bottomBarHeight = 50.0;
-  static const Duration animationDuration = Duration(milliseconds: 200);
-
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<PowderPilot> createState() => PowderPilotState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  final ActivityPage _activity = const ActivityPage();
-  final History _history = const History();
-
-  final PageController _pageController = PageController();
-  final int _numberOfPages = 2;
-  int _pageIndex = 0;
-
-  double getBottomBarHeight() {
-    return MyHomePage.bottomBarHeight + MediaQuery.of(context).padding.bottom;
+class PowderPilotState extends State<PowderPilot> {
+  @override
+  void initState() {
+    super.initState();
+    PowderPilot.reload = () {
+      if (mounted) {
+        setState(() {});
+      }
+    };
   }
 
   @override
   Widget build(BuildContext context) {
-    SystemUiOverlayStyle systemUiOverlayStyle = const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarDividerColor: Colors.transparent,
-      systemNavigationBarContrastEnforced: false,
-      systemStatusBarContrastEnforced: false,
-    );
-    SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
-
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.manual,
-      overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
-    );
-
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky,
-        overlays: [SystemUiOverlay.bottom]);
-
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     return Scaffold(
-      body: Stack(
-        children: [
-          Image.asset(
-            'assets/images/background.png',
-            fit: BoxFit.cover,
-            width: double.infinity,
-          ),
-          PageView(
-            controller: _pageController,
-            scrollDirection: Axis.horizontal,
-            onPageChanged: (int page) {
-              setState(() {});
-              _pageIndex = page;
-            },
-            children: [
-              _activity,
-              _history,
-            ],
-          ),
-          const CustomAppBar(),
-        ],
-      ),
-      bottomNavigationBar: _buildBottomBar(),
-    );
-  }
-
-  Widget _buildBottomBar() {
-    return Container(
-      height: getBottomBarHeight(),
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-      decoration: const BoxDecoration(
-        color: ColorTheme.background,
-      ),
-      child: Stack(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    _pageIndex = 0;
-                    _pageController.animateToPage(
-                      0,
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeInOut,
-                    );
-                  },
-                  child: _buildBottomBarContainer(
-                      iconData: LogoTheme.activity,
-                      text: 'Activity',
-                      page: 0),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    _pageIndex = 1;
-                    _pageController.animateToPage(
-                      1,
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeInOut,
-                    );
-                  },
-                  child: _buildBottomBarContainer(
-                      iconData: LogoTheme.history,
-                      text: 'History',
-                      page: 1),
-                ),
-              ),
-            ],
-          ),
-          AnimatedPositioned(
-            duration: MyHomePage.animationDuration,
-            top: 0,
-            left: (MediaQuery.of(context).size.width / _numberOfPages) *
-                (_pageIndex),
-            child: Container(
-              width: MediaQuery.of(context).size.width / _numberOfPages,
-              height: 4,
-              color: ColorTheme.primary,
+        body: Stack(
+          children: [
+            Image.asset(
+              'assets/images/background.png',
+              fit: BoxFit.cover,
+              width: double.infinity,
             ),
-          ),
-        ],
-      ),
-    );
-  }
+            if (ThemeChanger.currentTheme.darkMode)
+              Container(
+                color: ColorTheme.black.withOpacity(0.2),
+              ),
+            MainScrollView(controller: PowderPilot.controller),
 
-  Widget _buildBottomBarContainer(
-      {required IconData iconData, required String text, required int page}) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Icon(
-            iconData,
-            size: 32,
-            color: _pageIndex == page ? ColorTheme.primary : ColorTheme.grey,
-          ),
-        ],
-      ),
-    );
+            /// ignore: prefer_const_constructors
+            CustomAppBar(),
+          ],
+        ),
+        bottomNavigationBar:
+            CustomBottomBar(controller: PowderPilot.controller));
   }
 }
