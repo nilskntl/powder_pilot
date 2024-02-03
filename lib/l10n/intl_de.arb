@@ -73,7 +73,8 @@
   "StringPool_LAST_TITLE": "Letzte Schritte",
   "StringPool_LAST_SUBTITLE": "Beenden Sie Ihr Setup und beginnen Sie mit der Verfolgung Ihrer Aktivität.",
   "StringPool_TERMS_OF_SERVICE": "Nutzungsbedingungen",
-  "StringPool_PRIVACY_POLICY": "Datenschutzbestimmungen",
+  "StringPool_PRIVACY_POLICY": "Datenschutzerklärung",
   "StringPool_LEGAL_TEXT_1": "Ich stimme den ",
-  "StringPool_LEGAL_TEXT_2": " zu"
+  "StringPool_LEGAL_TEXT_2": " und der ",
+  "StringPool_LEGAL_TEXT_3": " zu."
 }

@@ -90,8 +90,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "StringPool_LAST_TITLE": MessageLookupByLibrary.simpleMessage('Letzte Schritte'),
     "StringPool_LAST_SUBTITLE": MessageLookupByLibrary.simpleMessage('Beenden Sie Ihr Setup und beginnen Sie mit der Verfolgung Ihrer Aktivität.'),
     "StringPool_TERMS_OF_SERVICE": MessageLookupByLibrary.simpleMessage('Nutzungsbedingungen'),
-    "StringPool_PRIVACY_POLICY": MessageLookupByLibrary.simpleMessage('Datenschutzbestimmungen'),
-    "StringPool_LEGAL_TEXT_1": MessageLookupByLibrary.simpleMessage('Ich stimme den'),
-    "StringPool_LEGAL_TEXT_2": MessageLookupByLibrary.simpleMessage(' zu'),
+    "StringPool_PRIVACY_POLICY": MessageLookupByLibrary.simpleMessage('Datenschtzerklärung'),
+    "StringPool_LEGAL_TEXT_1": MessageLookupByLibrary.simpleMessage('Ich stimme den '),
+    "StringPool_LEGAL_TEXT_2": MessageLookupByLibrary.simpleMessage(' und der '),
+    "StringPool_LEGAL_TEXT_3": MessageLookupByLibrary.simpleMessage(' zu.'),
   };
 }
