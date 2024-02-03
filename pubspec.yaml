@@ -18,8 +18,6 @@ dependencies:
   flutter_native_splash: ^2.3.9
   latlong2: ^0.9.0
   provider: ^6.1.1
-  expandable_page_view: ^1.0.17
-  page_view_indicators: ^2.0.0
   cupertino_icons: ^1.0.2
   flutter_map: ^6.1.0
   flutter_map_animations: ^0.5.3
@@ -34,6 +32,14 @@ dependencies:
   fl_chart: ^0.66.0
   geolocator: ^10.1.0
   geocoding: ^2.1.1
+  country_flags: ^2.2.0
+
+  # flutter pub run intl_translation:extract_to_arb --output-dir=lib/l10n lib/theme.dart
+  # flutter pub run intl_translation:generate_from_arb --output-dir=lib/l10n lib/theme.dart lib/l10n/intl_*.arb
+  intl: ^0.18.1
+  flutter_localizations:
+    sdk: flutter
+  intl_translation: ^0.19.0
 
 
 # Dependency overrides
@@ -79,6 +85,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  generate: true
+
   assets:
     - assets/images/icon_256.png
     - assets/images/background.png
@@ -92,6 +100,8 @@ flutter:
     - assets/images/welcome_pages/battery_optimization.png
     - assets/legal/terms_of_service.txt
     - assets/legal/privacy_policy.txt
+    - lib/l10n/intl_en.arb
+    - lib/l10n/intl_de.arb
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
