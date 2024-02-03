@@ -5,14 +5,6 @@ import 'database.dart';
 import 'state.dart';
 import 'timer.dart';
 
-/// Enum to represent GPS accuracy levels.
-enum GpsAccuracy {
-  none,
-  low,
-  medium,
-  high,
-}
-
 /// Class to encapsulate data related to an activity.
 class ActivityData {
   final ActivityState _state = ActivityState();
@@ -38,10 +30,6 @@ class ActivityData {
   /// Geographic coordinates and area name.
   double latitude = 0.0;
   double longitude = 0.0;
-  String areaName = '';
-
-  /// GPS accuracy level.
-  GpsAccuracy gpsAccuracy = GpsAccuracy.none;
 
   /// Object to store specific locations during the activity.
   ActivityLocations activityLocations = const ActivityLocations();
@@ -49,7 +37,7 @@ class ActivityData {
   /// Save the activity data to a database and return the database entry.
   ActivityDatabase saveActivity() {
     ActivityDatabase activityDatabase = ActivityDatabase(
-      areaName: areaName,
+      areaName: PowderPilot.locationService.areaName,
       maxSpeed: speed.maxSpeed,
       averageSpeed: speed.avgSpeed,
       totalRuns: runs.totalRuns,
@@ -71,6 +59,7 @@ class ActivityData {
       startTime: _activityTimer.startTime.toString(),
       endTime: _activityTimer.endTime.toString(),
       speeds: speed.speeds.toString(),
+      distances: distance.distances.toString(),
       speedLocation: activityLocations.fastestLocation.toString(),
       startLocation: activityLocations.startLocation.toString(),
       endLocation: activityLocations.endLocation.toString(),
@@ -83,19 +72,15 @@ class ActivityData {
 
   /// Update the user interface with the latest activity data.
   void updateData() {
-    PowderPilot.getActivityDataProvider().updateData(
+    PowderPilot.dataProvider.updateData(
       newSpeed: speed,
       newDistance: distance,
       newAltitude: altitude,
       newSlope: slope,
       newElapsedDuration: _activityTimer.duration,
-      newLatitude: latitude,
-      newLongitude: longitude,
-      newGpsAccuracy: gpsAccuracy,
       newRuns: runs,
       newRoute: route,
       newStatus: _state.activityStatus,
-      newArea: areaName,
       newActivityLocations: activityLocations,
     );
   }
@@ -195,6 +180,7 @@ class ActivityDistance {
   double totalDistance;
   double distanceUphill;
   double distanceDownhill;
+  List<List<double>> distances = [];
 
   ActivityDistance({
     this.totalDistance = 0.0,
