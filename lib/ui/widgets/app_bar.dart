@@ -15,12 +15,14 @@ class CustomMaterialAppBar {
   /// @return An AppBar with the specified properties.
   static AppBar appBar(
       {required String title, Widget child = const SizedBox()}) {
+    /// Flag to check if the current theme is dark.
+    bool dark = ThemeChanger.currentTheme.darkMode;
     return AppBar(
-      backgroundColor: ColorTheme.secondary,
-      foregroundColor: ColorTheme.contrast,
+      backgroundColor: dark ? ColorTheme.secondary : ColorTheme.contrast,
+      foregroundColor: dark ? ColorTheme.contrast : ColorTheme.secondary,
       title: Utils.buildText(
           text: title,
-          color: ColorTheme.contrast,
+          color: dark ? ColorTheme.contrast : ColorTheme.secondary,
           fontSize: FontTheme.sizeSubHeader - 4),
       actions: [child],
     );
@@ -33,6 +35,7 @@ class CustomAppBar extends StatelessWidget {
 
   /// The height of the app bar.
   static const barHeight = 64.0;
+
   /// The size of the items in the app bar.
   static const itemsSize = 40.0;
 
