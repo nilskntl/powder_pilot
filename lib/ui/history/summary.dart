@@ -1,137 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:powder_pilot/activity/data_provider.dart';
+import 'package:powder_pilot/ui/widgets/single_graph.dart';
 
-import '../activity/data.dart';
-import '../activity/database.dart';
-import '../activity/map.dart';
-import '../activity/route.dart';
-import '../theme.dart';
-import '../utils/app_bar.dart';
-import '../utils/general_utils.dart';
-import 'activity_page.dart';
-import 'history.dart';
-
-/// A stateful widget for displaying a summary dialog of an activity.
-class SummaryDialog extends StatefulWidget {
-  const SummaryDialog({super.key, required this.activityDatabase});
-
-  final ActivityDatabase activityDatabase;
-
-  @override
-  State<SummaryDialog> createState() => _SummaryDialogState();
-}
-
-class _SummaryDialogState extends State<SummaryDialog>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-
-    _scaleAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOut,
-      ),
-    );
-
-    _controller.forward();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _scaleAnimation,
-      child: Dialog(
-        insetPadding: const EdgeInsets.all(16.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16.0),
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            appBar: CustomMaterialAppBar.appBar(title: 'Summary'),
-            body: Container(
-              width: double.infinity,
-              height: double.infinity,
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16.0),
-                color: ColorTheme.background,
-              ),
-              child: ActivitySummary(
-                activityDatabase: widget.activityDatabase,
-                small: true,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-}
-
-/// A stateless widget for displaying a summary page of an activity.
-class SummaryPage extends StatelessWidget {
-  const SummaryPage({
-    super.key,
-    required this.activityDatabase,
-    required this.historyState,
-  });
-
-  final HistoryState historyState;
-  final ActivityDatabase activityDatabase;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomMaterialAppBar.appBar(
-        title: 'Summary,',
-        child: PopupMenuButton<String>(
-          onSelected: (value) {
-            switch (value) {
-              case 'delete':
-                History.showDeleteConfirmationDialog(
-                  context,
-                  activityDatabase,
-                  () {
-                    Navigator.pop(context);
-                    historyState.update();
-                  },
-                );
-                break;
-            }
-          },
-          itemBuilder: (BuildContext context) {
-            return [
-              PopupMenuItem<String>(
-                height: 40,
-                value: 'delete',
-                child: Utils.buildText(text: 'Delete', caps: false),
-              ),
-              // Add more PopupMenuItems if needed
-            ];
-          },
-        ),
-      ),
-      body: ActivitySummary(activityDatabase: activityDatabase),
-    );
-  }
-}
+import '../../activity/data.dart';
+import '../../activity/database.dart';
+import '../../activity/map.dart';
+import '../../activity/route.dart';
+import '../../string_pool.dart';
+import '../../theme.dart';
+import '../../utils/general_utils.dart';
+import '../activity/info/info.dart';
+import '../activity/info/widgets/category.dart';
+import '../activity/info/widgets/elapsed_time.dart';
+import '../activity/info/widgets/run.dart';
+import '../widgets/slope_circle.dart';
 
 /// A stateful widget for displaying the summary of an activity.
 class ActivitySummary extends StatefulWidget {
@@ -157,6 +40,7 @@ class _ActivitySummaryState extends State<ActivitySummary> {
       widget.activityDatabase.elapsedDownhillTime.split(':');
   late List<String> pauseParts =
       widget.activityDatabase.elapsedPauseTime.split(':');
+  late List<String> totalParts = widget.activityDatabase.elapsedTime.split(':');
 
   late final List<List<int>> dataAltitudes;
   late final List<List<double>> dataSpeeds;
@@ -168,6 +52,8 @@ class _ActivitySummaryState extends State<ActivitySummary> {
   late final double minus = widget.small ? 4 : 0;
 
   final double verticalPadding = 8.0;
+
+  final ActivityDataProvider runs = ActivityDataProvider();
 
   @override
   void initState() {
@@ -190,6 +76,17 @@ class _ActivitySummaryState extends State<ActivitySummary> {
         endLocation: endLocation,
       ),
     );
+    ActivityDistance activityDistance = ActivityDistance();
+    if (widget.activityDatabase.distances != null) {
+      activityDistance.distances =
+          parseStringToListListDouble(widget.activityDatabase.distances!);
+    }
+    runs.updateSummary(
+        newRuns: ActivityRun(
+          longestRun: widget.activityDatabase.longestRun,
+          totalRuns: widget.activityDatabase.totalRuns,
+        ),
+        newDistance: activityDistance);
   }
 
   List<double> parseStringToDoubleList(String doubleListString) {
@@ -332,9 +229,9 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                 flex: 1,
                 child: Container(
                   height: widget.small ? 120 : 160,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: ColorTheme.secondary,
-                    borderRadius: BorderRadius.only(
+                    borderRadius: const BorderRadius.only(
                         topRight: Radius.circular(16.0),
                         bottomRight: Radius.circular(16.0)),
                   ),
@@ -353,14 +250,15 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            CurrentSlope(
+                            SlopeCircle(
                                 slope: route.slopes[index], size: 32 - minus),
                             const SizedBox(width: 8),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                ActivityPage.buildSlopeName(route.slopes[index],
+                                SlopeCircle.buildSlopeName(
+                                    slope: route.slopes[index],
                                     size: FontTheme.size - minus),
                                 Utils.buildText(
                                     text: Utils.durationStringToString(route
@@ -402,13 +300,13 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const Icon(LogoTheme.gps,
+                          Icon(LogoTheme.gps,
                               color: ColorTheme.primary,
                               size: ActivitySummary.iconSize),
                           const SizedBox(width: 4.0),
                           Utils.buildText(
                               text: widget.activityDatabase.areaName == ''
-                                  ? 'Unknown'
+                                  ? StringPool.UNKNOWN_AREA
                                   : widget.activityDatabase.areaName,
                               fontSize: FontTheme.size,
                               fontWeight: FontWeight.bold,
@@ -446,7 +344,7 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                                           fontWeight: FontWeight.bold),
                                       Utils.buildText(
                                           text:
-                                              '${widget.activityDatabase.elapsedTime.substring(0, 4)} ${Info.unitTime}',
+                                              '${widget.activityDatabase.elapsedTime.substring(0, 4)} ${Measurement.unitTime}',
                                           fontSize: FontTheme.size - minus,
                                           fontWeight: FontWeight.bold,
                                           caps: false),
@@ -477,8 +375,128 @@ class _ActivitySummaryState extends State<ActivitySummary> {
           SizedBox(
             height: verticalPadding - minus / 2,
           ),
+          SizedBox(
+            height: verticalPadding - minus / 2,
+          ),
+          _map(),
+          SizedBox(
+            height: verticalPadding - minus / 2,
+          ),
+          Row(
+            children: [
+              _buildActivityDisplay(
+                icon: LogoTheme.speed,
+                title: StringPool.SPEED,
+                unit: Measurement.unitSpeed,
+                value1:
+                    (widget.activityDatabase.maxSpeed * Measurement.speedFactor)
+                        .toStringAsFixed(1),
+                titleValue1: StringPool.MAX,
+                value2: (widget.activityDatabase.averageSpeed *
+                        Measurement.speedFactor)
+                    .toStringAsFixed(1),
+                titleValue2: StringPool.AVERAGE,
+              ),
+              _buildActivityDisplay(
+                icon: LogoTheme.slope,
+                title: StringPool.DOWNWARD_SLOPE,
+                unit: Measurement.unitSlope,
+                value1: widget.activityDatabase.maxSlope.toStringAsFixed(1),
+                titleValue1: StringPool.MAX,
+                value3: widget.activityDatabase.avgSlope.toStringAsFixed(1),
+                titleValue3: StringPool.AVERAGE,
+              ),
+            ],
+          ),
+          SizedBox(
+            height: verticalPadding - minus / 2,
+          ),
+          Row(
+            children: [
+              _buildActivityDisplay(
+                icon: LogoTheme.altitude,
+                title: StringPool.ALTITUDE,
+                unit: Measurement.unitAltitude,
+                value1: (widget.activityDatabase.maxAltitude *
+                        Measurement.altitudeFactor)
+                    .round()
+                    .toString(),
+                titleValue1: StringPool.MAX,
+                value2: (widget.activityDatabase.minAltitude *
+                        Measurement.altitudeFactor)
+                    .round()
+                    .toString(),
+                titleValue2: StringPool.MIN,
+                value3: (widget.activityDatabase.avgAltitude *
+                        Measurement.altitudeFactor)
+                    .round()
+                    .toString(),
+                titleValue3: StringPool.AVERAGE,
+              ),
+              _buildActivityDisplay(
+                icon: LogoTheme.distance,
+                title: StringPool.DISTANCE,
+                unit: Measurement.unitDistance,
+                value1: (widget.activityDatabase.distance *
+                        Measurement.distanceFactor /
+                        1000)
+                    .toStringAsFixed(1),
+                titleValue1: StringPool.TOTAL,
+                value2: (widget.activityDatabase.distanceDownhill *
+                        Measurement.distanceFactor /
+                        1000)
+                    .toStringAsFixed(1),
+                titleValue2: StringPool.DOWNHILL,
+                value3: (widget.activityDatabase.distanceUphill *
+                        Measurement.distanceFactor /
+                        1000)
+                    .toStringAsFixed(1),
+                titleValue3: StringPool.UPHILL,
+              ),
+            ],
+          ),
+          SizedBox(
+            height: verticalPadding - minus / 2,
+          ),
+          Padding(
+            padding: Category.paddingOutside / 2 - EdgeInsets.all(minus / 2),
+            child: WidgetTheme.container(
+                child: Column(
+              children: [
+                _buildHeader(
+                    title: StringPool.SPEED,
+                    icon: LogoTheme.speed,
+                    color: ColorTheme.primary),
+                SingleGraph(
+                  data: dataSpeeds,
+                  factor: Measurement.speedFactor,
+                  unit: Measurement.unitSpeed,
+                  color: ColorTheme.primary,
+                ),
+                SizedBox(
+                  height: verticalPadding * 2 - minus / 2,
+                ),
+                _buildHeader(
+                    title: StringPool.ALTITUDE,
+                    icon: LogoTheme.altitude,
+                    color: ColorTheme.contrast,
+                    mirrored: true),
+                SingleGraph(
+                  data: dataAltitudes,
+                  factor: Measurement.altitudeFactor,
+                  unit: Measurement.unitAltitude,
+                  color: ColorTheme.contrast,
+                ),
+                SizedBox(
+                  height: verticalPadding - minus / 2,
+                ),
+              ],
+            )),
+          ),
           Container(
-            padding: Info.padding / 2,
+            color: ColorTheme.background,
+            padding: Category.paddingOutside / 2 - EdgeInsets.all(minus / 2),
+            height: 264,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -495,89 +513,22 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                       hours: int.parse(pauseParts[0]),
                       minutes: int.parse(pauseParts[1]),
                       seconds: double.parse(pauseParts[2]).toInt()),
+                  totalTime: Duration(
+                      hours: int.parse(totalParts[0]),
+                      minutes: int.parse(totalParts[1]),
+                      seconds: double.parse(totalParts[2]).toInt()),
+                  summary: true,
+                ),
+                SizedBox(width: 16.0 - minus / 2),
+                Expanded(
+                  child: Run(
+                    dataProvider: runs,
+                    summary: true,
+                  ),
                 ),
               ],
             ),
           ),
-          SizedBox(
-            height: verticalPadding - minus / 2,
-          ),
-          _map(),
-          SizedBox(
-            height: verticalPadding - minus / 2,
-          ),
-          Row(
-            children: [
-              _buildActivityDisplay(
-                  icon: LogoTheme.speed,
-                  title: 'Speed',
-                  unit: Info.unitSpeed,
-                  value1: (widget.activityDatabase.maxSpeed * Info.speedFactor)
-                      .toStringAsFixed(1),
-                  titleValue1: 'Max',
-                  value2:
-                      (widget.activityDatabase.averageSpeed * Info.speedFactor)
-                          .toStringAsFixed(1),
-                  titleValue2: 'Avg'),
-              _buildActivityDisplay(
-                  icon: LogoTheme.slope,
-                  title: 'Slope',
-                  unit: Info.unitSlope,
-                  value1: widget.activityDatabase.maxSlope.toStringAsFixed(1),
-                  titleValue1: 'Max',
-                  value3: widget.activityDatabase.avgSlope.toStringAsFixed(1),
-                  titleValue3: 'Avg'),
-            ],
-          ),
-          SizedBox(
-            height: verticalPadding - minus / 2,
-          ),
-          Row(
-            children: [
-              _buildActivityDisplay(
-                  icon: LogoTheme.altitude,
-                  title: 'Altitude',
-                  unit: Info.unitAltitude,
-                  value1: (widget.activityDatabase.maxAltitude *
-                          Info.altitudeFactor)
-                      .round()
-                      .toString(),
-                  titleValue1: 'Max',
-                  value2: (widget.activityDatabase.minAltitude *
-                          Info.altitudeFactor)
-                      .round()
-                      .toString(),
-                  titleValue2: 'Min',
-                  value3: (widget.activityDatabase.avgAltitude *
-                          Info.altitudeFactor)
-                      .round()
-                      .toString(),
-                  titleValue3: 'Avg'),
-              _buildActivityDisplay(
-                  icon: LogoTheme.distance,
-                  title: 'Distance',
-                  unit: Info.unitDistance,
-                  value1: (widget.activityDatabase.distance *
-                          Info.distanceFactor /
-                          1000)
-                      .toStringAsFixed(1),
-                  titleValue1: 'Total',
-                  value2: (widget.activityDatabase.distanceDownhill *
-                          Info.distanceFactor /
-                          1000)
-                      .toStringAsFixed(1),
-                  titleValue2: 'Downhill',
-                  value3: (widget.activityDatabase.distanceUphill *
-                          Info.distanceFactor /
-                          1000)
-                      .toStringAsFixed(1),
-                  titleValue3: 'Uphill'),
-            ],
-          ),
-          SizedBox(
-            height: verticalPadding - minus / 2,
-          ),
-          Graph(dataAltitudes: dataAltitudes, dataSpeeds: dataSpeeds, small: true,),
           SizedBox(
             height: verticalPadding - minus / 2,
           ),
@@ -601,10 +552,14 @@ class _ActivitySummaryState extends State<ActivitySummary> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Utils.buildText(
+          Flexible(
+            child: Utils.buildText(
               text: title,
               fontSize: FontTheme.size - minus,
-              color: ColorTheme.grey),
+              color: ColorTheme.grey,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
           Row(
             children: [
               Utils.buildText(
@@ -649,11 +604,17 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Utils.buildText(
+                Flexible(
+                  child: Utils.buildText(
                     text: title,
-                    fontSize: widget.small ? FontTheme.sizeSubHeader - minus * 2 : FontTheme.sizeSubHeader - minus,
+                    fontSize: widget.small
+                        ? FontTheme.sizeSubHeader - minus * 2
+                        : FontTheme.sizeSubHeader - 4,
                     color: ColorTheme.grey,
-                    fontWeight: FontWeight.bold),
+                    fontWeight: FontWeight.bold,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
             SizedBox(
@@ -674,60 +635,47 @@ class _ActivitySummaryState extends State<ActivitySummary> {
     );
   }
 
+  /// Build the header of the graph
+  ///
+  /// @param title The title of the header
+  /// @param icon The icon of the header
+  /// @param color The color of the header
+  /// @param mirrored Flag to mirror the elements of the row
+  Widget _buildHeader(
+      {required String title,
+      required IconData icon,
+      required Color color,
+      bool mirrored = false}) {
+    Widget buildIcon() {
+      return Icon(
+        icon,
+        size: widget.small ? Info.iconSize - 12 : Info.iconSize - 8,
+        color: color,
+      );
+    }
+
+    return Row(
+      children: [
+        if (!mirrored) buildIcon(),
+        if (!mirrored) const SizedBox(width: 8),
+        Utils.buildText(
+          text: title,
+          fontSize: widget.small ? FontTheme.size - 2 : FontTheme.size,
+          color: color,
+          fontWeight: FontWeight.normal,
+        ),
+        if (mirrored) const SizedBox(width: 8),
+        if (mirrored) buildIcon(),
+      ],
+    );
+  }
+
   Widget _buildContainer(
       {required Widget child, EdgeInsets padding = Info.padding}) {
     return Container(
       padding: padding / 2 - EdgeInsets.all(minus / 2),
-      child: Container(
-        padding: Info.padding,
-        decoration: const BoxDecoration(
-          color: ColorTheme.secondary,
-          borderRadius: BorderRadius.all(Radius.circular(16.0)),
-        ),
+      child: WidgetTheme.container(
         child: child,
-      ),
-    );
-  }
-}
-
-class ImageFile extends StatefulWidget {
-  const ImageFile({super.key, this.small = false});
-
-  final bool small;
-
-  @override
-  State<ImageFile> createState() => _ImageFileState();
-}
-
-class _ImageFileState extends State<ImageFile> {
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        height: widget.small ? 90 : 120,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: ColorTheme.grey,
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.camera_alt_rounded,
-                color: ColorTheme.secondary,
-                size: widget.small ? 36 : 48,
-              ),
-              Utils.buildText(
-                  text: 'Add a photo',
-                  color: ColorTheme.secondary,
-                  fontSize: FontTheme.size),
-            ],
-          ),
-        ),
       ),
     );
   }

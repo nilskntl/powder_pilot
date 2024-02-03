@@ -71,7 +71,7 @@ class SlopeFetcher {
       double latitude, double longitude, String type, String value) async {
     const distance = 20000;
 
-    if (PowderPilot.connectionStatus) {
+    if (PowderPilot.connectivityController.status) {
       final String overpassQuery = '''
     [out:json];
     (
@@ -105,7 +105,7 @@ class SlopeFetcher {
       double latitude, double longitude, String type) async {
     const distance = 20000;
 
-    if (PowderPilot.connectionStatus) {
+    if (PowderPilot.connectivityController.status) {
       final String overpassQuery = '''
     [out:json];
     (
@@ -135,7 +135,8 @@ class SlopeFetcher {
   /// @param data The map containing the fetched data.
   /// @param lift A flag indicating whether the fetched data is for a lift.
   /// @return A Future<bool> indicating the success of the parse operation.
-  static Future<bool> _parseData(Map<String, dynamic> data, {bool lift = false}) async {
+  static Future<bool> _parseData(Map<String, dynamic> data,
+      {bool lift = false}) async {
     /// Create a list to store futures of the parsing logic
     List<Future<void>> parsingFutures = [];
 
@@ -157,6 +158,7 @@ class SlopeFetcher {
     try {
       /// Create a new slope object from the element
       Slope slope = Slope(slope: element, lift: lift);
+
       /// Add the slope object to the SlopeMap
       SlopeMap.addSlope(slope);
     } catch (e) {
