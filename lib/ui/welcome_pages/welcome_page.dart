@@ -231,6 +231,9 @@ class _WelcomePageState extends State<WelcomePage> {
                                           const PowderPilot()));
                               SharedPref.saveBool(PowderPilot.startKey, true);
                             } else {
+                              if (widget.currentPage == 3) {
+                                PowderPilot.locationService.init();
+                              }
                               widget.pageController.animateToPage(
                                 widget.currentPage + 1,
                                 duration: const Duration(milliseconds: 500),
