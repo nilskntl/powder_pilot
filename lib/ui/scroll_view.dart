@@ -70,7 +70,7 @@ class _MainScrollViewState extends State<MainScrollView> {
         height: height * 1.5,
         decoration: BoxDecoration(
           color: ColorTheme.background,
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(height),
             topRight: Radius.circular(height),
           ),
