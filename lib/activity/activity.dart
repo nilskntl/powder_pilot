@@ -1,20 +1,19 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:powder_pilot/location.dart';
 
 import '../main.dart';
-import '../pages/activity_summary.dart';
+import '../ui/history/dialog/summary_dialog.dart';
 import '../utils/general_utils.dart';
 import '../utils/shared_preferences.dart';
 import '../utils/slope_data.dart';
 import 'data.dart';
 import 'database.dart';
-import 'state.dart';
 import 'slopes.dart';
+import 'state.dart';
 
 /// Enum to represent the type of location service used.
 enum LocationType {
@@ -24,15 +23,12 @@ enum LocationType {
 
 /// Class representing an activity, extending LocationHandler for location-related functionality.
 class Activity extends LocationHandler {
-  final int id;
-
   /// Constructor for Activity.
   ///
   /// @param id: Activity ID.
   /// @param currentPosition: Initial geographical coordinates.
   /// @param mapDownloaded: Flag indicating whether the map is downloaded.
   Activity({
-    required this.id,
     LatLng currentPosition = const LatLng(0.0, 0.0),
     bool mapDownloaded = false,
   }) {
@@ -43,16 +39,6 @@ class Activity extends LocationHandler {
       mapData.latitudeWhenDownloaded = latitude;
       mapData.longitudeWhenDownloaded = longitude;
     }
-    areaName = PowderPilot.locationService.areaName;
-  }
-
-  /// Initialization method for the Activity.
-  void init() {
-    if (kDebugMode) {
-      print('Activity $id initialized');
-    }
-
-    /// Start the location stream in LocationHandler
     _locationStream();
   }
 
@@ -116,6 +102,12 @@ class Activity extends LocationHandler {
     /// Add the end location to the route
     route.addCoordinates([longitude, latitude]);
 
+    /// Add the final distance to distances
+    distance.distances.add([
+      activityTimer.duration.total.inSeconds.toDouble(),
+      double.parse(distance.totalDistance.toStringAsFixed(1)),
+    ]);
+
     /// Set the end time to the current time
     activityTimer.endTime = DateTime.now();
 
@@ -138,6 +130,9 @@ class Activity extends LocationHandler {
     activityTimer.resetTimer();
     speed.currentSpeed = 0.0;
     slope.currentSlope = 0.0;
+    speed.speeds.clear();
+    altitude.altitudes.clear();
+    distance.distances.clear();
     updateData();
 
     /// Start the location stream in passive mode
@@ -350,10 +345,16 @@ class LocationHandler extends ActivityData {
         if (calculatedDistance > 400) {
           calculatedDistance = 0.0;
         }
+
         /// Add current location to the route.
         route.addCoordinates([longitude, latitude]);
+
         /// Update distance data.
         distance.totalDistance += calculatedDistance;
+        distance.distances.add([
+          activityTimer.duration.total.inSeconds.toDouble(),
+          double.parse(distance.totalDistance.toStringAsFixed(1)),
+        ]);
         tempDistance += calculatedDistance;
         lastLocation = position;
       }
@@ -494,16 +495,8 @@ class LocationHandler extends ActivityData {
 
       /// Handle location updates only if the activity is active.
       if (state.isRunning) {
-        if (position.accuracy < 10) {
-          gpsAccuracy = GpsAccuracy.high;
-        } else if (position.accuracy < 25) {
-          gpsAccuracy = GpsAccuracy.medium;
-        } else {
-          gpsAccuracy = GpsAccuracy.low;
-        }
-
-        if (gpsAccuracy == GpsAccuracy.high ||
-            gpsAccuracy == GpsAccuracy.medium) {
+        if (PowderPilot.locationService.gpsAccuracy == GpsAccuracy.high ||
+            PowderPilot.locationService.gpsAccuracy == GpsAccuracy.medium) {
           if (!_locationInitialized) {
             initializeLocation(position);
             route.addCoordinates([longitude, latitude]);
@@ -539,14 +532,11 @@ class LocationHandler extends ActivityData {
       /// Download the slope map if not already downloaded.
       if (!mapData.mapDownloaded) {
         if (_numberOfLocationUpdates % 15 == 0 &&
-            (PowderPilot.connectionStatus == true ||
+            (PowderPilot.connectivityController.status == true ||
                 _numberOfLocationUpdates == 0)) {
           _downloadMap();
         }
       }
-
-      /// Update area name if it has changed.
-      areaName = PowderPilot.locationService.areaName;
 
       /// Update UI
       updateData();
@@ -580,7 +570,7 @@ class LocationHandler extends ActivityData {
       return;
     }
     _isDownloadRunning = true;
-    if (PowderPilot.connectionStatus == true) {
+    if (PowderPilot.connectivityController.status == true) {
       if (mapData.mapDownloaded == true) {
         return;
       }
