@@ -14,6 +14,8 @@ class ActivityPage extends StatefulWidget {
   /// The controller for the custom page view and scroll view.
   final CustomController customPageController;
 
+  static void Function() reload = () {};
+
   @override
   State<ActivityPage> createState() => _ActivityPageState();
 }
@@ -23,6 +25,14 @@ class _ActivityPageState extends State<ActivityPage> {
   /// The data provider for the activity.
   late ActivityDataProvider dataProvider =
       Provider.of<ActivityDataProvider>(context);
+
+  @override
+  void initState() {
+    super.initState();
+    ActivityPage.reload = () {
+      if (mounted) setState(() {});
+    };
+  }
 
   @override
   Widget build(BuildContext context) {

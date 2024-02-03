@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:powder_pilot/ui/activity/activity_page.dart';
 
 import '../../../main.dart';
 import '../../../string_pool.dart';
@@ -45,6 +46,7 @@ class _AppThemeSettingState extends State<AppThemeSetting> {
                           SettingsPage.reload();
                           PowderPilot.reload();
                           History.reload();
+                          ActivityPage.reload();
                           setState(() {});
                         }))
                     .toList(),
@@ -74,37 +76,30 @@ class _AppThemeSettingState extends State<AppThemeSetting> {
       required Color tertiary}) {
     const double size = 25;
 
-    return MaterialButton(
-      onPressed: () {
-        //ThemeChanger.of(context)!.setTheme(ThemeData(primaryColor: primary, accentColor: secondary));
-      },
-      minWidth: size + 8,
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      padding: EdgeInsets.zero,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(4),
-        child: SizedBox(
-            width: size * 3,
-            height: size,
-            child: Row(
-              children: [
-                Container(
-                  width: size,
-                  height: size,
-                  color: primary,
-                ),
-                Container(
-                  width: size,
-                  height: size,
-                  color: secondary,
-                ),
-                Container(
-                  width: size,
-                  height: size,
-                  color: tertiary,
-                ),
-              ],
-            )),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(4),
+      child: SizedBox(
+        width: size * 3,
+        height: size,
+        child: Row(
+          children: [
+            Container(
+              width: size,
+              height: size,
+              color: primary,
+            ),
+            Container(
+              width: size,
+              height: size,
+              color: secondary,
+            ),
+            Container(
+              width: size,
+              height: size,
+              color: tertiary,
+            ),
+          ],
+        ),
       ),
     );
   }

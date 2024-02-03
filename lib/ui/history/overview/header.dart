@@ -36,6 +36,7 @@ class _HistoryHeaderState extends State<HistoryHeader> {
                 value: '0',
                 fontSize: FontTheme.size + 4),
           ),
+          const SizedBox(width: 8.0),
         ],
       );
     }

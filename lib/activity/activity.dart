@@ -52,6 +52,9 @@ class Activity extends LocationHandler {
     /// Set the activity to active
     state.startActivity();
 
+    /// Update the UI
+    updateData();
+
     /// Set the start time to the current time
     activityTimer.startTime = DateTime.now();
 
@@ -71,9 +74,6 @@ class Activity extends LocationHandler {
 
     /// Start the location stream in active mode
     PowderPilot.locationService.startActiveLocationStream();
-
-    /// Update the UI
-    updateData();
   }
 
   /// Method to stop the activity.
@@ -189,6 +189,9 @@ class Activity extends LocationHandler {
     /// Set the activity to active
     state.resumeActivity();
 
+    /// Update the UI
+    updateData();
+
     /// Check if the user moved more than 4km from the last downloaded map
     /// If so, download a new map
     if (Utils.calculateHaversineDistance(
@@ -205,9 +208,6 @@ class Activity extends LocationHandler {
 
     /// Start the location stream in active mode
     PowderPilot.locationService.startActiveLocationStream();
-
-    /// Update the UI
-    updateData();
   }
 }
 

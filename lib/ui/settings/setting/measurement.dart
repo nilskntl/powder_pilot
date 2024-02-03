@@ -6,6 +6,7 @@ import '../../../string_pool.dart';
 import '../../../theme.dart';
 import '../../../utils/general_utils.dart';
 import '../../../utils/shared_preferences.dart';
+import '../../activity/activity_page.dart';
 import '../../history/overview/history.dart';
 
 class MeasurementSetting extends StatefulWidget {
@@ -40,6 +41,7 @@ class _MeasurementSettingState extends State<MeasurementSetting> {
                     SharedPref.saveString('units', 'metric');
                     PowderPilot.reload();
                     History.reload();
+                    ActivityPage.reload();
                   });
                 }),
             WidgetTheme.settingsOption(
@@ -51,6 +53,7 @@ class _MeasurementSettingState extends State<MeasurementSetting> {
                     SharedPref.saveString('units', 'imperial');
                     PowderPilot.reload();
                     History.reload();
+                    ActivityPage.reload();
                   });
                 }),
           ], context: context);
