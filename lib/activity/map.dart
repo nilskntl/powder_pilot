@@ -6,11 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:powder_pilot/ui/activity/status/status.dart';
+import 'package:powder_pilot/ui/widgets/slope_circle.dart';
 
 import '../main.dart';
-import '../pages/activity_page.dart';
 import '../theme.dart';
-import '../utils/app_bar.dart';
+import '../ui/widgets/app_bar.dart';
 import '../utils/general_utils.dart';
 import 'data.dart';
 import 'data_provider.dart';
@@ -20,11 +21,9 @@ import 'state.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage(
-      {super.key,
-      required this.activityDataProvider,
-      required this.activityMap});
+      {super.key, required this.dataProvider, required this.activityMap});
 
-  final ActivityDataProvider activityDataProvider;
+  final ActivityDataProvider dataProvider;
 
   final ActivityMap activityMap;
 
@@ -41,13 +40,13 @@ class _MapPageState extends State<MapPage> {
       appBar: CustomMaterialAppBar.appBar(title: 'Map'),
       body: Stack(
         children: [
-          if (widget.activityDataProvider.status == ActivityStatus.inactive ||
+          if (widget.dataProvider.status == ActivityStatus.inactive ||
               SlopeMap.slopes.isEmpty ||
-              widget.activityDataProvider.route.slopes.isEmpty)
+              widget.dataProvider.route.slopes.isEmpty)
             widget.activityMap,
-          if (widget.activityDataProvider.status != ActivityStatus.inactive &&
+          if (widget.dataProvider.status != ActivityStatus.inactive &&
               SlopeMap.slopes.isNotEmpty &&
-              widget.activityDataProvider.route.slopes.isNotEmpty)
+              widget.dataProvider.route.slopes.isNotEmpty)
             CustomScrollView(
               controller: _scrollController,
               slivers: [
@@ -71,9 +70,9 @@ class _MapPageState extends State<MapPage> {
                         children: [
                           Container(
                             height: Status.heightBarContainer,
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               color: ColorTheme.background,
-                              borderRadius: BorderRadius.only(
+                              borderRadius: const BorderRadius.only(
                                 topLeft:
                                     Radius.circular(Status.heightBarContainer),
                                 topRight:
@@ -98,9 +97,10 @@ class _MapPageState extends State<MapPage> {
                                 top: 16,
                                 bottom: 16,
                               ),
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 color: ColorTheme.background,
                               ),
+
                               /// Make an entry for every route in the full route of widget.activityDataProvider.route except the last one
                               child: Column(
                                 children: [
@@ -112,21 +112,19 @@ class _MapPageState extends State<MapPage> {
                                     ),
                                     child: Row(
                                       children: [
-                                        if (widget.activityDataProvider.route
-                                            .slopes.isNotEmpty)
-                                          CurrentSlope(
-                                            slope: widget.activityDataProvider
-                                                .route.slopes.last,
+                                        if (widget.dataProvider.route.slopes
+                                            .isNotEmpty)
+                                          SlopeCircle(
+                                            slope: widget
+                                                .dataProvider.route.slopes.last,
                                             animated: true,
                                           ),
                                         const SizedBox(width: 16),
-                                        if (widget.activityDataProvider.route
-                                            .slopes.isNotEmpty)
-                                          ActivityPage.buildSlopeName(widget
-                                              .activityDataProvider
-                                              .route
-                                              .slopes
-                                              .last),
+                                        if (widget.dataProvider.route.slopes
+                                            .isNotEmpty)
+                                          SlopeCircle.buildSlopeName(
+                                              slope: widget.dataProvider.route
+                                                  .slopes.last),
                                         const Spacer(),
                                         Container(
                                           height: 24,
@@ -149,12 +147,12 @@ class _MapPageState extends State<MapPage> {
                                     controller: _scrollController,
                                     shrinkWrap: true,
                                     reverse: true,
-                                    itemCount: widget.activityDataProvider.route
-                                        .slopes.length,
+                                    itemCount:
+                                        widget.dataProvider.route.slopes.length,
                                     itemBuilder: (context, index) {
                                       if (index !=
-                                          widget.activityDataProvider.route
-                                                  .slopes.length -
+                                          widget.dataProvider.route.slopes
+                                                  .length -
                                               1) {
                                         return Container(
                                           padding: const EdgeInsets.all(8),
@@ -167,11 +165,9 @@ class _MapPageState extends State<MapPage> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.center,
                                             children: [
-                                              CurrentSlope(
-                                                  slope: widget
-                                                      .activityDataProvider
-                                                      .route
-                                                      .slopes[index]),
+                                              SlopeCircle(
+                                                  slope: widget.dataProvider
+                                                      .route.slopes[index]),
                                               const SizedBox(width: 16),
                                               Column(
                                                 crossAxisAlignment:
@@ -190,7 +186,7 @@ class _MapPageState extends State<MapPage> {
                                                       const SizedBox(width: 4),
                                                       Utils.buildText(
                                                           text: Utils.durationStringToString(widget
-                                                              .activityDataProvider
+                                                              .dataProvider
                                                               .route
                                                               .slopes[index]
                                                               .startTime
@@ -203,11 +199,9 @@ class _MapPageState extends State<MapPage> {
                                                               .contrast),
                                                     ],
                                                   ),
-                                                  ActivityPage.buildSlopeName(
-                                                      widget
-                                                          .activityDataProvider
-                                                          .route
-                                                          .slopes[index]),
+                                                  SlopeCircle.buildSlopeName(
+                                                      slope: widget.dataProvider
+                                                          .route.slopes[index]),
                                                   Row(
                                                     children: [
                                                       Utils.buildText(
@@ -221,12 +215,12 @@ class _MapPageState extends State<MapPage> {
                                                       const SizedBox(width: 4),
                                                       Utils.buildText(
                                                           text: Utils.formatDuration(widget
-                                                                  .activityDataProvider
+                                                                  .dataProvider
                                                                   .route
                                                                   .slopes[index]
                                                                   .endTime
                                                                   .difference(widget
-                                                                      .activityDataProvider
+                                                                      .dataProvider
                                                                       .route
                                                                       .slopes[
                                                                           index]
@@ -317,9 +311,9 @@ class _MapPageSummaryState extends State<MapPageSummary> {
                         children: [
                           Container(
                             height: Status.heightBarContainer,
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               color: ColorTheme.background,
-                              borderRadius: BorderRadius.only(
+                              borderRadius: const BorderRadius.only(
                                 topLeft:
                                     Radius.circular(Status.heightBarContainer),
                                 topRight:
@@ -344,9 +338,10 @@ class _MapPageSummaryState extends State<MapPageSummary> {
                                 top: 16,
                                 bottom: 16,
                               ),
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 color: ColorTheme.background,
                               ),
+
                               /// Make an entry for every route in the full route of widget.activityDataProvider.route except the last one
                               child: Column(
                                 children: [
@@ -367,7 +362,7 @@ class _MapPageSummaryState extends State<MapPageSummary> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            CurrentSlope(
+                                            SlopeCircle(
                                                 slope:
                                                     widget.route.slopes[index]),
                                             const SizedBox(width: 16),
@@ -398,8 +393,9 @@ class _MapPageSummaryState extends State<MapPageSummary> {
                                                             .contrast),
                                                   ],
                                                 ),
-                                                ActivityPage.buildSlopeName(
-                                                    widget.route.slopes[index]),
+                                                SlopeCircle.buildSlopeName(
+                                                    slope: widget
+                                                        .route.slopes[index]),
                                                 Row(
                                                   children: [
                                                     Utils.buildText(
@@ -536,8 +532,8 @@ class _ActivityMapState extends State<ActivityMap>
     _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
       if (_previewMode && PowderPilot.activity.latitude != 0.0) {
         mapController.animateTo(
-          dest: LatLng(
-              PowderPilot.activity.latitude, PowderPilot.activity.longitude),
+          dest: LatLng(PowderPilot.locationService.latitude,
+              PowderPilot.locationService.longitude),
         );
       }
     });
@@ -580,8 +576,8 @@ class _ActivityMapState extends State<ActivityMap>
         Marker(
           width: markerSize,
           height: markerSize,
-          point: LatLng(
-              PowderPilot.activity.latitude, PowderPilot.activity.longitude),
+          point: LatLng(PowderPilot.locationService.latitude,
+              PowderPilot.locationService.longitude),
           child: CustomPaint(
             painter: LocationMark(),
           ),
@@ -654,8 +650,8 @@ class _ActivityMapState extends State<ActivityMap>
           backgroundColor: backgroundColor,
           initialCenter: widget.staticMap
               ? _middlePoint
-              : LatLng(PowderPilot.activity.latitude,
-                  PowderPilot.activity.longitude),
+              : LatLng(PowderPilot.locationService.latitude,
+                  PowderPilot.locationService.longitude),
           initialZoom: widget.staticMap ? zoomOverview : zoomLevel,
           interactionOptions: const InteractionOptions(
             flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
@@ -663,6 +659,7 @@ class _ActivityMapState extends State<ActivityMap>
           maxZoom: maxZoom,
           minZoom: minZoom,
         ),
+
         /// Layers are drawn in the order they are defined
         children: [
           _tileLayer(),
@@ -776,7 +773,9 @@ class _ActivityMapState extends State<ActivityMap>
     Polyline polyline = Polyline(
       points: polylinePoints,
       color: polylineColor,
-      strokeWidth: 5.0, /// Adjust this to your desired line width
+      strokeWidth: 5.0,
+
+      /// Adjust this to your desired line width
     );
 
     polylines.add(polyline);
@@ -853,6 +852,8 @@ class LocationMark extends CustomPainter {
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
-    return true; /// Repaint whenever the compass heading changes
+    return true;
+
+    /// Repaint whenever the compass heading changes
   }
 }

@@ -12,16 +12,11 @@ class ConnectivityController {
   /// Notifier to observe the internet connectivity status.
   ValueNotifier<bool> isConnected = ValueNotifier(false);
 
-  /// Constructor to initialize the connectivity controller.
-  ConnectivityController() {
-    init();
-  }
-
   /// Updates the internet status in the app's data provider.
   ///
   /// @param isConnected The new internet connectivity status.
   void _updateStatus(bool isConnected) {
-    PowderPilot.getActivityDataProvider().updateInternetStatus(
+    PowderPilot.dataProvider.updateInternetStatus(
       newInternetStatus: isConnected,
     );
   }
@@ -54,4 +49,9 @@ class ConnectivityController {
     }
     return false;
   }
+
+  /// Getter for the internet connectivity status.
+  ///
+  /// @return true if internet is connected (mobile or wifi), false otherwise.
+  bool get status => isConnected.value;
 }
