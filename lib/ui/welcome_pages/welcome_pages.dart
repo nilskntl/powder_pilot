@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:powder_pilot/pages/welcome_pages/welcome_page.dart';
+import 'package:powder_pilot/ui/welcome_pages/welcome_page.dart';
 
-import '../../main.dart';
+import '../../string_pool.dart';
+import '../../theme.dart';
 
 /// A widget representing a set of welcome pages for onboarding.
 class WelcomePages extends StatefulWidget {
@@ -30,52 +31,53 @@ class _WelcomePagesState extends State<WelcomePages> {
         onPageChanged: (page) => setState(() => _currentPage = page),
         children: [
           WelcomePage(
-            title: 'Welcome to ${PowderPilot.appName}',
-            subtitle: 'Track your skiing activity with ${PowderPilot.appName}',
+            title: StringPool.WELCOME_TITLE,
+            subtitle: StringPool.WELCOME_SUBTITLE_1,
             image: 'assets/images/welcome_pages/activity.png',
             pageController: _pageController,
             currentPage: _currentPage,
             imageAlignment: Alignment.topCenter,
+            buttonText: StringPool.BUTTON_TEXT,
           ),
           WelcomePage(
-            title: 'Welcome to ${PowderPilot.appName}',
-            subtitle: 'See your stats and improve your skiing',
+            title: StringPool.WELCOME_TITLE,
+            subtitle: StringPool.WELCOME_SUBTITLE_2,
             image: 'assets/images/welcome_pages/stats.png',
             pageController: _pageController,
             currentPage: _currentPage,
+            buttonText: StringPool.BUTTON_TEXT,
           ),
           WelcomePage(
-            title: 'Welcome to ${PowderPilot.appName}',
-            subtitle: 'Analyse your ski day',
+            title: StringPool.WELCOME_TITLE,
+            subtitle: StringPool.WELCOME_SUBTITLE_3,
             image: 'assets/images/welcome_pages/slope_info.png',
             pageController: _pageController,
             currentPage: _currentPage,
+            buttonText: StringPool.BUTTON_TEXT,
           ),
           WelcomePage(
-            title: 'Location Access',
-            subtitle:
-                'To track your activity ${PowderPilot.appName} needs access to your GPS location',
+            title: StringPool.LOCATION_ACCESS_TITLE,
+            subtitle: StringPool.LOCATION_ACCESS_SUBTITLE,
             image: 'assets/images/welcome_pages/location.png',
-            buttonText: 'Enable Location',
+            buttonText: StringPool.ENABLE_LOCATION,
             pageController: _pageController,
             currentPage: _currentPage,
           ),
           if (Platform.isAndroid)
             WelcomePage(
-              title: 'Enable Background Mode',
-              subtitle:
-                  'Enable background mode of your device to allow proper work of ${PowderPilot.appName} when the screen is switched off.',
+              title: StringPool.BATTERY_OPTIMIZATION_TITLE,
+              subtitle: StringPool.BATTERY_OPTIMIZATION_SUBTITLE,
               image: 'assets/images/welcome_pages/battery_optimization.png',
-              buttonText: 'Open Settings',
+              buttonText: StringPool.OPEN_SETTINGS,
               pageController: _pageController,
               currentPage: _currentPage,
               isLastPage: false,
             ),
           WelcomePage(
-            title: 'Last steps to go',
-            subtitle: 'Finish your setup and start tracking your activity',
+            title: StringPool.LAST_TITLE,
+            subtitle: StringPool.LAST_SUBTITLE,
             image: 'assets/images/welcome_pages/finish.png',
-            buttonText: 'Get started',
+            buttonText: StringPool.GET_STARTED,
             pageController: _pageController,
             currentPage: _currentPage,
             isLastPage: true,

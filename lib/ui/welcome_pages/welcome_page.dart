@@ -10,6 +10,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:powder_pilot/location.dart';
 
 import '../../main.dart';
+import '../../string_pool.dart';
 import '../../theme.dart';
 import '../../utils/general_utils.dart';
 import '../../utils/shared_preferences.dart';
@@ -24,11 +25,9 @@ class WelcomePage extends StatefulWidget {
     required this.pageController,
     required this.currentPage,
     this.isLastPage = false,
-    this.buttonText = standardButtonText,
+    required this.buttonText,
     this.imageAlignment = Alignment.bottomCenter,
   });
-
-  static const String standardButtonText = 'Next';
 
   final String title;
   final String subtitle;
@@ -57,7 +56,7 @@ class _WelcomePageState extends State<WelcomePage> {
     if (status == LocationPermission.whileInUse ||
         status == LocationPermission.always) {
       setState(() {
-        _buttonText = WelcomePage.standardButtonText;
+        _buttonText = StringPool.BUTTON_TEXT;
         _accepted = true;
       });
     }
@@ -67,14 +66,14 @@ class _WelcomePageState extends State<WelcomePage> {
   void _askForLocation() async {
     _accepted = await LocationService.askForPermission();
     if (_accepted) {
-      _buttonText = WelcomePage.standardButtonText;
+      _buttonText = StringPool.BUTTON_TEXT;
       widget.pageController.animateToPage(
         widget.currentPage + 1,
         duration: const Duration(milliseconds: 500),
         curve: Curves.ease,
       );
     } else {
-      _buttonText = 'Open Settings';
+      _buttonText = StringPool.OPEN_SETTINGS;
     }
     if (mounted) {
       setState(() {});
@@ -92,7 +91,7 @@ class _WelcomePageState extends State<WelcomePage> {
     }
     sleep(const Duration(milliseconds: 250));
     setState(() {
-      _buttonText = 'Next';
+      _buttonText = StringPool.BUTTON_TEXT;
       _accepted = true;
     });
   }
@@ -100,7 +99,7 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   void initState() {
     super.initState();
-    if (widget.buttonText != WelcomePage.standardButtonText) {
+    if (widget.buttonText != StringPool.BUTTON_TEXT) {
       _accepted = false;
       if (widget.currentPage == 2) {
         /// Should be 3 but somehow it's 2
@@ -114,12 +113,16 @@ class _WelcomePageState extends State<WelcomePage> {
     return Stack(
       children: [
         Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                ColorTheme.backgroundGradient1,
+                Color.fromARGB(
+                    256,
+                    ColorTheme.background.red.toInt() + 24,
+                    ColorTheme.background.green.toInt() + 24,
+                    ColorTheme.background.blue.toInt() + 24),
                 ColorTheme.background,
               ],
             ),
@@ -236,7 +239,7 @@ class _WelcomePageState extends State<WelcomePage> {
                             }
                           } else {
                             if (widget.currentPage == 3) {
-                              if (_buttonText != 'Open Settings') {
+                              if (_buttonText != StringPool.OPEN_SETTINGS) {
                                 _askForLocation();
                               } else {
                                 LocationService.openSettings();
@@ -248,8 +251,8 @@ class _WelcomePageState extends State<WelcomePage> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          side: const BorderSide(
-                              width: 2.0, color: ColorTheme.primary),
+                          side:
+                              BorderSide(width: 2.0, color: ColorTheme.primary),
                           foregroundColor: ColorTheme.secondary,
                           backgroundColor: _accepted
                               ? ColorTheme.primary
@@ -294,7 +297,7 @@ class _WelcomePageState extends State<WelcomePage> {
     return Row(
       children: [
         Checkbox(
-          side: const BorderSide(width: 2.0, color: ColorTheme.primary),
+          side: BorderSide(width: 2.0, color: ColorTheme.primary),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(4),
           ),
@@ -310,13 +313,13 @@ class _WelcomePageState extends State<WelcomePage> {
           child: RichText(
             text: TextSpan(
               children: [
-                const TextSpan(
-                  text: 'I agree to the',
+                TextSpan(
+                  text: StringPool.LEGAL_TEXT[0],
                   style: TextStyle(
                       color: ColorTheme.contrast, fontSize: FontTheme.size),
                 ),
                 TextSpan(
-                  text: ' Terms of Service',
+                  text: StringPool.LEGAL_TEXT[1],
                   style: const TextStyle(
                       color: ColorTheme.blue, fontSize: FontTheme.size),
                   recognizer: TapGestureRecognizer()
@@ -326,13 +329,13 @@ class _WelcomePageState extends State<WelcomePage> {
                           asset: 'assets/legal/terms_of_service.txt');
                     },
                 ),
-                const TextSpan(
-                  text: ' and',
+                TextSpan(
+                  text: StringPool.LEGAL_TEXT[2],
                   style: TextStyle(
                       color: ColorTheme.contrast, fontSize: FontTheme.size),
                 ),
                 TextSpan(
-                  text: ' Privacy Policy',
+                  text: StringPool.LEGAL_TEXT[3],
                   style: const TextStyle(
                       color: ColorTheme.blue, fontSize: FontTheme.size),
                   recognizer: TapGestureRecognizer()
@@ -341,6 +344,11 @@ class _WelcomePageState extends State<WelcomePage> {
                           context: context,
                           asset: 'assets/legal/privacy_policy.txt');
                     },
+                ),
+                TextSpan(
+                  text: StringPool.LEGAL_TEXT[4],
+                  style: TextStyle(
+                      color: ColorTheme.contrast, fontSize: FontTheme.size),
                 ),
               ],
             ),
@@ -442,7 +450,7 @@ class _LegalDialogState extends State<LegalDialog>
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.close,
                     color: ColorTheme.contrast,
                   ),
