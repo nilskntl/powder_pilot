@@ -6,6 +6,7 @@ import '../../../activity/database.dart';
 import '../../../string_pool.dart';
 import '../../../theme.dart';
 import '../../../utils/general_utils.dart';
+import 'history.dart';
 
 /// Shows an overview over the most important data of an activity
 class Highlight extends StatefulWidget {
@@ -64,6 +65,11 @@ class _HighlightState extends State<Highlight> {
           SizedBox(height: _deleted ? 0.0 : 8.0),
           WidgetTheme.animatedContainer(
               height: _deleted ? 0.0 : 156.0,
+              onEnd: () {
+                if (_deleted) {
+                  History.reload();
+                }
+              },
               child: ListView(
                 padding: const EdgeInsets.all(0.0),
                 shrinkWrap: true,

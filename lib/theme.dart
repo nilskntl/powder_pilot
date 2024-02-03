@@ -448,10 +448,12 @@ class WidgetTheme {
       Alignment alignment = Alignment.center,
       BorderRadius borderRadius = const BorderRadius.all(Radius.circular(16.0)),
       Widget child = const SizedBox(),
-      EdgeInsets padding = const EdgeInsets.all(8.0)}) {
+      EdgeInsets padding = const EdgeInsets.all(8.0),
+      void Function()? onEnd}) {
     if (color == const Color(0xff000001)) {
       color = ColorTheme.secondary;
     }
+    onEnd ??= () {};
     if (height >= 0 && width >= 0) {
       return AnimatedContainer(
         duration: duration,
@@ -459,6 +461,7 @@ class WidgetTheme {
         height: height,
         width: width,
         padding: padding,
+        onEnd: onEnd,
         decoration: BoxDecoration(
           color: color,
           borderRadius: borderRadius,
@@ -471,6 +474,7 @@ class WidgetTheme {
         duration: duration,
         curve: curve,
         height: height,
+        onEnd: onEnd,
         padding: padding,
         decoration: BoxDecoration(
           color: color,
@@ -485,6 +489,7 @@ class WidgetTheme {
         curve: curve,
         width: width,
         padding: padding,
+        onEnd: onEnd,
         decoration: BoxDecoration(
           color: color,
           borderRadius: borderRadius,
