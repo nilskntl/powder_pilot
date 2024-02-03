@@ -1,13 +1,21 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:powder_pilot/string_pool.dart';
 import 'package:powder_pilot/theme.dart';
 
 import 'main.dart';
+
+/// Enum to represent GPS accuracy levels.
+enum GpsAccuracy {
+  none,
+  low,
+  medium,
+  high,
+}
 
 /// A callback function to handle location updates.
 typedef LocationCallback = void Function(Position);
@@ -35,8 +43,15 @@ class LocationService {
   /// Number of location updates received.
   int _numOfLocations = 0;
 
+  /// Current position.
+  double _latitude = 0.0;
+  double _longitude = 0.0;
+
+  /// Current GPS accuracy.
+  GpsAccuracy _gpsAccuracy = GpsAccuracy.none;
+
   /// Constructor to initialize the LocationService.
-  LocationService() {
+  init() async {
     _initSettings();
     askForPermission();
     startPassiveLocationStream();
@@ -49,12 +64,11 @@ class LocationService {
       _activeSettings = AndroidSettings(
         intervalDuration: const Duration(seconds: 1),
         forceLocationManager: false,
-        foregroundNotificationConfig: const ForegroundNotificationConfig(
-          notificationText:
-          "Your ski journey is being tracked in the background. Enjoy the ride!",
-          notificationTitle: "Activity in progress",
+        foregroundNotificationConfig: ForegroundNotificationConfig(
+          notificationTitle: StringPool.NOTIFICATION_TITLE,
+          notificationText: StringPool.NOTIFICATION_TEXT,
           enableWakeLock: true,
-          notificationIcon: AndroidResource(
+          notificationIcon: const AndroidResource(
             name: 'splash',
             defType: 'drawable',
           ),
@@ -62,6 +76,7 @@ class LocationService {
         ),
         useMSLAltitude: true,
       );
+
       /// Android settings for passive location updates
       _passiveSettings = AndroidSettings(
         intervalDuration: const Duration(seconds: 1),
@@ -75,6 +90,7 @@ class LocationService {
         showBackgroundLocationIndicator: true,
         allowBackgroundLocationUpdates: true,
       );
+
       /// iOS settings for passive location updates
       _passiveSettings = AppleSettings(
         pauseLocationUpdatesAutomatically: true,
@@ -86,6 +102,7 @@ class LocationService {
       _activeSettings = const LocationSettings(
         accuracy: LocationAccuracy.high,
       );
+
       /// Fallback settings for passive location updates
       _passiveSettings = const LocationSettings();
     }
@@ -156,33 +173,35 @@ class LocationService {
   /// Starts the stream of active location updates.
   void startActiveLocationStream() {
     _stopLocationStream();
+
     /// Simulate location updates
     _locationSubscription =
         Geolocator.getPositionStream(locationSettings: _activeSettings).listen(
-                (Position position) {
-              _handleLocationUpdate(position);
-              _notifyListeners(position);
-            }, onError: (error) {
-          if (kDebugMode) {
-            print('Error in location stream: $error');
-          }
-        });
+            (Position position) {
+      _handleLocationUpdate(position);
+      _notifyListeners(position);
+    }, onError: (error) {
+      if (kDebugMode) {
+        print('Error in location stream: $error');
+      }
+    });
   }
 
   /// Starts the stream of passive location updates.
   void startPassiveLocationStream() {
     _stopLocationStream();
+
     /// Simulate location updates
     _locationSubscription =
         Geolocator.getPositionStream(locationSettings: _passiveSettings).listen(
-                (Position position) {
-              _handleLocationUpdate(position);
-              _notifyListeners(position);
-            }, onError: (error) {
-          if (kDebugMode) {
-            print('Error in location stream: $error');
-          }
-        });
+            (Position position) {
+      _handleLocationUpdate(position);
+      _notifyListeners(position);
+    }, onError: (error) {
+      if (kDebugMode) {
+        print('Error in location stream: $error');
+      }
+    });
   }
 
   /// Stops the current location stream.
@@ -200,8 +219,38 @@ class LocationService {
   ///
   /// @param position The position to handle.
   void _handleLocationUpdate(Position position) {
+    _updatePosition(position);
+    _updateGpsAccuracy(position);
     _updateArea(position);
     _numOfLocations++;
+  }
+
+  /// Updates the current position.
+  ///
+  /// @param position The new position.
+  void _updatePosition(Position position) {
+    _latitude = position.latitude;
+    _longitude = position.longitude;
+    PowderPilot.dataProvider.updatePosition(
+      newLatitude: position.latitude,
+      newLongitude: position.longitude,
+    );
+  }
+
+  /// Updates the GPS accuracy.
+  ///
+  /// @param position The new position.
+  void _updateGpsAccuracy(Position position) {
+    if (position.accuracy < 10) {
+      _gpsAccuracy = GpsAccuracy.high;
+    } else if (position.accuracy < 25) {
+      _gpsAccuracy = GpsAccuracy.medium;
+    } else {
+      _gpsAccuracy = GpsAccuracy.low;
+    }
+    PowderPilot.dataProvider.updateGpsAccuracy(
+      newGpsAccuracy: _gpsAccuracy,
+    );
   }
 
   /// Flag to track if the locality is found.
@@ -227,6 +276,9 @@ class LocationService {
             _localityFound = true;
           }
         }
+        PowderPilot.dataProvider.updateArea(
+          newArea: _areaName,
+        );
       } catch (e) {
         if (kDebugMode) {
           print('Error while trying to fetch address data $e');
@@ -235,7 +287,8 @@ class LocationService {
     }
 
     if (_numOfLocations % 15 == 0) {
-      if (PowderPilot.connectionStatus == true || _numOfLocations == 0) {
+      if (PowderPilot.connectivityController.status == true ||
+          _numOfLocations == 0) {
         if (areaName == '' || areaName == 'Unknown') {
           update();
         } else {
@@ -261,6 +314,14 @@ class LocationService {
 
   /// Gets the current area name based on the last location update.
   String get areaName => _areaName;
+
+  /// Gets the current latitude and longitude.
+  double get latitude => _latitude;
+
+  double get longitude => _longitude;
+
+  /// Gets the current GPS accuracy.
+  GpsAccuracy get gpsAccuracy => _gpsAccuracy;
 
   /// Checks if location permission is granted either always or while in use.
   bool get isLocationPermissionGranted {
