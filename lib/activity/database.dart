@@ -8,7 +8,7 @@ import 'package:sqflite/sqflite.dart';
 /// A helper class for managing the SQLite database for activity data.
 class ActivityDatabaseHelper {
   /// The actual database filename saved in the docs directory.
-  static const _databaseName = "activity_database.db";
+  static const _databaseName = "activity_database_new.db";
 
   /// The table name for storing activity data.
   static const _tableName = "activity";
@@ -84,6 +84,7 @@ class ActivityDatabaseHelper {
         endTime TEXT,
         altitudes TEXT,
         speeds TEXT,
+        distances TEXT,
         speedLocation TEXT,
         startLocation TEXT,
         endLocation TEXT,
@@ -167,6 +168,7 @@ class ActivityDatabaseHelper {
         endTime: maps[i]['endTime'] as String,
         altitudes: maps[i]['altitudes'] as String,
         speeds: maps[i]['speeds'] as String,
+        distances: maps[i]['distances'] as String?,
         speedLocation: maps[i]['speedLocation'] as String,
         startLocation: maps[i]['startLocation'] as String,
         endLocation: maps[i]['endLocation'] as String,
@@ -217,6 +219,25 @@ class ActivityDatabaseHelper {
       /// Pass the Activity's id as a whereArg to prevent SQL injection.
       whereArgs: [id],
     );
+  }
+
+  /// Checks if an activity is in the database or not
+  ///
+  /// @param id The id of the activity to be checked
+  /// @return Future<bool> Returns a future with the result
+  static Future<bool> containsActivity(int id) async {
+    /// Get a reference to the database.
+    final db = await database;
+
+    /// Query the table for the activity.
+    final List<Map<String, dynamic>> maps = await db.query(
+      _tableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    /// Return true if the activity is in the database, false otherwise.
+    return maps.isNotEmpty;
   }
 
   /// Delete the entire database.
@@ -277,6 +298,9 @@ class ActivityDatabase {
   /// List of speeds
   final String speeds;
 
+  /// List of distances
+  final String? distances;
+
   /// Image
   final Uint8List? image;
 
@@ -309,6 +333,7 @@ class ActivityDatabase {
     required this.endTime,
     required this.altitudes,
     required this.speeds,
+    this.distances,
     required this.speedLocation,
     required this.startLocation,
     required this.endLocation,
@@ -342,6 +367,7 @@ class ActivityDatabase {
       'endTime': endTime,
       'altitudes': altitudes,
       'speeds': speeds,
+      if (distances != null) 'distances': distances,
       'speedLocation': speedLocation,
       'startLocation': startLocation,
       'endLocation': endLocation,
@@ -354,7 +380,7 @@ class ActivityDatabase {
   /// each Activity when using the print statement.
   @override
   String toString() {
-    return 'Activity{id: $id, areaName: $areaName, maxSpeed: $maxSpeed, averageSpeed: $averageSpeed, totalRuns: $totalRuns, longestRun: $longestRun, maxAltitude: $maxAltitude, minAltitude: $minAltitude, avgAltitude: $avgAltitude, maxSlope: $maxSlope, avgSlope: $avgSlope, distance: $distance, distanceDownhill: $distanceDownhill, distanceUphill: $distanceUphill, elapsedTime: $elapsedTime, elapsedDownhillTime: $elapsedDownhillTime, elapsedUphillTime: $elapsedUphillTime, elapsedPauseTime: $elapsedPauseTime, route: $route, startTime: $startTime, endTime: $endTime, altitudes: $altitudes, speeds: $speeds, image: $image, speedLocation: $speedLocation, startLocation: $startLocation, endLocation: $endLocation}';
+    return 'Activity{id: $id, areaName: $areaName, maxSpeed: $maxSpeed, averageSpeed: $averageSpeed, totalRuns: $totalRuns, longestRun: $longestRun, maxAltitude: $maxAltitude, minAltitude: $minAltitude, avgAltitude: $avgAltitude, maxSlope: $maxSlope, avgSlope: $avgSlope, distance: $distance, distanceDownhill: $distanceDownhill, distanceUphill: $distanceUphill, elapsedTime: $elapsedTime, elapsedDownhillTime: $elapsedDownhillTime, elapsedUphillTime: $elapsedUphillTime, elapsedPauseTime: $elapsedPauseTime, route: $route, startTime: $startTime, endTime: $endTime, altitudes: $altitudes, speeds: $speeds, speedLocation: $speedLocation, startLocation: $startLocation, endLocation: $endLocation, image: $image, distances: $distances}';
   }
 
   /// Copy the [ActivityDatabase] with a new ID.
@@ -386,6 +412,7 @@ class ActivityDatabase {
       endTime: endTime,
       altitudes: altitudes,
       speeds: speeds,
+      distances: distances,
       image: image,
       speedLocation: speedLocation,
       startLocation: startLocation,
