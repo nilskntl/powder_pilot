@@ -207,7 +207,7 @@ class _SingleGraphState extends State<SingleGraph> {
                     end: Alignment.bottomCenter,
                     stops: const [
                       0.0,
-                      0.8,
+                      0.6,
                       1.0
                     ],
                     colors: [
