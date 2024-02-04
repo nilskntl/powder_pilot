@@ -494,8 +494,7 @@ class LocationHandler extends ActivityData {
 
       /// Handle location updates only if the activity is active.
       if (state.isRunning) {
-        if (PowderPilot.locationService.gpsAccuracy == GpsAccuracy.high ||
-            PowderPilot.locationService.gpsAccuracy == GpsAccuracy.medium) {
+        if (PowderPilot.locationService.gpsAccuracy == GpsAccuracy.high) {
           if (!_locationInitialized) {
             initializeLocation(position);
             route.addCoordinates([longitude, latitude]);
