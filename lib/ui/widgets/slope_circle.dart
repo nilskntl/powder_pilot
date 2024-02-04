@@ -122,7 +122,7 @@ class _SlopeCircleState extends State<SlopeCircle> {
       return Utils.buildText(
           text: widget.slope.name,
           fontSize: widget.size / 3,
-          color: ColorTheme.secondary,
+          color: ColorTheme.white,
           fontWeight: FontWeight.bold,
           caps: false);
     } else if (widget.slope.type == 'gondola' ||
@@ -135,7 +135,7 @@ class _SlopeCircleState extends State<SlopeCircle> {
     } else {
       return Icon(
         LogoTheme.activity,
-        color: ColorTheme.secondary,
+        color: ColorTheme.white,
         size: widget.size / 3 * 2,
       );
     }
