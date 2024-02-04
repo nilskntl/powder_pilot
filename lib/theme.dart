@@ -316,13 +316,15 @@ class WidgetTheme {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: ColorTheme.secondary,
-          child: Container(
-            padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-            height: height,
-            child: ListView(
-              children: children,
+        return AnimateWidget(
+          child: Dialog(
+            backgroundColor: ColorTheme.secondary,
+            child: Container(
+              padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
+              height: height,
+              child: ListView(
+                children: children,
+              ),
             ),
           ),
         );
@@ -534,5 +536,53 @@ class WidgetTheme {
         child: child,
       );
     }
+  }
+}
+
+class AnimateWidget extends StatefulWidget {
+  const AnimateWidget({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  State<AnimateWidget> createState() => _AnimateWidgetState();
+}
+
+class _AnimateWidgetState extends State<AnimateWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+    _controller.forward();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      child: widget.child,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }

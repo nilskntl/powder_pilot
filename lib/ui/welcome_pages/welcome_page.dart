@@ -383,30 +383,8 @@ class LegalDialog extends StatefulWidget {
 }
 
 /// The state for the LegalDialog widget.
-class _LegalDialogState extends State<LegalDialog>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
+class _LegalDialogState extends State<LegalDialog> {
   List<String> arr = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOut,
-      ),
-    );
-    _controller.forward();
-  }
 
   /// Loads text from assets.
   Future<void> loadTextFromAssets() async {
@@ -437,8 +415,7 @@ class _LegalDialogState extends State<LegalDialog>
     /// Load it here and not in initState because setState() might be called
     /// before the widget is mounted.
     loadTextFromAssets();
-    return ScaleTransition(
-      scale: _scaleAnimation,
+    return AnimateWidget(
       child: Dialog(
         insetPadding: const EdgeInsets.all(16.0),
         backgroundColor: ColorTheme.background,
@@ -501,7 +478,6 @@ class _LegalDialogState extends State<LegalDialog>
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 }
