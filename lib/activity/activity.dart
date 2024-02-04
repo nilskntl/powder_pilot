@@ -105,7 +105,7 @@ class Activity extends LocationHandler {
     /// Add the final distance to distances
     distance.distances.add([
       activityTimer.duration.total.inSeconds.toDouble(),
-      double.parse(distance.totalDistance.toStringAsFixed(1)),
+      distance.totalDistance,
     ]);
 
     /// Set the end time to the current time
@@ -261,7 +261,7 @@ class LocationHandler extends ActivityData {
 
         speed.speeds.add([
           activityTimer.duration.total.inSeconds.toDouble(),
-          double.parse(speed.currentSpeed.toStringAsFixed(1)),
+          speed.currentSpeed,
         ]);
       }
     }
@@ -353,7 +353,7 @@ class LocationHandler extends ActivityData {
         distance.totalDistance += calculatedDistance;
         distance.distances.add([
           activityTimer.duration.total.inSeconds.toDouble(),
-          double.parse(distance.totalDistance.toStringAsFixed(1)),
+          distance.totalDistance,
         ]);
         tempDistance += calculatedDistance;
         lastLocation = position;

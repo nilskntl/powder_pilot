@@ -6,13 +6,12 @@ import '../../theme.dart';
 
 /// Widget to display a single graph
 class SingleGraph<T> extends StatefulWidget {
-  const SingleGraph(
-      {super.key,
-      required this.data,
-      this.factor = 1.0,
-      required this.color,
-      this.unit = '',
-      this.dummy = false});
+  const SingleGraph({super.key,
+    required this.data,
+    this.factor = 1.0,
+    required this.color,
+    this.unit = '',
+    this.dummy = false});
 
   /// The data of the altitude
   final List<List<T>> data;
@@ -83,15 +82,16 @@ class _SingleGraphState extends State<SingleGraph> {
       if (data.length == 2) {
         /// Get the values of the list (x, y)
         double x =
-            data[0] is int ? (data[0] as int).toDouble() : data[0] as double;
+        data[0] is int ? (data[0] as int).toDouble() : data[0] as double;
         double y =
-            data[1] is int ? (data[1] as int).toDouble() : data[1] as double;
+        data[1] is int ? (data[1] as int).toDouble() : data[1] as double;
 
         /// Try to add the FlSpot to the list of FlSpots
         /// If the value is not a double, the value is not added
         /// If the value is a double, the value is rounded to one decimal place
         try {
-          flSpots.add(FlSpot(x, y * widget.factor));
+          flSpots.add(
+              FlSpot(x, double.parse((y * widget.factor).toStringAsFixed(1))));
         } catch (e) {
           if (kDebugMode) {
             print('Cant add FlSpot: $e');
@@ -145,17 +145,17 @@ class _SingleGraphState extends State<SingleGraph> {
           duration: AnimationTheme.fastAnimationDuration,
           height: widget.data.length > 1 || widget.dummy
               ? _differentEntries || widget.dummy
-                  ? widget.heightExpanded
-                  : widget.heightSameEntries
+              ? widget.heightExpanded
+              : widget.heightSameEntries
               : 0,
           child: widget.data.length > 1
               ? _buildLineChart(
-                  list: widget.data,
-                  color: widget.color,
-                )
+            list: widget.data,
+            color: widget.color,
+          )
               : widget.dummy
-                  ? _buildDummyChart(flSpots: dummyData)
-                  : const SizedBox(),
+              ? _buildDummyChart(flSpots: dummyData)
+              : const SizedBox(),
         ),
       ],
     );
@@ -207,7 +207,7 @@ class _SingleGraphState extends State<SingleGraph> {
                     end: Alignment.bottomCenter,
                     stops: const [
                       0.0,
-                      0.6,
+                      0.8,
                       1.0
                     ],
                     colors: [
@@ -242,14 +242,14 @@ class _SingleGraphState extends State<SingleGraph> {
           LineChartBarData(
             isCurved: true,
             color: ColorTheme.grey.withOpacity(0.6),
-            barWidth: 2,
+            barWidth: 1,
             isStrokeCapRound: true,
             dotData: const FlDotData(show: false),
             belowBarData: BarAreaData(
               show: false,
             ),
             spots: flSpots,
-            curveSmoothness: 0.01,
+            curveSmoothness: 0.1,
           ),
         ],
         borderData: FlBorderData(show: false),
