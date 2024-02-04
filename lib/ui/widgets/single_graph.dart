@@ -91,7 +91,7 @@ class _SingleGraphState extends State<SingleGraph> {
         /// If the value is a double, the value is rounded to one decimal place
         try {
           flSpots.add(
-              FlSpot(x, double.parse((y * widget.factor).toStringAsFixed(1))));
+              FlSpot(x, double.parse((y * widget.factor).toStringAsFixed(2))));
         } catch (e) {
           if (kDebugMode) {
             print('Cant add FlSpot: $e');
