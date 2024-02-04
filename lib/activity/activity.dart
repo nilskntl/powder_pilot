@@ -373,7 +373,6 @@ class LocationHandler extends ActivityData {
           updateDistanceHelper(RunningStatus.uphill);
         } else if (altitude.currentAltitude - altitude.currentExtrema < -5) {
           updateDistanceHelper(RunningStatus.downhill);
-          runs.totalRuns++;
         }
       } else {
         if (altitude.currentAltitude - altitude.currentExtrema > 15) {
