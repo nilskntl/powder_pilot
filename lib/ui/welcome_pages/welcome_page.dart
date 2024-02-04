@@ -415,7 +415,7 @@ class _LegalDialogState extends State<LegalDialog> {
     /// Load it here and not in initState because setState() might be called
     /// before the widget is mounted.
     loadTextFromAssets();
-    return AnimateWidget(
+    return CustomAnimatedWidget(
       child: Dialog(
         insetPadding: const EdgeInsets.all(16.0),
         backgroundColor: ColorTheme.background,

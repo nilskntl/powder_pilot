@@ -316,7 +316,7 @@ class WidgetTheme {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AnimateWidget(
+        return CustomAnimatedWidget(
           child: Dialog(
             backgroundColor: ColorTheme.secondary,
             child: Container(
@@ -539,16 +539,16 @@ class WidgetTheme {
   }
 }
 
-class AnimateWidget extends StatefulWidget {
-  const AnimateWidget({super.key, required this.child});
+class CustomAnimatedWidget extends StatefulWidget {
+  const CustomAnimatedWidget({super.key, required this.child});
 
   final Widget child;
 
   @override
-  State<AnimateWidget> createState() => _AnimateWidgetState();
+  State<CustomAnimatedWidget> createState() => _CustomAnimatedWidgetState();
 }
 
-class _AnimateWidgetState extends State<AnimateWidget>
+class _CustomAnimatedWidgetState extends State<CustomAnimatedWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
