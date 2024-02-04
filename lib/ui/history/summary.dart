@@ -5,7 +5,7 @@ import 'package:powder_pilot/ui/widgets/single_graph.dart';
 
 import '../../activity/data.dart';
 import '../../activity/database.dart';
-import '../../activity/map.dart';
+import '../map/map.dart';
 import '../../activity/route.dart';
 import '../../string_pool.dart';
 import '../../theme.dart';
