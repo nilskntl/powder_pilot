@@ -558,7 +558,7 @@ class _AnimateWidgetState extends State<AnimateWidget>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 200),
     );
     _scaleAnimation = Tween<double>(
       begin: 0.0,
