@@ -541,9 +541,10 @@ class WidgetTheme {
 }
 
 class CustomAnimatedWidget extends StatefulWidget {
-  const CustomAnimatedWidget({super.key, required this.child});
+  const CustomAnimatedWidget({super.key, required this.child, this.duration = AnimationTheme.animationDuration});
 
   final Widget child;
+  final Duration duration;
 
   @override
   State<CustomAnimatedWidget> createState() => _CustomAnimatedWidgetState();
@@ -559,7 +560,7 @@ class _CustomAnimatedWidgetState extends State<CustomAnimatedWidget>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 200),
+      duration: widget.duration,
     );
     _scaleAnimation = Tween<double>(
       begin: 0.0,
