@@ -58,7 +58,7 @@ class _RunState extends State<Run> {
                     fontWeight: FontWeight.bold),
                 const Spacer(),
                 Category.buildSecondaryValueColumn(
-                  value: widget.dataProvider.runs.longestRun.toStringAsFixed(1),
+                  value: (widget.dataProvider.runs.longestRun / 1000 * Measurement.distanceFactor).toStringAsFixed(1),
                   title: StringPool.LONGEST,
                   unit: Measurement.unitDistance,
                 ),
