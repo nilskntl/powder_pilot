@@ -16,37 +16,15 @@ class SummaryDialog extends StatefulWidget {
   State<SummaryDialog> createState() => _SummaryDialogState();
 }
 
-class _SummaryDialogState extends State<SummaryDialog>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
+class _SummaryDialogState extends State<SummaryDialog> {
   @override
   void initState() {
     super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-
-    _scaleAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOut,
-      ),
-    );
-
-    _controller.forward();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _scaleAnimation,
+    return CustomAnimatedWidget(
       child: Dialog(
         insetPadding: const EdgeInsets.all(16.0),
         child: ClipRRect(
@@ -75,7 +53,6 @@ class _SummaryDialogState extends State<SummaryDialog>
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 }
