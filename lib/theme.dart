@@ -334,12 +334,33 @@ class WidgetTheme {
       {required String title,
       Widget subtitle = const SizedBox(),
       Widget leading = const SizedBox(),
+      Widget trailing = const SizedBox(),
       required BuildContext context,
       required Function() onTap}) {
-    if (subtitle is SizedBox && leading is SizedBox) {
+    if (subtitle is SizedBox && leading is SizedBox && trailing is SizedBox) {
       return ListTile(
           title:
               Utils.buildText(text: title, caps: false, align: TextAlign.left),
+          dense: true,
+          onTap: () {
+            onTap();
+            Navigator.pop(context);
+          });
+    } else if (leading is SizedBox && trailing is SizedBox) {
+      return ListTile(
+          title:
+              Utils.buildText(text: title, caps: false, align: TextAlign.left),
+          subtitle: subtitle,
+          dense: true,
+          onTap: () {
+            onTap();
+            Navigator.pop(context);
+          });
+    } else if (subtitle is SizedBox && trailing is SizedBox) {
+      return ListTile(
+          title:
+              Utils.buildText(text: title, caps: false, align: TextAlign.left),
+          leading: leading,
           dense: true,
           onTap: () {
             onTap();
@@ -350,6 +371,7 @@ class WidgetTheme {
           title:
               Utils.buildText(text: title, caps: false, align: TextAlign.left),
           subtitle: subtitle,
+          trailing: trailing,
           dense: true,
           onTap: () {
             onTap();
@@ -360,6 +382,7 @@ class WidgetTheme {
           title:
               Utils.buildText(text: title, caps: false, align: TextAlign.left),
           leading: leading,
+          trailing: trailing,
           dense: true,
           onTap: () {
             onTap();
@@ -371,6 +394,7 @@ class WidgetTheme {
               Utils.buildText(text: title, caps: false, align: TextAlign.left),
           subtitle: subtitle,
           leading: leading,
+          trailing: trailing,
           dense: true,
           onTap: () {
             onTap();
