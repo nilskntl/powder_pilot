@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'dart:math';
-import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
@@ -9,15 +8,16 @@ import 'package:latlong2/latlong.dart';
 import 'package:powder_pilot/ui/activity/status/status.dart';
 import 'package:powder_pilot/ui/widgets/slope_circle.dart';
 
-import '../main.dart';
-import '../theme.dart';
-import '../ui/widgets/app_bar.dart';
-import '../utils/general_utils.dart';
-import 'data.dart';
-import 'data_provider.dart';
-import 'route.dart';
-import 'slopes.dart';
-import 'state.dart';
+import '../../main.dart';
+import '../../theme.dart';
+import 'location_mark.dart';
+import '../widgets/app_bar.dart';
+import '../../utils/general_utils.dart';
+import '../../activity/data.dart';
+import '../../activity/data_provider.dart';
+import '../../activity/route.dart';
+import '../../activity/slopes.dart';
+import '../../activity/state.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage(
@@ -720,6 +720,9 @@ class _ActivityMapState extends State<ActivityMap>
     ]);
   }
 
+  /// Shows the credits dialog
+  ///
+  /// @param context The context
   void _showCreditsDialog(BuildContext context) {
     String credit =
         "Map data provided by opensnowmap.org. Ski resort slopes used with kind permission. Data (c) www.openstreetmap.org & contributors ODBL and www.opensnowmap.org CC-BY-SA.";
@@ -760,6 +763,9 @@ class _ActivityMapState extends State<ActivityMap>
     );
   }
 
+  /// Build the polyline
+  ///
+  /// @param route The route
   List<Polyline> _buildPolyline(ActivityRoute route) {
     List<Polyline> polylines = [];
     List<LatLng> polylinePoints = [];
@@ -770,12 +776,11 @@ class _ActivityMapState extends State<ActivityMap>
 
     Color polylineColor = ColorTheme.primary;
 
+    /// Design of the polyline
     Polyline polyline = Polyline(
       points: polylinePoints,
       color: polylineColor,
       strokeWidth: 5.0,
-
-      /// Adjust this to your desired line width
     );
 
     polylines.add(polyline);
@@ -785,75 +790,16 @@ class _ActivityMapState extends State<ActivityMap>
 
   @override
   void dispose() {
-    if (!widget.staticMap) {
-      _timer.cancel();
+    try {
+      if (!widget.staticMap) {
+        _timer.cancel();
+      }
+      mapController.dispose();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error in dispose: $e');
+      }
     }
-    mapController.dispose();
     super.dispose();
-  }
-}
-
-const double markerSize = 32.0;
-const int markerBorderWidth = 4;
-const double interpolationFactorLocationMark = 0.02;
-Color locationMark = const Color(0xFF007aff);
-Color locationMarkBorder = Colors.white;
-Color locationMarkArrow = locationMark;
-
-class LocationMark extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    drawCircle(canvas, size, locationMarkBorder, size.width / 2);
-    drawCircle(canvas, size, locationMark, size.width / 2 - markerBorderWidth);
-  }
-
-  void drawArrow(Canvas canvas, Size size) {
-    var arrow = Paint()
-      ..color = locationMarkArrow
-      ..style = PaintingStyle.fill;
-
-    double arrowAngle = 270 * (pi / 180);
-    double arrowLength = size.width;
-
-    Offset arrowTip = Offset(size.width / 2 + arrowLength * cos(arrowAngle),
-        size.height / 2 + arrowLength * sin(arrowAngle));
-    Offset arrowBase1 = calculateOffset(size, arrowAngle - pi / 2);
-    Offset arrowBase2 = calculateOffset(size, arrowAngle + pi / 2);
-
-    ui.Path path = ui.Path();
-    path.moveTo(arrowBase1.dx, arrowBase1.dy);
-    path.lineTo(arrowTip.dx, arrowTip.dy);
-    path.lineTo(arrowBase2.dx, arrowBase2.dy);
-    path.arcTo(
-        Rect.fromCircle(
-            center: Offset(size.width / 2, size.height / 2),
-            radius: size.width / 2),
-        arrowAngle + pi / 2,
-        pi,
-        false);
-    path.close();
-
-    canvas.drawPath(path, arrow);
-  }
-
-  Offset calculateOffset(Size size, double angle) {
-    return Offset(size.width / 2 + (size.width / 2 * cos(angle)),
-        size.height / 2 + (size.width / 2 * sin(angle)));
-  }
-
-  void drawCircle(Canvas canvas, Size size, Color color, double radius) {
-    var circlePaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(
-        Offset(size.width / 2, size.height / 2), radius, circlePaint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
-
-    /// Repaint whenever the compass heading changes
   }
 }
