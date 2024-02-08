@@ -93,6 +93,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "StringPool_PRIVACY_POLICY": MessageLookupByLibrary.simpleMessage('Privacy Policy'),
     "StringPool_LEGAL_TEXT_1": MessageLookupByLibrary.simpleMessage('I agree to the '),
     "StringPool_LEGAL_TEXT_2": MessageLookupByLibrary.simpleMessage(' and the '),
-    "StringPool_LEGAL_TEXT_2": MessageLookupByLibrary.simpleMessage('.'),
+    "StringPool_LEGAL_TEXT_3": MessageLookupByLibrary.simpleMessage('.'),
   };
 }
