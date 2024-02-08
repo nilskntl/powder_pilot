@@ -4,7 +4,10 @@ import 'package:powder_pilot/activity/data_provider.dart';
 import '../../../activity/state.dart';
 import '../../../main.dart';
 import '../../../string_pool.dart';
-import '../../../theme.dart';
+import '../../../theme/color.dart';
+import '../../../theme/animation.dart';
+import '../../../theme/font.dart';
+import '../../../theme/icon.dart';
 import '../../../utils/general_utils.dart';
 import '../../controller.dart';
 import 'widgets/stop_button.dart';
@@ -69,8 +72,7 @@ class _StatusBarState extends State<StatusBar> {
             elevation: 4.0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16.0),
-              side: BorderSide(
-                  color: ColorTheme.primary, width: 1.0),
+              side: BorderSide(color: ColorTheme.primary, width: 1.0),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

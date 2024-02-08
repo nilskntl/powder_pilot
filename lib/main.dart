@@ -6,7 +6,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:powder_pilot/location.dart';
-import 'package:powder_pilot/theme.dart';
+import 'package:powder_pilot/theme/color.dart';
+import 'package:powder_pilot/theme/measurement.dart';
 import 'package:powder_pilot/ui/controller.dart';
 import 'package:powder_pilot/ui/scroll_view.dart';
 import 'package:powder_pilot/ui/welcome_pages/welcome_pages.dart';
@@ -132,7 +133,7 @@ void _init() async {
     SharedPref.saveString(PowderPilot.unitsKey, 'metric');
   }
 
-  if(welcome) {
+  if (welcome) {
     PowderPilot.locationService.init();
   }
   PowderPilot.connectivityController.init();

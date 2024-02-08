@@ -2,7 +2,8 @@ import 'package:flutter/cupertino.dart';
 
 import '../../../../activity/data_provider.dart';
 import '../../../../location.dart';
-import '../../../../theme.dart';
+import '../../../../theme/color.dart';
+import '../../../../theme/icon.dart';
 
 /// The GPS status shows the current GPS status.
 class GpsStatus extends StatefulWidget {

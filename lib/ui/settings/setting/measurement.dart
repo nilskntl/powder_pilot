@@ -1,10 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:powder_pilot/main.dart';
+import 'package:powder_pilot/theme/icon.dart';
 import 'package:powder_pilot/ui/settings/settings.dart';
 
 import '../../../string_pool.dart';
-import '../../../theme.dart';
+import '../../../theme/color.dart';
+import '../../../theme/measurement.dart';
+import '../../../theme/widget.dart';
 import '../../../utils/general_utils.dart';
 import '../../../utils/shared_preferences.dart';
 import '../../activity/activity_page.dart';
@@ -43,7 +46,7 @@ class _MeasurementSettingState extends State<MeasurementSetting> {
     return WidgetTheme.settingsListTile(
       title: StringPool.MEASUREMENT,
       leading: Icon(
-        Icons.speed,
+        LogoTheme.measurement,
         color: ColorTheme.contrast,
         size: SettingsPage.leadingWidget,
       ),
@@ -60,12 +63,22 @@ class _MeasurementSettingState extends State<MeasurementSetting> {
               onTap: () {
                 _switchMeasurement('metric');
               }),
+          Divider(
+            color: ThemeChanger.currentTheme.darkMode
+                ? ColorTheme.background
+                : ColorTheme.grey,
+          ),
           WidgetTheme.settingsOption(
             title: '${StringPool.MEASUREMENT_IMPERIAL} (mph)',
             context: context,
             onTap: () {
               _switchMeasurement('imperial');
             },
+          ),
+          Divider(
+            color: ThemeChanger.currentTheme.darkMode
+                ? ColorTheme.background
+                : ColorTheme.grey,
           ),
         ], context: context);
       },

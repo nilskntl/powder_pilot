@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../activity/database.dart';
 import '../../../string_pool.dart';
-import '../../../theme.dart';
+import '../../../theme/color.dart';
+import '../../../theme/animation.dart';
 import '../../widgets/app_bar.dart';
 import '../summary.dart';
 

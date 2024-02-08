@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 
-import '../../theme.dart';
+import '../../theme/color.dart';
+import '../../theme/animation.dart';
 
 /// Class to animate the size of an icon
 class AnimatedIconSize extends StatefulWidget {

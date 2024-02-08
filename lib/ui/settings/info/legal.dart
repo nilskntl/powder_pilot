@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../string_pool.dart';
-import '../../../theme.dart';
+import '../../../theme/color.dart';
 import '../../../utils/general_utils.dart';
 import '../../welcome_pages/welcome_page.dart';
 
@@ -20,6 +20,9 @@ class LegalSetting extends StatelessWidget {
               _showDialog(
                   context: context, asset: 'assets/legal/privacy_policy.txt');
             },
+            style: ButtonStyle(
+              overlayColor: MaterialStateProperty.all(Colors.grey.withOpacity(0.5)),
+            ),
             child: Utils.buildText(
               text: StringPool.PRIVACY_POLICY,
               color: ColorTheme.grey,
@@ -35,6 +38,9 @@ class LegalSetting extends StatelessWidget {
               _showDialog(
                   context: context, asset: 'assets/legal/terms_of_service.txt');
             },
+            style: ButtonStyle(
+              overlayColor: MaterialStateProperty.all(Colors.grey.withOpacity(0.5)),
+            ),
             child: Utils.buildText(
               text: StringPool.TERMS_OF_SERVICE,
               color: ColorTheme.grey,

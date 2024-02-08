@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:powder_pilot/ui/controller.dart';
 
 import '../../string_pool.dart';
-import '../../theme.dart';
+import '../../theme/color.dart';
+import '../../theme/animation.dart';
+import '../../theme/icon.dart';
 
 /// Class for the custom bottom bar (activity and history)
 class CustomBottomBar extends StatefulWidget {
@@ -27,9 +29,10 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
   @override
   void initState() {
     super.initState();
+
     /// Update the state of the bottom bar when the page changes
     widget.controller.updateState = () {
-      if(mounted) setState(() {});
+      if (mounted) setState(() {});
     };
   }
 
@@ -51,8 +54,13 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
           Row(
             children: [
               _buildItem(
-                  iconData: LogoTheme.activity, text: StringPool.ACTIVITY, page: 0),
-              _buildItem(iconData: LogoTheme.history, text: StringPool.HISTORY, page: 1),
+                  iconData: LogoTheme.activity,
+                  text: StringPool.ACTIVITY,
+                  page: 0),
+              _buildItem(
+                  iconData: LogoTheme.history,
+                  text: StringPool.HISTORY,
+                  page: 1),
             ],
           ),
           AnimatedPositioned(

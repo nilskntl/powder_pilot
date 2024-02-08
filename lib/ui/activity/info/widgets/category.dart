@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:powder_pilot/activity/state.dart';
 import 'package:powder_pilot/main.dart';
 
-import '../../../../theme.dart';
+import '../../../../theme/color.dart';
+import '../../../../theme/animation.dart';
+import '../../../../theme/font.dart';
+import '../../../../theme/widget.dart';
 import '../../../../utils/general_utils.dart';
 
 /// Class for displaying a category (e.g. speed, altitude, etc.)

@@ -4,7 +4,11 @@ import 'package:powder_pilot/ui/history/page/summary_page.dart';
 
 import '../../../activity/database.dart';
 import '../../../string_pool.dart';
-import '../../../theme.dart';
+import '../../../theme/color.dart';
+import '../../../theme/font.dart';
+import '../../../theme/icon.dart';
+import '../../../theme/measurement.dart';
+import '../../../theme/widget.dart';
 import '../../../utils/general_utils.dart';
 import 'history.dart';
 

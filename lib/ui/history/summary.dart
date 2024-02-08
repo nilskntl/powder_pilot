@@ -5,15 +5,19 @@ import 'package:powder_pilot/ui/widgets/single_graph.dart';
 
 import '../../activity/data.dart';
 import '../../activity/database.dart';
-import '../map/map.dart';
 import '../../activity/route.dart';
 import '../../string_pool.dart';
-import '../../theme.dart';
+import '../../theme/color.dart';
+import '../../theme/font.dart';
+import '../../theme/icon.dart';
+import '../../theme/measurement.dart';
+import '../../theme/widget.dart';
 import '../../utils/general_utils.dart';
 import '../activity/info/info.dart';
 import '../activity/info/widgets/category.dart';
 import '../activity/info/widgets/elapsed_time.dart';
 import '../activity/info/widgets/run.dart';
+import '../map/map.dart';
 import '../widgets/slope_circle.dart';
 
 /// A stateful widget for displaying the summary of an activity.
@@ -42,7 +46,7 @@ class _ActivitySummaryState extends State<ActivitySummary> {
       widget.activityDatabase.elapsedPauseTime.split(':');
   late List<String> totalParts = widget.activityDatabase.elapsedTime.split(':');
 
-  late final List<List<int>> dataAltitudes;
+  late final List<List<double>> dataAltitudes;
   late final List<List<double>> dataSpeeds;
 
   late final ActivityRoute route;
@@ -58,7 +62,8 @@ class _ActivitySummaryState extends State<ActivitySummary> {
   @override
   void initState() {
     super.initState();
-    dataAltitudes = parseStringToListListInt(widget.activityDatabase.altitudes);
+    dataAltitudes =
+        parseStringToListListDouble(widget.activityDatabase.altitudes);
     dataSpeeds = parseStringToListListDouble(widget.activityDatabase.speeds);
     route = ActivityRoute.stringToRoute(widget.activityDatabase.route);
     List<double> startLocation =
@@ -78,8 +83,8 @@ class _ActivitySummaryState extends State<ActivitySummary> {
     );
     ActivityDistance activityDistance = ActivityDistance();
     if (widget.activityDatabase.distances != null) {
-      activityDistance.distances =
-          parseStringToListListDouble(widget.activityDatabase.distances!);
+      activityDistance.setDistances(
+          parseStringToListListDouble(widget.activityDatabase.distances!));
     }
     runs.updateSummary(
         newRuns: ActivityRun(

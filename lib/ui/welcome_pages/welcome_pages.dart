@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:powder_pilot/ui/welcome_pages/welcome_page.dart';
 
 import '../../string_pool.dart';
-import '../../theme.dart';
+import '../../theme/color.dart';
 
 /// A widget representing a set of welcome pages for onboarding.
 class WelcomePages extends StatefulWidget {

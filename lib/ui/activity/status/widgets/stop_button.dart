@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../../activity/data_provider.dart';
 import '../../../../activity/state.dart';
 import '../../../../main.dart';
-import '../../../../theme.dart';
+import '../../../../theme/color.dart';
 
 /// The stop button allows the user to stop the activity.
 /// The button is red and animated when the activity is running.

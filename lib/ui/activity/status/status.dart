@@ -5,7 +5,8 @@ import 'package:powder_pilot/ui/activity/status/widgets/map_overview.dart';
 import 'package:powder_pilot/ui/activity/status/status_bar.dart';
 
 import '../../../activity/data_provider.dart';
-import '../../../theme.dart';
+import '../../../theme/color.dart';
+import '../../../theme/widget.dart';
 import '../../controller.dart';
 
 /// The status shows the current status of the activity.

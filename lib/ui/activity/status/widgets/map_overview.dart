@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../../../activity/data_provider.dart';
-import '../../../map/map.dart';
 import '../../../../activity/state.dart';
-import '../../../../theme.dart';
+import '../../../../theme/color.dart';
+import '../../../../theme/icon.dart';
 import '../../../map/location_mark.dart';
+import '../../../map/map.dart';
 import '../../../widgets/slope_circle.dart';
 
 /// The map overview shows a small map overview of the current activity.

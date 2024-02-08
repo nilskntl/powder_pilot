@@ -3,7 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../theme.dart';
+import '../theme/color.dart';
+import '../theme/font.dart';
 
 /// A utility class containing various helper methods and widgets.
 class Utils {
@@ -92,6 +93,9 @@ class Utils {
   /// @param pos2 The second geographical position.
   /// @return The Haversine distance between the two positions.
   static double calculateHaversineDistance(LatLng pos1, LatLng pos2) {
+    /// Converts degrees to radians.
+    ///
+    /// @param degree The degree to convert.
     double toRadians(double degree) {
       return degree * (math.pi / 180.0);
     }
@@ -101,9 +105,8 @@ class Utils {
     double lon1 = pos1.longitude;
     double lon2 = pos2.longitude;
 
-    const R = 6371000.0;
-
     /// Earth radius in meters
+    const R = 6371000.0;
 
     final dLat = toRadians(lat2 - lat1);
     final dLon = toRadians(lon2 - lon1);

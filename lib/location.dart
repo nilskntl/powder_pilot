@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:powder_pilot/string_pool.dart';
-import 'package:powder_pilot/theme.dart';
+import 'package:powder_pilot/theme/color.dart';
 
 import 'main.dart';
 

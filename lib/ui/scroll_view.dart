@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:powder_pilot/ui/page_view.dart';
 
-import '../theme.dart';
+import '../theme/color.dart';
 import 'controller.dart';
 
 /// Class for the main scroll view. The actual content

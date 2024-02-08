@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 
-import '../../string_pool.dart';
-import '../../theme.dart';
-import '../../utils/general_utils.dart';
 import '../../activity/slopes.dart';
+import '../../string_pool.dart';
+import '../../theme/color.dart';
+import '../../theme/font.dart';
+import '../../theme/icon.dart';
+import '../../utils/general_utils.dart';
 
 /// Class to display a circle with a slope or lift
 class SlopeCircle extends StatefulWidget {

@@ -8,16 +8,18 @@ import 'package:latlong2/latlong.dart';
 import 'package:powder_pilot/ui/activity/status/status.dart';
 import 'package:powder_pilot/ui/widgets/slope_circle.dart';
 
-import '../../main.dart';
-import '../../theme.dart';
-import 'location_mark.dart';
-import '../widgets/app_bar.dart';
-import '../../utils/general_utils.dart';
 import '../../activity/data.dart';
 import '../../activity/data_provider.dart';
 import '../../activity/route.dart';
 import '../../activity/slopes.dart';
 import '../../activity/state.dart';
+import '../../main.dart';
+import '../../theme/color.dart';
+import '../../theme/font.dart';
+import '../../theme/icon.dart';
+import '../../utils/general_utils.dart';
+import '../widgets/app_bar.dart';
+import 'location_mark.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage(

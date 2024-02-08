@@ -2,7 +2,11 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../string_pool.dart';
-import '../../../../theme.dart';
+import '../../../../theme/color.dart';
+import '../../../../theme/animation.dart';
+import '../../../../theme/font.dart';
+import '../../../../theme/icon.dart';
+import '../../../../theme/widget.dart';
 
 class DurationGraph extends StatefulWidget {
   const DurationGraph(
@@ -138,13 +142,13 @@ class _DurationGraphState extends State<DurationGraph> {
     Widget icon;
     switch (value.toInt()) {
       case 0:
-        icon = buildIcon(icon: Icons.pause);
+        icon = buildIcon(icon: LogoTheme.pause);
         break;
       case 1:
-        icon = buildIcon(icon: Icons.arrow_downward);
+        icon = buildIcon(icon: LogoTheme.downhill);
         break;
       case 2:
-        icon = buildIcon(icon: Icons.arrow_upward);
+        icon = buildIcon(icon: LogoTheme.uphill);
         break;
       default:
         icon = const SizedBox();

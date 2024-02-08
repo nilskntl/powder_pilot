@@ -6,7 +6,11 @@ import 'package:powder_pilot/ui/widgets/single_graph.dart';
 
 import '../../../../activity/state.dart';
 import '../../../../string_pool.dart';
-import '../../../../theme.dart';
+import '../../../../theme/color.dart';
+import '../../../../theme/font.dart';
+import '../../../../theme/icon.dart';
+import '../../../../theme/measurement.dart';
+import '../../../../theme/widget.dart';
 import '../../../../utils/general_utils.dart';
 import 'category.dart';
 
@@ -58,7 +62,10 @@ class _RunState extends State<Run> {
                     fontWeight: FontWeight.bold),
                 const Spacer(),
                 Category.buildSecondaryValueColumn(
-                  value: (widget.dataProvider.runs.longestRun / 1000 * Measurement.distanceFactor).toStringAsFixed(1),
+                  value: (widget.dataProvider.runs.longestRun /
+                          1000 *
+                          Measurement.distanceFactor)
+                      .toStringAsFixed(1),
                   title: StringPool.LONGEST,
                   unit: Measurement.unitDistance,
                 ),

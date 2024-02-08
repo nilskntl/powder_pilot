@@ -3,7 +3,7 @@ import 'package:powder_pilot/ui/history/delete.dart';
 
 import '../../../activity/database.dart';
 import '../../../string_pool.dart';
-import '../../../theme.dart';
+import '../../../theme/color.dart';
 import '../../../utils/general_utils.dart';
 import '../../widgets/app_bar.dart';
 import '../summary.dart';

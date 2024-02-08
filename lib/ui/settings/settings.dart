@@ -5,7 +5,7 @@ import 'package:powder_pilot/ui/settings/setting/measurement.dart';
 import 'package:powder_pilot/ui/settings/setting/theme.dart';
 
 import '../../string_pool.dart';
-import '../../theme.dart';
+import '../../theme/color.dart';
 import '../widgets/app_bar.dart';
 import 'info/legal.dart';
 import 'setting/language.dart';

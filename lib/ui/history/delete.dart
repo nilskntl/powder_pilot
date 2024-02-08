@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../activity/database.dart';
 import '../../string_pool.dart';
-import '../../theme.dart';
+import '../../theme/color.dart';
+import '../../theme/font.dart';
 import '../../utils/general_utils.dart';
-import 'overview/history.dart';
 
 /// Class to handle the deletion of an activity
 class DeleteActivity {
@@ -22,11 +22,12 @@ class DeleteActivity {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Utils.buildText(
-              text: StringPool.DELETE_ACTIVITY,
-              caps: false,
-              align: TextAlign.left,
-              fontWeight: FontWeight.bold,
-              fontSize: FontTheme.sizeSubHeader),
+            text: StringPool.DELETE_ACTIVITY,
+            caps: false,
+            align: TextAlign.left,
+            fontWeight: FontWeight.bold,
+            fontSize: FontTheme.sizeSubHeader,
+          ),
           content: Utils.buildText(
               text: StringPool.DELETE_ACTIVITY_CONFIRMATION,
               caps: false,
@@ -37,10 +38,11 @@ class DeleteActivity {
                 Navigator.of(context).pop();
               },
               child: Utils.buildText(
-                  text: StringPool.CANCEL,
-                  caps: false,
-                  align: TextAlign.left,
-                  color: ColorTheme.primary),
+                text: StringPool.CANCEL,
+                caps: false,
+                align: TextAlign.left,
+                color: ColorTheme.primary,
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -49,10 +51,11 @@ class DeleteActivity {
                 onPressed();
               },
               child: Utils.buildText(
-                  text: StringPool.DELETE,
-                  caps: false,
-                  align: TextAlign.left,
-                  color: ColorTheme.primary),
+                text: StringPool.DELETE,
+                caps: false,
+                align: TextAlign.left,
+                color: ColorTheme.primary,
+              ),
             ),
           ],
         );

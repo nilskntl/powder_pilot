@@ -1,10 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:powder_pilot/theme/icon.dart';
 import 'package:powder_pilot/ui/activity/activity_page.dart';
 
 import '../../../main.dart';
 import '../../../string_pool.dart';
-import '../../../theme.dart';
+import '../../../theme/color.dart';
+import '../../../theme/widget.dart';
 import '../../../utils/general_utils.dart';
 import '../../history/overview/history.dart';
 import '../settings.dart';
@@ -50,38 +52,47 @@ class _AppThemeSettingState extends State<AppThemeSetting> {
             WidgetTheme.settingsDialog(
               height: MediaQuery.of(context).size.height / 2,
               children: ThemeChanger.availableThemes
-                  .map((theme) => WidgetTheme.settingsOption(
-                      title: theme.name,
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: _buildSchema(
+                  .map(
+                    (theme) => Column(
+                      children: [
+                        WidgetTheme.settingsOption(
+                          title: theme.name,
+                          leading: _buildSchema(
                             primary: theme.colors[0],
                             secondary: theme.colors[1],
-                            tertiary: theme.colors[2]),
-                      ),
-                      trailing: Icon(
-                        theme.darkMode ? Icons.dark_mode : Icons.light_mode,
-                        color: ColorTheme.contrast,
-                        size: 14,
-                      ),
-                      context: context,
-                      onTap: () {
-                        _changeTheme(theme.name);
-                      }))
+                            tertiary: theme.colors[2],
+                          ),
+                          trailing: Icon(
+                            theme.darkMode ? LogoTheme.darkMode : LogoTheme.lightMode,
+                            color: ColorTheme.contrast,
+                            size: 14,
+                          ),
+                          context: context,
+                          onTap: () {
+                            _changeTheme(theme.name);
+                          },
+                        ),
+                        Divider(
+                          color: ThemeChanger.currentTheme.darkMode
+                              ? ColorTheme.background
+                              : ColorTheme.grey,
+                        ),
+                      ],
+                    ),
+                  )
                   .toList(),
               context: context,
             );
           },
           leading: Icon(
-            Icons.brush_rounded,
+            LogoTheme.theme,
             color: ColorTheme.contrast,
             size: SettingsPage.leadingWidget,
           ),
         ),
         Positioned(
-          top: 0,
-          bottom: 0,
           right: 8,
+          top: 24,
           child: _buildSchema(
             primary: ColorTheme.primary,
             secondary: ColorTheme.secondary,
@@ -101,10 +112,10 @@ class _AppThemeSettingState extends State<AppThemeSetting> {
       {required Color primary,
       required Color secondary,
       required Color tertiary}) {
-    const double size = 25;
+    const double size = 24;
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: BorderRadius.circular(size / 3),
       child: SizedBox(
         width: size * 3,
         height: size,

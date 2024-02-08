@@ -6,7 +6,10 @@ import 'package:powder_pilot/ui/widgets/single_graph.dart';
 import '../../../activity/data_provider.dart';
 import '../../../activity/state.dart';
 import '../../../string_pool.dart';
-import '../../../theme.dart';
+import '../../../theme/color.dart';
+import '../../../theme/icon.dart';
+import '../../../theme/measurement.dart';
+import '../../../theme/widget.dart';
 import 'widgets/elapsed_time.dart';
 
 class Info extends StatefulWidget {

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../main.dart';
-import '../settings/settings.dart';
-import '../../theme.dart';
+import '../../theme/color.dart';
+import '../../theme/font.dart';
+import '../../theme/icon.dart';
 import '../../utils/general_utils.dart';
+import '../settings/settings.dart';
 
 /// A utility class for creating custom Material app bars.
 class CustomMaterialAppBar {

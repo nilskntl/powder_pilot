@@ -11,7 +11,9 @@ import 'package:powder_pilot/location.dart';
 
 import '../../main.dart';
 import '../../string_pool.dart';
-import '../../theme.dart';
+import '../../theme/color.dart';
+import '../../theme/animation.dart';
+import '../../theme/font.dart';
 import '../../utils/general_utils.dart';
 import '../../utils/shared_preferences.dart';
 
@@ -254,8 +256,10 @@ class _WelcomePageState extends State<WelcomePage> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          side:
-                              BorderSide(width: 2.0, color: ColorTheme.primary),
+                          side: BorderSide(
+                            width: 2.0,
+                            color: ColorTheme.primary,
+                          ),
                           foregroundColor: ColorTheme.secondary,
                           backgroundColor: _accepted
                               ? ColorTheme.primary
@@ -300,7 +304,10 @@ class _WelcomePageState extends State<WelcomePage> {
     return Row(
       children: [
         Checkbox(
-          side: BorderSide(width: 2.0, color: ColorTheme.primary),
+          side: BorderSide(
+            width: 2.0,
+            color: ColorTheme.primary,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(4),
           ),
@@ -319,12 +326,16 @@ class _WelcomePageState extends State<WelcomePage> {
                 TextSpan(
                   text: StringPool.LEGAL_TEXT[0],
                   style: TextStyle(
-                      color: ColorTheme.contrast, fontSize: FontTheme.size),
+                    color: ColorTheme.contrast,
+                    fontSize: FontTheme.size,
+                  ),
                 ),
                 TextSpan(
                   text: StringPool.LEGAL_TEXT[1],
                   style: const TextStyle(
-                      color: ColorTheme.blue, fontSize: FontTheme.size),
+                    color: ColorTheme.blue,
+                    fontSize: FontTheme.size,
+                  ),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
                       _showDialog(
@@ -335,12 +346,16 @@ class _WelcomePageState extends State<WelcomePage> {
                 TextSpan(
                   text: StringPool.LEGAL_TEXT[2],
                   style: TextStyle(
-                      color: ColorTheme.contrast, fontSize: FontTheme.size),
+                    color: ColorTheme.contrast,
+                    fontSize: FontTheme.size,
+                  ),
                 ),
                 TextSpan(
                   text: StringPool.LEGAL_TEXT[3],
                   style: const TextStyle(
-                      color: ColorTheme.blue, fontSize: FontTheme.size),
+                    color: ColorTheme.blue,
+                    fontSize: FontTheme.size,
+                  ),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
                       _showDialog(
@@ -351,7 +366,9 @@ class _WelcomePageState extends State<WelcomePage> {
                 TextSpan(
                   text: StringPool.LEGAL_TEXT[4],
                   style: TextStyle(
-                      color: ColorTheme.contrast, fontSize: FontTheme.size),
+                    color: ColorTheme.contrast,
+                    fontSize: FontTheme.size,
+                  ),
                 ),
               ],
             ),

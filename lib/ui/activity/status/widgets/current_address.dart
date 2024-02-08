@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:powder_pilot/activity/data_provider.dart';
 
 import '../../../../string_pool.dart';
-import '../../../../theme.dart';
+import '../../../../theme/color.dart';
+import '../../../../theme/font.dart';
+import '../../../../theme/icon.dart';
 import '../../../../utils/general_utils.dart';
 
 /// The current address shows the current address of the user.
@@ -60,7 +62,6 @@ class _CurrentAddressState extends State<CurrentAddress> {
         const SizedBox(width: 4),
         Utils.buildText(
           text: _text(),
-          fontSize: FontTheme.size,
           color: _color(),
           fontWeight: FontWeight.bold,
           overflow: TextOverflow.ellipsis,

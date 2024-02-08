@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 
 import '../../../activity/database.dart';
 import '../../../string_pool.dart';
-import '../../../theme.dart';
+import '../../../theme/color.dart';
+import '../../../theme/font.dart';
+import '../../../theme/icon.dart';
 import '../../../utils/general_utils.dart';
 
 /// Shows an overview over the most important data of the history

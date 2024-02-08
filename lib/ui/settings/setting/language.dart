@@ -1,13 +1,15 @@
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:powder_pilot/main.dart';
 import 'package:powder_pilot/ui/settings/settings.dart';
 
 import '../../../l10n/messages_all_locales.dart';
 import '../../../string_pool.dart';
-import '../../../theme.dart';
+import '../../../theme/color.dart';
+import '../../../theme/widget.dart';
 import '../../../utils/general_utils.dart';
 import '../../activity/activity_page.dart';
 
@@ -70,23 +72,35 @@ class _LanguageSettingState extends State<LanguageSetting> {
         WidgetTheme.settingsDialog(
           height: MediaQuery.of(context).size.height / 2,
           children: PowderPilot.availableLanguages
-              .map((language) => WidgetTheme.settingsOption(
-                  title: language[1],
-                  leading: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: CountryFlag.fromCountryCode(
-                      language[0] == 'en' ? 'gb' : language[0],
-                      height: SettingsPage.leadingWidget / 3 * 2,
-                      width: SettingsPage.leadingWidget,
-                      borderRadius: 0.0,
+              .map(
+                (language) => Column(
+                  children: [
+                    WidgetTheme.settingsOption(
+                      title: language[1],
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: CountryFlag.fromCountryCode(
+                          language[0] == 'en' ? 'gb' : language[0],
+                          height: SettingsPage.leadingWidget / 3 * 2,
+                          width: SettingsPage.leadingWidget,
+                          borderRadius: 0.0,
+                        ),
+                      ),
+                      context: context,
+                      onTap: () {
+                        _switchLanguage(
+                          language[0],
+                        );
+                      },
                     ),
-                  ),
-                  context: context,
-                  onTap: () {
-                    _switchLanguage(
-                      language[0],
-                    );
-                  }))
+                    Divider(
+                      color: ThemeChanger.currentTheme.darkMode
+                          ? ColorTheme.background
+                          : ColorTheme.grey,
+                    ),
+                  ],
+                ),
+              )
               .toList(),
           context: context,
         );
