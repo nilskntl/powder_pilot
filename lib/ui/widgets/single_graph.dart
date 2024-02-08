@@ -2,7 +2,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../theme.dart';
+import '../../theme/color.dart';
+import '../../theme/animation.dart';
 
 /// Widget to display a single graph
 class SingleGraph<T> extends StatefulWidget {
@@ -79,7 +80,7 @@ class _SingleGraphState extends State<SingleGraph> {
     /// Iterate through the list of T
     for (List<T> data in list) {
       /// Only add the FlSpot if the list has two elements
-      if (data.length == 2) {
+      if (data.length >= 2) {
         /// Get the values of the list (x, y)
         double x =
         data[0] is int ? (data[0] as int).toDouble() : data[0] as double;

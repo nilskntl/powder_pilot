@@ -103,10 +103,15 @@ class Activity extends LocationHandler {
     route.addCoordinates([longitude, latitude]);
 
     /// Add the final distance to distances
-    distance.distances.add([
+    distance.addDistance(
       activityTimer.duration.total.inSeconds.toDouble(),
       distance.totalDistance,
-    ]);
+    );
+
+    /// Reduce the list for speeds, altitudes and distances
+    distance.reduceDistances();
+    speed.reduceSpeeds();
+    altitude.reduceAltitudes();
 
     /// Set the end time to the current time
     activityTimer.endTime = DateTime.now();
@@ -259,10 +264,10 @@ class LocationHandler extends ActivityData {
           speed.avgSpeed = speed.totalSpeed / _numberOfSpeedUpdates;
         }
 
-        speed.speeds.add([
+        speed.addSpeed(
           activityTimer.duration.total.inSeconds.toDouble(),
           speed.currentSpeed,
-        ]);
+        );
       }
     }
 
@@ -303,10 +308,10 @@ class LocationHandler extends ActivityData {
       altitude.totalAltitude += altitude.currentAltitude;
       altitude.avgAltitude = altitude.totalAltitude / _numberOfAltitudeUpdates;
 
-      altitude.altitudes.add([
-        activityTimer.duration.total.inSeconds,
-        altitude.currentAltitude.round(),
-      ]);
+      altitude.addAltitude(
+        activityTimer.duration.total.inSeconds.toDouble(),
+        altitude.currentAltitude.round().toDouble(),
+      );
     }
 
     /// Temporary distance variable.
@@ -351,10 +356,10 @@ class LocationHandler extends ActivityData {
 
         /// Update distance data.
         distance.totalDistance += calculatedDistance;
-        distance.distances.add([
+        distance.addDistance(
           activityTimer.duration.total.inSeconds.toDouble(),
           distance.totalDistance,
-        ]);
+        );
         tempDistance += calculatedDistance;
         lastLocation = position;
       }
@@ -383,12 +388,12 @@ class LocationHandler extends ActivityData {
         }
       }
 
-      if (!state.isUphill &&
+      if (state.isUphill &&
           altitude.currentAltitude - altitude.currentExtrema > 0) {
         altitude.currentExtrema = altitude.currentAltitude;
         distance.distanceUphill += tempDistance;
         tempDistance = 0.0;
-      } else if (!state.isDownhill &&
+      } else if (state.isDownhill &&
           altitude.currentAltitude - altitude.currentExtrema < 0) {
         altitude.currentExtrema = altitude.currentAltitude;
         distance.distanceDownhill += tempDistance;
@@ -397,7 +402,7 @@ class LocationHandler extends ActivityData {
             ? currentRunLength
             : runs.longestRun;
         tempDistance = 0.0;
-      }
+      } else if (state.isDownhill) {}
     }
 
     /// Temporary altitude variable for slope calculation.
@@ -419,7 +424,7 @@ class LocationHandler extends ActivityData {
 
       /// Handle slope updates only if the activity is in
       /// downhill or uphill mode.
-      if (state.runningStatus != RunningStatus.pause) {
+      if (state.runningStatus != RunningStatus.pause || true) {
         /// Calculate the difference between the current altitude and the
         /// previous saved altitude.
         double difference = (tempAltitude - altitude.currentAltitude).abs();
@@ -433,17 +438,19 @@ class LocationHandler extends ActivityData {
           difference = 0.0;
         }
 
+        /// Calculate the horizontal distance between the current location
+        double horizontalDistance = Utils.calculateHaversineDistance(
+            LatLng(tempLocation.latitude, tempLocation.longitude),
+            LatLng(position.latitude, position.longitude));
+
         /// If the difference is greater than $slopeBuffer, calculate the slope.
         /// Formula: slope = (vertical distance / horizontal distance) * 100
-        if (difference > slopeBuffer) {
+        if (difference > slopeBuffer && horizontalDistance > slopeBuffer / 3) {
           if (tempLocation.latitude == position.latitude &&
               tempLocation.longitude == position.longitude) {
             return;
           }
           if (tempAltitude - altitude.currentAltitude > 0) {
-            double horizontalDistance = Utils.calculateHaversineDistance(
-                LatLng(tempLocation.latitude, tempLocation.longitude),
-                LatLng(position.latitude, position.longitude));
             double verticalDistance = tempAltitude - altitude.currentAltitude;
             slope.currentSlope = verticalDistance / horizontalDistance * 100;
             _numberOfSlopeUpdates++;
