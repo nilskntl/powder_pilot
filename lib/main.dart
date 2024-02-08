@@ -77,6 +77,7 @@ void _init() async {
       return false;
     }
 
+    // ignore: deprecated_member_use
     String locale = ui.window.locale.toString();
     if (locale.contains('_')) {
       locale = locale.split('_').first;
