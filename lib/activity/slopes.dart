@@ -13,6 +13,10 @@ class SlopeMap {
 
   /// Adds a slope to the slope map. If the slope already exists, coordinates are added, and duplicates are removed.
   static void addSlope(Slope slope) {
+    /// Only add a slope if the ref is not 'Unknown'
+    if(slope.ref == 'Unknown') {
+      return;
+    }
     if (_slopes.contains(slope)) {
       _slopes[_slopes.indexOf(slope)].coordinates.addAll(slope.coordinates);
       _slopes[_slopes.indexOf(slope)].removeDuplicates();
