@@ -30,7 +30,7 @@ class LogoTheme {
 
   /// Icons used to display different kinds of connections.
   static const IconData noInternet =
-      Icons.signal_cellular_connected_no_internet_0_bar_sharp;
+      Icons.wifi_off_sharp;
   static const IconData gps = Icons.location_on_sharp;
 
   /// Icons used to display different kinds of gps connection status.
