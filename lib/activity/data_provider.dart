@@ -47,7 +47,7 @@ class ActivityDataProvider extends ChangeNotifier {
   ActivityRoute route = const ActivityRoute(coordinates: [], slopes: []);
 
   /// Activity Locations
-  late final ActivityLocations activityLocations;
+  ActivityLocations? activityLocations;
   bool _activityLocationsLoaded = false;
 
   /// Method to update the data for the runs used in the activity summary
