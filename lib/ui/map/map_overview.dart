@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:powder_pilot/activity/data.dart';
+import 'package:powder_pilot/main.dart';
 
 import '../../activity/data_provider.dart';
 import '../../activity/route.dart';
@@ -42,8 +43,10 @@ class _MapOverviewState extends State<MapOverview> {
   );
 
   ActivityLocations _getLocations() {
-    if (widget.dataProvider != null && !widget.static) {
-      return widget.dataProvider!.activityLocations;
+    if (widget.dataProvider != null &&
+        !widget.static &&
+        widget.dataProvider!.activityLocations != null) {
+      return widget.dataProvider!.activityLocations!;
     } else if (widget.locations != null) {
       return widget.locations!;
     } else {
@@ -73,7 +76,10 @@ class _MapOverviewState extends State<MapOverview> {
       }
     }
 
-    if (widget.static || widget.dataProvider!.latitude != 0.0) {
+    if (!widget.static
+        ? widget.dataProvider!.internetStatus == true
+        : PowderPilot.connectivityController.status == true &&
+            (widget.static || widget.dataProvider!.latitude != 0.0)) {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -108,15 +114,54 @@ class _MapOverviewState extends State<MapOverview> {
           borderRadius: BorderRadius.circular(16.0),
           child: Stack(
             children: [
-              if (widget.static || widget.dataProvider!.latitude != 0.0) _map,
+              if (!widget.static
+                  ? widget.dataProvider!.internetStatus == true
+                  : PowderPilot.connectivityController.status == true &&
+                      (widget.static || widget.dataProvider!.latitude != 0.0))
+                _map
+              else
+                Container(
+                  color: ColorTheme.background,
+                  child: Center(
+                    child: Icon(
+                      LogoTheme.activity,
+                      color: ColorTheme.contrast,
+                    ),
+                  ),
+                ),
               _mapOverlay(),
-              if (!widget.static && widget.dataProvider!.latitude != 0.0)
+              if (!widget.static && !widget.static
+                  ? widget.dataProvider!.internetStatus == true
+                  : PowderPilot.connectivityController.status == true &&
+                      widget.dataProvider!.latitude != 0.0)
                 _drawLocationMark(),
-              _clickIcon(),
+              if (!widget.static
+                  ? widget.dataProvider!.internetStatus == true
+                  : PowderPilot.connectivityController.status == true)
+                _clickIcon(),
               if (!widget.static) _currentSlope(),
+              if (!widget.static
+                  ? widget.dataProvider!.internetStatus == false
+                  : PowderPilot.connectivityController.status == false)
+                _noInternet(),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  /// Shows a message if the user is offline
+  Widget _noInternet() {
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Icon(
+        size: 48.0,
+        LogoTheme.noInternet,
+        color: ColorTheme.contrast,
       ),
     );
   }
