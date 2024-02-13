@@ -27,7 +27,7 @@ class _SummaryDialogState extends State<SummaryDialog> {
   Widget build(BuildContext context) {
     return CustomAnimatedWidget(
       child: Dialog(
-        insetPadding: const EdgeInsets.all(16.0),
+        insetPadding: const EdgeInsets.all(12.0),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16.0),
           child: Scaffold(
@@ -36,7 +36,6 @@ class _SummaryDialogState extends State<SummaryDialog> {
             body: Container(
               width: double.infinity,
               height: double.infinity,
-              padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16.0),
                 color: ColorTheme.background,
