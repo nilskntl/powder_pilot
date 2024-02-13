@@ -88,7 +88,7 @@ class ActivityRoute {
       }
       slopes.last.endTime = DateTime.now();
       /// Check if last slope was longer then 30s otherwise delete the slope
-      if (slopes.last.endTime.difference(slopes.last.startTime).inSeconds < 5) {
+      if (slopes.last.endTime.difference(slopes.last.startTime).inSeconds < 15) {
         slopes.removeLast();
       }
       /// Check if its now the same slope

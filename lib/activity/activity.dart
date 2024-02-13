@@ -402,7 +402,7 @@ class LocationHandler extends ActivityData {
             ? currentRunLength
             : runs.longestRun;
         tempDistance = 0.0;
-      } else if (state.isDownhill) {}
+      }
     }
 
     /// Temporary altitude variable for slope calculation.
@@ -445,7 +445,7 @@ class LocationHandler extends ActivityData {
 
         /// If the difference is greater than $slopeBuffer, calculate the slope.
         /// Formula: slope = (vertical distance / horizontal distance) * 100
-        if (difference > slopeBuffer && horizontalDistance > slopeBuffer / 3) {
+        if (difference > slopeBuffer && horizontalDistance > slopeBuffer) {
           if (tempLocation.latitude == position.latitude &&
               tempLocation.longitude == position.longitude) {
             return;
