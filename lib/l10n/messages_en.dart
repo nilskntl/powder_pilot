@@ -94,5 +94,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "StringPool_LEGAL_TEXT_1": MessageLookupByLibrary.simpleMessage('I agree to the '),
     "StringPool_LEGAL_TEXT_2": MessageLookupByLibrary.simpleMessage(' and the '),
     "StringPool_LEGAL_TEXT_3": MessageLookupByLibrary.simpleMessage('.'),
+    "StringPool_MAP": MessageLookupByLibrary.simpleMessage('Map'),
   };
 }
