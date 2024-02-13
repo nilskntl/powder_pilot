@@ -133,7 +133,7 @@ class _MapOverviewState extends State<MapOverview> {
               if (!widget.static && !widget.static
                   ? widget.dataProvider!.internetStatus == true
                   : PowderPilot.connectivityController.status == true &&
-                  (widget.static || widget.dataProvider!.latitude != 0.0))
+                  !widget.static && widget.dataProvider!.latitude != 0.0)
                 _drawLocationMark(),
               if (!widget.static
                   ? widget.dataProvider!.internetStatus == true
