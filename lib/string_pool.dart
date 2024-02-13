@@ -6,6 +6,7 @@ import 'main.dart';
 
 /// Class to define String constants used in the app.
 class StringPool {
+
   static String get APP_NAME => PowderPilot.appName;
 
   static String get IDLE => Intl.message('Idle',
@@ -85,6 +86,9 @@ class StringPool {
 
   static String get HISTORY => Intl.message('History',
       name: 'StringPool_HISTORY', locale: PowderPilot.language[0]);
+
+  static String get MAP => Intl.message('Map',
+      name: 'StringPool_MAP', locale: PowderPilot.language[0]);
 
   static String get NO_ACTIVITIES => Intl.message('No activities found.',
       name: 'StringPool_NO_ACTIVITIES', locale: PowderPilot.language[0]);
