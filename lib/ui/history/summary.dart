@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:powder_pilot/activity/data_provider.dart';
+import 'package:powder_pilot/ui/map/map_overview.dart';
 import 'package:powder_pilot/ui/widgets/single_graph.dart';
 
 import '../../activity/data.dart';
@@ -17,7 +18,6 @@ import '../activity/info/info.dart';
 import '../activity/info/widgets/category.dart';
 import '../activity/info/widgets/elapsed_time.dart';
 import '../activity/info/widgets/run.dart';
-import '../map/map.dart';
 import '../widgets/slope_circle.dart';
 
 /// A stateful widget for displaying the summary of an activity.
@@ -51,7 +51,7 @@ class _ActivitySummaryState extends State<ActivitySummary> {
 
   late final ActivityRoute route;
 
-  late final ActivityMap _activityMap;
+  late final MapOverview _mapOverview;
 
   late final double minus = widget.small ? 4 : 0;
 
@@ -72,10 +72,11 @@ class _ActivitySummaryState extends State<ActivitySummary> {
         parseStringToDoubleList(widget.activityDatabase.endLocation);
     final List<double> fastestLocation =
         parseStringToDoubleList(widget.activityDatabase.speedLocation);
-    _activityMap = ActivityMap(
+    _mapOverview = MapOverview(
+      height: 160,
       route: route,
-      staticMap: true,
-      activityLocations: ActivityLocations(
+      static: true,
+      locations: ActivityLocations(
         fastestLocation: fastestLocation,
         startLocation: startLocation,
         endLocation: endLocation,
@@ -163,71 +164,15 @@ class _ActivitySummaryState extends State<ActivitySummary> {
 
   Widget _map() {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MapPageSummary(
-              route: route,
-              activityMap: _activityMap,
-            ),
-            settings: const RouteSettings(
-                name:
-                    '/fullscreenSummary'), // Setzen Sie hier den gewünschten Routennamen
-          ),
-        );
-      },
+      onTap: () {},
       child: Container(
-        height: widget.small ? 120 : 160,
+        height: widget.small ? 120 : 128,
         padding: Info.padding / 2,
         child: Row(
           children: [
             Expanded(
               flex: 1,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: ColorTheme.secondary,
-                  borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(16.0),
-                      bottomLeft: const Radius.circular(16.0),
-                      topRight:
-                          Radius.circular(route.slopes.isEmpty ? 16.0 : 0.0),
-                      bottomRight:
-                          Radius.circular(route.slopes.isEmpty ? 16.0 : 0.0)),
-                ),
-                alignment: Alignment.center,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(16.0),
-                      bottomLeft: const Radius.circular(16.0),
-                      topRight:
-                          Radius.circular(route.slopes.isEmpty ? 16.0 : 0.0),
-                      bottomRight:
-                          Radius.circular(route.slopes.isEmpty ? 16.0 : 0.0)),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      _activityMap,
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: RadialGradient(
-                            colors: [
-                              Colors.transparent,
-                              ColorTheme.secondary.withOpacity(0.6),
-                              ColorTheme.secondary.withOpacity(0.9)
-                            ],
-                            stops: const [0.0, 0.8, 1.0],
-                            center: Alignment.center,
-                            radius: route.slopes.isEmpty
-                                ? 1.5
-                                : 1.2, // Radius steuert die Größe des Gradients
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              child: _mapOverview,
             ),
             if (route.slopes.isNotEmpty)
               Expanded(
@@ -376,9 +321,6 @@ class _ActivitySummaryState extends State<ActivitySummary> {
                 ),
               ),
             ],
-          ),
-          SizedBox(
-            height: verticalPadding - minus / 2,
           ),
           SizedBox(
             height: verticalPadding - minus / 2,

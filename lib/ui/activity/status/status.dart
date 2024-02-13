@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:powder_pilot/ui/activity/status/widgets/current_address.dart';
 import 'package:powder_pilot/ui/activity/status/widgets/gps_status.dart';
-import 'package:powder_pilot/ui/activity/status/widgets/map_overview.dart';
+import 'package:powder_pilot/ui/map/map_overview.dart';
 import 'package:powder_pilot/ui/activity/status/status_bar.dart';
 
 import '../../../activity/data_provider.dart';

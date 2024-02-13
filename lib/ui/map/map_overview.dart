@@ -1,20 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:powder_pilot/activity/data.dart';
 
-import '../../../../activity/data_provider.dart';
-import '../../../../activity/state.dart';
-import '../../../../theme/color.dart';
-import '../../../../theme/icon.dart';
-import '../../../map/location_mark.dart';
-import '../../../map/map.dart';
-import '../../../widgets/slope_circle.dart';
+import '../../activity/data_provider.dart';
+import '../../activity/route.dart';
+import '../../activity/state.dart';
+import '../../theme/color.dart';
+import '../../theme/icon.dart';
+import 'location_mark.dart';
+import 'map.dart';
+import 'map_page.dart';
+import '../widgets/slope_circle.dart';
 
 /// The map overview shows a small map overview of the current activity.
 class MapOverview extends StatefulWidget {
   const MapOverview(
-      {super.key, required this.dataProvider, this.height = 128.0});
+      {super.key,
+      this.dataProvider,
+      this.static = false,
+      this.route,
+      this.locations,
+      this.height = 128.0});
 
-  final ActivityMap activityMap = const ActivityMap(staticMap: false);
-  final ActivityDataProvider dataProvider;
+  final ActivityDataProvider? dataProvider;
+  final ActivityRoute? route;
+  final ActivityLocations? locations;
+
+  /// If static is true the dataProvider MUST be != null
+  final bool static;
 
   final double height;
 
@@ -23,15 +35,53 @@ class MapOverview extends StatefulWidget {
 }
 
 class _MapOverviewState extends State<MapOverview> {
+  late final ActivityMap _map = ActivityMap(
+    staticMap: widget.static,
+    route: _getRoute(),
+    activityLocations: _getLocations(),
+  );
+
+  ActivityLocations _getLocations() {
+    if (widget.dataProvider != null && !widget.static) {
+      return widget.dataProvider!.activityLocations;
+    } else if (widget.locations != null) {
+      return widget.locations!;
+    } else {
+      return const ActivityLocations();
+    }
+  }
+
+  ActivityRoute _getRoute() {
+    if (widget.dataProvider != null && !widget.static) {
+      return widget.dataProvider!.route;
+    } else if (widget.route != null) {
+      return widget.route!;
+    } else {
+      return const ActivityRoute(coordinates: [], slopes: []);
+    }
+  }
+
   /// Opens the map in full screen mode with more details
   void _openMapPage() {
-    if (widget.dataProvider.latitude != 0.0) {
+    ActivityStatus getStatus() {
+      if (!widget.static) {
+        return ActivityStatus.running;
+      } else if (widget.dataProvider != null) {
+        return widget.dataProvider!.status;
+      } else {
+        return ActivityStatus.inactive;
+      }
+    }
+
+    if (widget.static || widget.dataProvider!.latitude != 0.0) {
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => MapPage(
-            dataProvider: widget.dataProvider,
-            activityMap: widget.activityMap,
+            static: widget.static,
+            route: _getRoute(),
+            status: getStatus(),
+            activityMap: _map,
           ),
           settings: const RouteSettings(
               name:
@@ -58,11 +108,12 @@ class _MapOverviewState extends State<MapOverview> {
           borderRadius: BorderRadius.circular(16.0),
           child: Stack(
             children: [
-              if (widget.dataProvider.latitude != 0.0) widget.activityMap,
+              if (widget.static || widget.dataProvider!.latitude != 0.0) _map,
               _mapOverlay(),
-              if (widget.dataProvider.latitude != 0.0) _drawLocationMark(),
+              if (!widget.static && widget.dataProvider!.latitude != 0.0)
+                _drawLocationMark(),
               _clickIcon(),
-              _currentSlope(),
+              if (!widget.static) _currentSlope(),
             ],
           ),
         ),
@@ -116,14 +167,14 @@ class _MapOverviewState extends State<MapOverview> {
 
   /// Shows the current slope or lift the user is on
   Widget _currentSlope() {
-    if (widget.dataProvider.latitude != 0.0 &&
-        widget.dataProvider.status == ActivityStatus.running &&
-        widget.dataProvider.route.slopes.isNotEmpty) {
+    if (widget.dataProvider!.latitude != 0.0 &&
+        widget.dataProvider!.status == ActivityStatus.running &&
+        widget.dataProvider!.route.slopes.isNotEmpty) {
       return Positioned(
         right: 4,
         bottom: 4,
         child: SlopeCircle(
-            slope: widget.dataProvider.route.slopes.last, animated: true),
+            slope: widget.dataProvider!.route.slopes.last, animated: true),
       );
     } else {
       return const SizedBox();
