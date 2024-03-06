@@ -11,7 +11,7 @@ class CustomAnimatedWidget extends StatefulWidget {
   const CustomAnimatedWidget(
       {super.key,
       required this.child,
-      this.duration = AnimationTheme.animationDuration});
+      this.duration = AnimationTheme.fastAnimationDuration});
 
   /// The child widget to animate
   final Widget child;
