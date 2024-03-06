@@ -125,7 +125,9 @@ class Activity extends LocationHandler {
       ActivityDatabase activityDatabase = saveActivity();
       _locationInitialized = false;
       showCustomDialog(context, activityDatabase);
-      _addActivityToList();
+
+      /// Save values for all-time statistics
+      _saveAllTimeStatistics();
     }
 
     /// Set the activity to inactive
@@ -152,13 +154,84 @@ class Activity extends LocationHandler {
         mapDownloaded: mapData.mapDownloaded);
   }
 
-  /// Method to add the activity to the list.
-  void _addActivityToList() async {
-    /// Get the number of total activities
+  void _saveAllTimeStatistics() async {
+    double tempTotalDistance = distance.totalDistance;
+    double tempDownhillDistance = distance.distanceDownhill;
+    double tempUphillDistance = distance.distanceUphill;
+    double tempHighestAltitude = altitude.maxAltitude;
+    Duration tempTotalTime = activityTimer.duration.total;
+    Duration tempDownhillTime = activityTimer.duration.downhill;
+    Duration tempUphillTime = activityTimer.duration.uphill;
+    double tempLongestRun = runs.longestRun;
+    int tempNumRuns = runs.totalRuns;
+    double tempMaxSpeed = speed.maxSpeed;
+    double tempAvgSpeed = speed.avgSpeed;
+
+    /// Get the total distance from shared preferences and save the incremented
+    /// values
+
+    /// // Get the number of total activities
     int numActivities = await SharedPref.readInt(PowderPilot.numActivitiesKey);
 
     /// Save the incremented number of total activities to shared preferences
     SharedPref.saveInt(PowderPilot.numActivitiesKey, numActivities + 1);
+
+    /// Save distances
+    SharedPref.saveDouble(
+        PowderPilot.allTimeDistance,
+        await SharedPref.readDouble(PowderPilot.allTimeDistance) +
+            tempTotalDistance);
+    SharedPref.saveDouble(
+        PowderPilot.allTimeDistanceDownhill,
+        await SharedPref.readDouble(PowderPilot.allTimeDistanceDownhill) +
+            tempDownhillDistance);
+    SharedPref.saveDouble(
+        PowderPilot.allTimeDistanceUphill,
+        await SharedPref.readDouble(PowderPilot.allTimeDistanceUphill) +
+            tempUphillDistance);
+
+    /// Save highest altitude
+    if (await SharedPref.readDouble(PowderPilot.highestAltitude) <
+        tempHighestAltitude) {
+      SharedPref.saveDouble(PowderPilot.highestAltitude, tempHighestAltitude);
+    }
+
+    /// Save speed
+    if (await SharedPref.readDouble(PowderPilot.fastestSpeed) < tempMaxSpeed) {
+      SharedPref.saveDouble(PowderPilot.fastestSpeed, tempMaxSpeed);
+    }
+    int allTimeDownhillAndUphillDuration =
+        await SharedPref.readInt(PowderPilot.allTimeDurationDownhill) +
+            await SharedPref.readInt(PowderPilot.allTimeDurationUphill);
+    int currentDownhillAndUphillDuration =
+        tempDownhillTime.inSeconds + tempUphillTime.inSeconds;
+    double allTimeAvgSpeed =
+        await SharedPref.readDouble(PowderPilot.allTimeAverageSpeed);
+    double newAvgSpeed = (allTimeAvgSpeed * allTimeDownhillAndUphillDuration +
+            tempAvgSpeed * currentDownhillAndUphillDuration) /
+        (allTimeDownhillAndUphillDuration + currentDownhillAndUphillDuration);
+    SharedPref.saveDouble(PowderPilot.allTimeAverageSpeed, newAvgSpeed);
+
+    /// Save Runs
+    SharedPref.saveInt(PowderPilot.numberRuns,
+        await SharedPref.readInt(PowderPilot.numberRuns) + tempNumRuns);
+    if (await SharedPref.readDouble(PowderPilot.longestRun) < tempLongestRun) {
+      SharedPref.saveDouble(PowderPilot.longestRun, tempLongestRun);
+    }
+
+    /// Save Durations
+    SharedPref.saveInt(
+        PowderPilot.allTimeDuration,
+        await SharedPref.readInt(PowderPilot.allTimeDuration) +
+            tempTotalTime.inSeconds);
+    SharedPref.saveInt(
+        PowderPilot.allTimeDurationDownhill,
+        await SharedPref.readInt(PowderPilot.allTimeDurationDownhill) +
+            tempDownhillTime.inSeconds);
+    SharedPref.saveInt(
+        PowderPilot.allTimeDurationUphill,
+        await SharedPref.readInt(PowderPilot.allTimeDurationUphill) +
+            tempUphillTime.inSeconds);
   }
 
   /// Method to pause the activity.

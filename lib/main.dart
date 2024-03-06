@@ -186,6 +186,18 @@ class PowderPilot extends StatefulWidget {
 
   /// Key names for SharedPreferences
   static const String numActivitiesKey = 'numActivities';
+  static const String allTimeDistance = 'allTimeDistance';
+  static const String allTimeDistanceDownhill = 'allTimeDistanceDownhill';
+  static const String allTimeDistanceUphill = 'allTimeDistanceUphill';
+  static const String allTimeDuration = 'allTimeDuration';
+  static const String allTimeDurationDownhill = 'allTimeDurationDownhill';
+  static const String allTimeDurationUphill = 'allTimeDurationUphill';
+  static const String fastestSpeed = 'fastestSpeed';
+  static const String highestAltitude = 'highestAltitude';
+  static const String longestRun = 'longestRun';
+  static const String numberRuns = 'numberRuns';
+  static const String allTimeAverageSpeed = 'allTimeAverageSpeed';
+
   static const String activityKey = 'activity';
   static const String startKey = 'start';
   static const String unitsKey = 'units';
