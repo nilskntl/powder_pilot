@@ -8,7 +8,6 @@ import 'package:powder_pilot/location.dart';
 import '../main.dart';
 import '../ui/history/dialog/summary_dialog.dart';
 import '../utils/general_utils.dart';
-import '../utils/shared_preferences.dart';
 import '../utils/slope_data.dart';
 import 'data.dart';
 import 'database.dart';
@@ -127,7 +126,7 @@ class Activity extends LocationHandler {
       showCustomDialog(context, activityDatabase);
 
       /// Save values for all-time statistics
-      _saveAllTimeStatistics();
+      PowderPilot.statistics.saveToSharedPref();
     }
 
     /// Set the activity to inactive
@@ -152,86 +151,6 @@ class Activity extends LocationHandler {
     PowderPilot.createNewActivity(
         currentPosition: LatLng(latitude, longitude),
         mapDownloaded: mapData.mapDownloaded);
-  }
-
-  void _saveAllTimeStatistics() async {
-    double tempTotalDistance = distance.totalDistance;
-    double tempDownhillDistance = distance.distanceDownhill;
-    double tempUphillDistance = distance.distanceUphill;
-    double tempHighestAltitude = altitude.maxAltitude;
-    Duration tempTotalTime = activityTimer.duration.total;
-    Duration tempDownhillTime = activityTimer.duration.downhill;
-    Duration tempUphillTime = activityTimer.duration.uphill;
-    double tempLongestRun = runs.longestRun;
-    int tempNumRuns = runs.totalRuns;
-    double tempMaxSpeed = speed.maxSpeed;
-    double tempAvgSpeed = speed.avgSpeed;
-
-    /// Get the total distance from shared preferences and save the incremented
-    /// values
-
-    /// // Get the number of total activities
-    int numActivities = await SharedPref.readInt(PowderPilot.numActivitiesKey);
-
-    /// Save the incremented number of total activities to shared preferences
-    SharedPref.saveInt(PowderPilot.numActivitiesKey, numActivities + 1);
-
-    /// Save distances
-    SharedPref.saveDouble(
-        PowderPilot.allTimeDistance,
-        await SharedPref.readDouble(PowderPilot.allTimeDistance) +
-            tempTotalDistance);
-    SharedPref.saveDouble(
-        PowderPilot.allTimeDistanceDownhill,
-        await SharedPref.readDouble(PowderPilot.allTimeDistanceDownhill) +
-            tempDownhillDistance);
-    SharedPref.saveDouble(
-        PowderPilot.allTimeDistanceUphill,
-        await SharedPref.readDouble(PowderPilot.allTimeDistanceUphill) +
-            tempUphillDistance);
-
-    /// Save highest altitude
-    if (await SharedPref.readDouble(PowderPilot.highestAltitude) <
-        tempHighestAltitude) {
-      SharedPref.saveDouble(PowderPilot.highestAltitude, tempHighestAltitude);
-    }
-
-    /// Save speed
-    if (await SharedPref.readDouble(PowderPilot.fastestSpeed) < tempMaxSpeed) {
-      SharedPref.saveDouble(PowderPilot.fastestSpeed, tempMaxSpeed);
-    }
-    int allTimeDownhillAndUphillDuration =
-        await SharedPref.readInt(PowderPilot.allTimeDurationDownhill) +
-            await SharedPref.readInt(PowderPilot.allTimeDurationUphill);
-    int currentDownhillAndUphillDuration =
-        tempDownhillTime.inSeconds + tempUphillTime.inSeconds;
-    double allTimeAvgSpeed =
-        await SharedPref.readDouble(PowderPilot.allTimeAverageSpeed);
-    double newAvgSpeed = (allTimeAvgSpeed * allTimeDownhillAndUphillDuration +
-            tempAvgSpeed * currentDownhillAndUphillDuration) /
-        (allTimeDownhillAndUphillDuration + currentDownhillAndUphillDuration);
-    SharedPref.saveDouble(PowderPilot.allTimeAverageSpeed, newAvgSpeed);
-
-    /// Save Runs
-    SharedPref.saveInt(PowderPilot.numberRuns,
-        await SharedPref.readInt(PowderPilot.numberRuns) + tempNumRuns);
-    if (await SharedPref.readDouble(PowderPilot.longestRun) < tempLongestRun) {
-      SharedPref.saveDouble(PowderPilot.longestRun, tempLongestRun);
-    }
-
-    /// Save Durations
-    SharedPref.saveInt(
-        PowderPilot.allTimeDuration,
-        await SharedPref.readInt(PowderPilot.allTimeDuration) +
-            tempTotalTime.inSeconds);
-    SharedPref.saveInt(
-        PowderPilot.allTimeDurationDownhill,
-        await SharedPref.readInt(PowderPilot.allTimeDurationDownhill) +
-            tempDownhillTime.inSeconds);
-    SharedPref.saveInt(
-        PowderPilot.allTimeDurationUphill,
-        await SharedPref.readInt(PowderPilot.allTimeDurationUphill) +
-            tempUphillTime.inSeconds);
   }
 
   /// Method to pause the activity.
@@ -325,6 +244,9 @@ class LocationHandler extends ActivityData {
               activityLocations.setFastestLocation([longitude, latitude]);
           route.addCoordinates([longitude, latitude]);
           speed.maxSpeed = speed.currentSpeed;
+          if (speed.maxSpeed > PowderPilot.statistics.maxSpeed) {
+            PowderPilot.statistics.maxSpeed = speed.maxSpeed;
+          }
         }
 
         /// Handle speed updates and maintain a record of speeds.
@@ -335,6 +257,7 @@ class LocationHandler extends ActivityData {
           state.resumeDownhillOrUphill();
           speed.totalSpeed += speed.currentSpeed;
           speed.avgSpeed = speed.totalSpeed / _numberOfSpeedUpdates;
+          PowderPilot.statistics.updateAvgSpeed(speed.avgSpeed);
         }
 
         speed.addSpeed(
@@ -369,15 +292,18 @@ class LocationHandler extends ActivityData {
       }
 
       altitude.currentAltitude = smoothAltitude(position.altitude);
-      altitude.maxAltitude = altitude.currentAltitude > altitude.maxAltitude
-          ? altitude.currentAltitude
-          : altitude.maxAltitude;
+      if (altitude.currentAltitude > altitude.maxAltitude) {
+        PowderPilot.statistics.maxAltitude = altitude.currentAltitude;
+        if (altitude.currentAltitude > PowderPilot.statistics.maxAltitude) {
+          PowderPilot.statistics.maxAltitude = altitude.currentAltitude;
+        }
+      }
       if (altitude.minAltitude == 0.0) {
         altitude.minAltitude = altitude.currentAltitude;
       }
-      altitude.minAltitude = altitude.currentAltitude < altitude.minAltitude
-          ? altitude.currentAltitude
-          : altitude.minAltitude;
+      if (altitude.currentAltitude < altitude.minAltitude) {
+        altitude.maxAltitude = altitude.currentAltitude;
+      }
       altitude.totalAltitude += altitude.currentAltitude;
       altitude.avgAltitude = altitude.totalAltitude / _numberOfAltitudeUpdates;
 
@@ -429,6 +355,7 @@ class LocationHandler extends ActivityData {
 
         /// Update distance data.
         distance.totalDistance += calculatedDistance;
+        PowderPilot.statistics.distanceTotal += calculatedDistance;
         distance.addDistance(
           activityTimer.duration.total.inSeconds.toDouble(),
           distance.totalDistance,
@@ -458,6 +385,7 @@ class LocationHandler extends ActivityData {
         } else if (altitude.currentAltitude - altitude.currentExtrema < -15) {
           updateDistanceHelper(RunningStatus.downhill);
           runs.totalRuns++;
+          PowderPilot.statistics.numRuns++;
         }
       }
 
@@ -465,15 +393,20 @@ class LocationHandler extends ActivityData {
           altitude.currentAltitude - altitude.currentExtrema > 0) {
         altitude.currentExtrema = altitude.currentAltitude;
         distance.distanceUphill += tempDistance;
+        PowderPilot.statistics.distanceUphill += tempDistance;
         tempDistance = 0.0;
       } else if (state.isDownhill &&
           altitude.currentAltitude - altitude.currentExtrema < 0) {
         altitude.currentExtrema = altitude.currentAltitude;
         distance.distanceDownhill += tempDistance;
+        PowderPilot.statistics.distanceDownhill += tempDistance;
         currentRunLength += tempDistance;
-        runs.longestRun = currentRunLength > runs.longestRun
-            ? currentRunLength
-            : runs.longestRun;
+        if (currentRunLength > runs.longestRun) {
+          runs.longestRun = currentRunLength;
+          if (currentRunLength > PowderPilot.statistics.longestRun) {
+            PowderPilot.statistics.longestRun = currentRunLength;
+          }
+        }
         tempDistance = 0.0;
       }
     }
@@ -578,6 +511,7 @@ class LocationHandler extends ActivityData {
           if (!_locationInitialized) {
             initializeLocation(position);
             route.addCoordinates([longitude, latitude]);
+            PowderPilot.statistics.numActivities++;
           }
 
           /// Update speed

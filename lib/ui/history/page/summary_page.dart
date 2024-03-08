@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:powder_pilot/ui/history/delete.dart';
+import 'package:powder_pilot/ui/history/actions/delete.dart';
 
 import '../../../activity/database.dart';
 import '../../../string_pool.dart';

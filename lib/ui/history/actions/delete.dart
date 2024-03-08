@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../activity/database.dart';
-import '../../string_pool.dart';
-import '../../theme/color.dart';
-import '../../theme/font.dart';
-import '../../utils/general_utils.dart';
+import '../../../activity/database.dart';
+import '../../../string_pool.dart';
+import '../../../theme/color.dart';
+import '../../../theme/font.dart';
+import '../../../utils/general_utils.dart';
 
 /// Class to handle the deletion of an activity
 class DeleteActivity {

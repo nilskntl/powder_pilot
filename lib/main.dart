@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:powder_pilot/location.dart';
+import 'package:powder_pilot/statistics/statistics.dart';
 import 'package:powder_pilot/theme/color.dart';
 import 'package:powder_pilot/theme/measurement.dart';
 import 'package:powder_pilot/ui/controller.dart';
@@ -63,6 +64,9 @@ void _init() async {
 
   /// Read the language key from the shared preferences
   String language = await SharedPref.readString(PowderPilot.languageKey);
+
+  /// Load the all-time statistics from the shared preferences
+  PowderPilot.statistics.loadFromSharedPref();
 
   /// Set the language to the system language
   /// If the system language is not available, set it to English
@@ -239,6 +243,9 @@ class PowderPilot extends StatefulWidget {
 
   /// The current activity
   static Activity _activity = Activity();
+
+  /// The all-time statistics
+  static Statistics statistics = Statistics();
 
   /// The data provider for the activity
   /// Initialized with a dummy to avoid null pointer exceptions

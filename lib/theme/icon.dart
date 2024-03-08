@@ -14,6 +14,7 @@ class LogoTheme {
 
   /// Icons used to display different kind of UI elements.
   static const IconData activity = Icons.downhill_skiing_sharp;
+  static const IconData statistics = Icons.bar_chart_sharp;
   static const IconData settings = Icons.settings_sharp;
   static const IconData history = Icons.calendar_month_sharp;
   static const IconData click = Icons.touch_app_sharp;

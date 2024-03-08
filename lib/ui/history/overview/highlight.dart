@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:powder_pilot/ui/history/delete.dart';
+import 'package:powder_pilot/ui/history/actions/delete.dart';
 import 'package:powder_pilot/ui/history/page/summary_page.dart';
 
 import '../../../activity/database.dart';
@@ -10,7 +10,7 @@ import '../../../theme/icon.dart';
 import '../../../theme/measurement.dart';
 import '../../../theme/widget.dart';
 import '../../../utils/general_utils.dart';
-import 'history.dart';
+import '../history.dart';
 
 /// Shows an overview over the most important data of an activity
 class Highlight extends StatefulWidget {
@@ -71,7 +71,7 @@ class _HighlightState extends State<Highlight> {
               height: _deleted ? 0.0 : 156.0,
               onEnd: () {
                 if (_deleted) {
-                  History.reload();
+                  HistoryPage.reload();
                 }
               },
               child: ListView(

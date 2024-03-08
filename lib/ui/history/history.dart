@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:powder_pilot/ui/history/overview/header.dart';
 
-import '../../../activity/database.dart';
-import '../../../string_pool.dart';
-import '../../../theme/color.dart';
-import '../../../utils/general_utils.dart';
-import 'highlight.dart';
+import '../../activity/database.dart';
+import '../../string_pool.dart';
+import '../../theme/color.dart';
+import '../../utils/general_utils.dart';
+import 'overview/highlight.dart';
 
-class History extends StatefulWidget {
-  const History({super.key});
+class HistoryPage extends StatefulWidget {
+  const HistoryPage({super.key});
 
   static void Function() reload = () {};
 
   @override
-  State<History> createState() => HistoryState();
+  State<HistoryPage> createState() => HistoryPageState();
 }
 
-class HistoryState extends State<History> {
+class HistoryPageState extends State<HistoryPage> {
   void update() {
     setState(() {});
   }
@@ -24,10 +24,10 @@ class HistoryState extends State<History> {
   @override
   void initState() {
     super.initState();
-    History.reload = () {
-     if(mounted) {
-       setState(() {});
-     }
+    HistoryPage.reload = () {
+      if (mounted) {
+        setState(() {});
+      }
     };
   }
 

@@ -11,7 +11,7 @@ import '../../../theme/widget.dart';
 import '../../../utils/general_utils.dart';
 import '../../../utils/shared_preferences.dart';
 import '../../activity/activity_page.dart';
-import '../../history/overview/history.dart';
+import '../../history/history.dart';
 
 /// The measurement setting allows the user to change the measurement units of the app.
 class MeasurementSetting extends StatefulWidget {
@@ -36,7 +36,7 @@ class _MeasurementSettingState extends State<MeasurementSetting> {
       Measurement.setUnits(measurement);
       SharedPref.saveString('units', measurement);
       PowderPilot.reload();
-      History.reload();
+      HistoryPage.reload();
       ActivityPage.reload();
     });
   }

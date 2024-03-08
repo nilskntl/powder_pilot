@@ -58,9 +58,13 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
                   text: StringPool.ACTIVITY,
                   page: 0),
               _buildItem(
+                  iconData: LogoTheme.statistics,
+                  text: StringPool.STATISTICS,
+                  page: 1),
+              _buildItem(
                   iconData: LogoTheme.history,
                   text: StringPool.HISTORY,
-                  page: 1),
+                  page: 2),
             ],
           ),
           AnimatedPositioned(

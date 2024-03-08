@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:powder_pilot/ui/statistics/statistics.dart';
 
 import 'activity/activity_page.dart';
 import 'controller.dart';
-import 'history/overview/history.dart';
+import 'history/history.dart';
 
 /// Class for the main page view (activity and history)
 class MainPageView extends StatefulWidget {
@@ -22,7 +23,10 @@ class _MainPageViewState extends State<MainPageView> {
       ActivityPage(customPageController: widget.controller);
 
   /// The page for the history
-  final History history = const History();
+  final HistoryPage history = const HistoryPage();
+  
+  /// The page for statistics
+  final StatisticsPage statistics = const StatisticsPage();
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +40,7 @@ class _MainPageViewState extends State<MainPageView> {
       },
       children: [
         activity,
+        statistics,
         history,
       ],
     );
