@@ -19,6 +19,7 @@ import 'package:provider/provider.dart';
 
 import 'activity/activity.dart';
 import 'activity/data_provider.dart';
+import 'history/past_activities.dart';
 import 'l10n/messages_all_locales.dart';
 import 'ui/widgets/app_bar.dart';
 
@@ -67,6 +68,9 @@ void _init() async {
 
   /// Load the all-time statistics from the shared preferences
   PowderPilot.statistics.loadFromSharedPref();
+
+  /// Load the past activities from the database
+  PowderPilot.pastActivities.loadActivities();
 
   /// Set the language to the system language
   /// If the system language is not available, set it to English
@@ -246,6 +250,9 @@ class PowderPilot extends StatefulWidget {
 
   /// The all-time statistics
   static Statistics statistics = Statistics();
+
+  /// The past activities
+  static PastActivities pastActivities = PastActivities();
 
   /// The data provider for the activity
   /// Initialized with a dummy to avoid null pointer exceptions

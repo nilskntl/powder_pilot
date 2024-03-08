@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:powder_pilot/ui/history/actions/delete.dart';
 import 'package:powder_pilot/ui/history/page/summary_page.dart';
 
 import '../../../activity/database.dart';
+import '../../../history/delete.dart';
 import '../../../string_pool.dart';
 import '../../../theme/color.dart';
 import '../../../theme/font.dart';
@@ -25,32 +25,19 @@ class Highlight extends StatefulWidget {
 
 /// The state for the HistoryOverview widget.
 class _HighlightState extends State<Highlight> {
-  /// Flag to track if the activity is deleted
-  bool _deleted = false;
-
-  /// Check if the activity is deleted
-  void _checkIfActivityIsDeleted() async {
-    if (!(await ActivityDatabaseHelper.containsActivity(widget.activity.id))) {
-      /// Update the state of the History Page if the activity is deleted
-      /// and set the value of _deleted to true
-      setState(() {
-        _deleted = true;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onLongPress: () {
         /// Show a dialog to confirm the deletion of the activity
         DeleteActivity.showDeleteConfirmationDialog(
-            context: context,
-            activity: widget.activity,
-            onPressed: () {
-              /// Check if the activity is deleted
-              _checkIfActivityIsDeleted();
-            });
+          context: context,
+          activity: widget.activity,
+          onPressed: () {
+            /// Check if the activity is deleted
+            HistoryPage.reload();
+          },
+        );
       },
       onTap: () {
         /// Go to the detailed [SummaryPage] of the activity
@@ -59,21 +46,16 @@ class _HighlightState extends State<Highlight> {
           MaterialPageRoute(
             builder: (context) => SummaryPage(
               activityDatabase: widget.activity,
-              onDelete: _checkIfActivityIsDeleted,
+              onDelete: HistoryPage.reload,
             ),
           ),
         );
       },
       child: Column(
         children: [
-          SizedBox(height: _deleted ? 0.0 : 8.0),
-          WidgetTheme.animatedContainer(
-              height: _deleted ? 0.0 : 156.0,
-              onEnd: () {
-                if (_deleted) {
-                  HistoryPage.reload();
-                }
-              },
+          const SizedBox(height: 8.0),
+          WidgetTheme.container(
+              height: 156.0,
               child: ListView(
                 padding: const EdgeInsets.all(0.0),
                 shrinkWrap: true,
@@ -105,7 +87,7 @@ class _HighlightState extends State<Highlight> {
                   ),
                 ],
               )),
-          SizedBox(height: _deleted ? 0.0 : 8.0),
+          const SizedBox(height: 8.0),
         ],
       ),
     );

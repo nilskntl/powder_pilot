@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:powder_pilot/ui/history/actions/delete.dart';
 
 import '../../../activity/database.dart';
+import '../../../history/delete.dart';
 import '../../../string_pool.dart';
 import '../../../theme/color.dart';
 import '../../../utils/general_utils.dart';

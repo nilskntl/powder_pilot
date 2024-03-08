@@ -24,7 +24,6 @@ enum LocationType {
 class Activity extends LocationHandler {
   /// Constructor for Activity.
   ///
-  /// @param id: Activity ID.
   /// @param currentPosition: Initial geographical coordinates.
   /// @param mapDownloaded: Flag indicating whether the map is downloaded.
   Activity({

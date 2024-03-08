@@ -38,6 +38,7 @@ class ActivityData {
   /// Save the activity data to a database and return the database entry.
   ActivityDatabase saveActivity() {
     ActivityDatabase activityDatabase = ActivityDatabase(
+      id: DateTime.now().millisecondsSinceEpoch,
       areaName: PowderPilot.locationService.areaName,
       maxSpeed: speed.maxSpeed,
       averageSpeed: speed.avgSpeed,
@@ -66,8 +67,8 @@ class ActivityData {
       endLocation: activityLocations.endLocation.toString(),
     );
 
-    /// Insert the activity into the database.
-    ActivityDatabaseHelper.insertActivity(activityDatabase);
+    /// Save the activity
+    PowderPilot.pastActivities.addActivity(activityDatabase);
     return activityDatabase;
   }
 

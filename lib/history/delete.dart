@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:powder_pilot/main.dart';
 
-import '../../../activity/database.dart';
-import '../../../string_pool.dart';
-import '../../../theme/color.dart';
-import '../../../theme/font.dart';
-import '../../../utils/general_utils.dart';
+import '../../activity/database.dart';
+import '../../string_pool.dart';
+import '../../theme/color.dart';
+import '../../theme/font.dart';
+import '../../utils/general_utils.dart';
 
 /// Class to handle the deletion of an activity
 class DeleteActivity {
@@ -46,7 +47,7 @@ class DeleteActivity {
             ),
             TextButton(
               onPressed: () {
-                _deleteActivity(activity.id);
+                PowderPilot.pastActivities.removeActivity(activity.id);
                 Navigator.of(context).pop();
                 onPressed();
               },
@@ -61,12 +62,5 @@ class DeleteActivity {
         );
       },
     );
-  }
-
-  /// Delete an activity from the database
-  ///
-  /// @param id The id of the activity to delete
-  static void _deleteActivity(int id) {
-    ActivityDatabaseHelper.deleteActivity(id);
   }
 }
