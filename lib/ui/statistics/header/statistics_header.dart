@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:powder_pilot/theme/font.dart';
-import 'package:powder_pilot/ui/statistics/runs/mountain_painter.dart';
 
 import '../../../string_pool.dart';
 import '../../../theme/color.dart';

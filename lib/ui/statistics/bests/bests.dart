@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:powder_pilot/theme/widget.dart';
 
 import '../../../main.dart';
 import '../../../string_pool.dart';
