@@ -76,12 +76,12 @@ class PastActivities {
   ///
   /// @param activity The id of the activity to be removed
   void removeActivity(int id) {
-    /// Remove the activity from the list of activities
-    activities.removeWhere((element) => element.id == id);
-
     /// Remove one from the area count
     _removeAreaName(
         activities.firstWhere((element) => element.id == id).areaName);
+
+    /// Remove the activity from the list of activities
+    activities.removeWhere((element) => element.id == id);
 
     /// Remove from the database
     ActivityDatabaseHelper.deleteActivity(id);
