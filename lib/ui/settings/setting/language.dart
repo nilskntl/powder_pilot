@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:powder_pilot/main.dart';
 import 'package:powder_pilot/ui/settings/settings.dart';
+import 'package:powder_pilot/ui/statistics/statistics.dart';
 
 import '../../../l10n/messages_all_locales.dart';
 import '../../../string_pool.dart';
@@ -41,6 +42,7 @@ class _LanguageSettingState extends State<LanguageSetting> {
       SettingsPage.reload();
       PowderPilot.reload();
       ActivityPage.reload();
+      StatisticsPage.reload();
     });
   }
 

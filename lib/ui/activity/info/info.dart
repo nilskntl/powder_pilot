@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:powder_pilot/ui/activity/info/widgets/category.dart';
 import 'package:powder_pilot/ui/activity/info/widgets/run.dart';
-import 'package:powder_pilot/ui/widgets/single_graph.dart';
+import 'package:powder_pilot/ui/widgets/single_line_graph.dart';
 
 import '../../../activity/data_provider.dart';
 import '../../../activity/state.dart';

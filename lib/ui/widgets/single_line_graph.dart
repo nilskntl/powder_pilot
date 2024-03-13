@@ -7,12 +7,14 @@ import '../../theme/animation.dart';
 
 /// Widget to display a single graph
 class SingleGraph<T> extends StatefulWidget {
-  const SingleGraph({super.key,
+  const SingleGraph({
+    super.key,
     required this.data,
     this.factor = 1.0,
     required this.color,
     this.unit = '',
-    this.dummy = false});
+    this.dummy = false,
+  });
 
   /// The data of the altitude
   final List<List<T>> data;
@@ -83,9 +85,9 @@ class _SingleGraphState extends State<SingleGraph> {
       if (data.length >= 2) {
         /// Get the values of the list (x, y)
         double x =
-        data[0] is int ? (data[0] as int).toDouble() : data[0] as double;
+            data[0] is int ? (data[0] as int).toDouble() : data[0] as double;
         double y =
-        data[1] is int ? (data[1] as int).toDouble() : data[1] as double;
+            data[1] is int ? (data[1] as int).toDouble() : data[1] as double;
 
         /// Try to add the FlSpot to the list of FlSpots
         /// If the value is not a double, the value is not added
@@ -146,17 +148,17 @@ class _SingleGraphState extends State<SingleGraph> {
           duration: AnimationTheme.fastAnimationDuration,
           height: widget.data.length > 1 || widget.dummy
               ? _differentEntries || widget.dummy
-              ? widget.heightExpanded
-              : widget.heightSameEntries
+                  ? widget.heightExpanded
+                  : widget.heightSameEntries
               : 0,
           child: widget.data.length > 1
               ? _buildLineChart(
-            list: widget.data,
-            color: widget.color,
-          )
+                  list: widget.data,
+                  color: widget.color,
+                )
               : widget.dummy
-              ? _buildDummyChart(flSpots: dummyData)
-              : const SizedBox(),
+                  ? _buildDummyChart(flSpots: dummyData)
+                  : const SizedBox(),
         ),
       ],
     );

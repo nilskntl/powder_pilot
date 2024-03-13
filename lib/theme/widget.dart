@@ -133,7 +133,7 @@ class WidgetTheme {
         Alignment alignment = Alignment.center,
         BorderRadius borderRadius = const BorderRadius.all(Radius.circular(16.0)),
         Widget child = const SizedBox(),
-        EdgeInsets padding = const EdgeInsets.all(8.0)}) {
+        EdgeInsets padding = const EdgeInsets.all(8.0), EdgeInsets margin = const EdgeInsets.all(0.0)}) {
     if (color == const Color(0xff000001)) {
       color = ColorTheme.secondary;
     }
@@ -142,6 +142,7 @@ class WidgetTheme {
         height: height,
         width: width,
         padding: padding,
+        margin: margin,
         decoration: BoxDecoration(
           color: color,
           borderRadius: borderRadius,
@@ -153,6 +154,7 @@ class WidgetTheme {
       return Container(
         height: height,
         padding: padding,
+        margin: margin,
         decoration: BoxDecoration(
           color: color,
           borderRadius: borderRadius,
@@ -164,6 +166,7 @@ class WidgetTheme {
       return Container(
         width: width,
         padding: padding,
+        margin: margin,
         decoration: BoxDecoration(
           color: color,
           borderRadius: borderRadius,
@@ -174,6 +177,7 @@ class WidgetTheme {
     } else {
       return Container(
         padding: padding,
+        margin: margin,
         decoration: BoxDecoration(
           color: color,
           borderRadius: borderRadius,
@@ -195,6 +199,7 @@ class WidgetTheme {
         BorderRadius borderRadius = const BorderRadius.all(Radius.circular(16.0)),
         Widget child = const SizedBox(),
         EdgeInsets padding = const EdgeInsets.all(8.0),
+        EdgeInsets margin = const EdgeInsets.all(0.0),
         void Function()? onEnd}) {
     if (color == const Color(0xff000001)) {
       color = ColorTheme.secondary;
@@ -207,6 +212,7 @@ class WidgetTheme {
         height: height,
         width: width,
         padding: padding,
+        margin: margin,
         onEnd: onEnd,
         decoration: BoxDecoration(
           color: color,
@@ -222,6 +228,7 @@ class WidgetTheme {
         height: height,
         onEnd: onEnd,
         padding: padding,
+        margin: margin,
         decoration: BoxDecoration(
           color: color,
           borderRadius: borderRadius,
@@ -235,6 +242,7 @@ class WidgetTheme {
         curve: curve,
         width: width,
         padding: padding,
+        margin: margin,
         onEnd: onEnd,
         decoration: BoxDecoration(
           color: color,
@@ -248,6 +256,7 @@ class WidgetTheme {
         duration: duration,
         curve: curve,
         padding: padding,
+        margin: margin,
         decoration: BoxDecoration(
           color: color,
           borderRadius: borderRadius,

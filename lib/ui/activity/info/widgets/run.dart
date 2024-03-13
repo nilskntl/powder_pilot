@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:powder_pilot/activity/data_provider.dart';
 import 'package:powder_pilot/main.dart';
-import 'package:powder_pilot/ui/widgets/single_graph.dart';
+import 'package:powder_pilot/ui/widgets/single_line_graph.dart';
 
 import '../../../../activity/state.dart';
 import '../../../../string_pool.dart';

@@ -74,6 +74,7 @@ class _StatusBarState extends State<StatusBar> {
               borderRadius: BorderRadius.circular(16.0),
               side: BorderSide(color: ColorTheme.primary, width: 1.0),
             ),
+            splashColor: ColorTheme.grey.withOpacity(0.2),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

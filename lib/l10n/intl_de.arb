@@ -1,12 +1,10 @@
 {
   "@@locale": "de",
-
   "StringPool_IDLE": "Inaktiv",
   "StringPool_RUNNING": "Läuft",
   "StringPool_PAUSED": "Pausiert",
   "StringPool_FINISHED": "Abgeschlossen",
   "StringPool_INACTIVE": "Inaktiv",
-
   "StringPool_SPEED": "Geschwindigkeit",
   "StringPool_ALTITUDE": "Höhe",
   "StringPool_DOWNWARD_SLOPE": "Gefälle",
@@ -21,16 +19,13 @@
   "StringPool_RESUME": "Fortsetzen",
   "StringPool_STOP": "Stoppen",
   "StringPool_START": "Start",
-
   "StringPool_CURRENT": "Aktuell",
   "StringPool_AVERAGE": "Schnitt",
   "StringPool_MAX": "Max",
   "StringPool_MIN": "Min",
   "StringPool_LONGEST": "Längste",
-
   "StringPool_ACTIVITY": "Aktivität",
   "StringPool_HISTORY": "Verlauf",
-
   "StringPool_NO_ACTIVITIES": "Keine Aktivitäten gefunden.",
   "StringPool_ACTIVITIES": "Aktivitäten",
   "StringPool_LATEST": "Neueste",
@@ -40,7 +35,6 @@
   "StringPool_DELETE_ACTIVITY_CONFIRMATION": "Sind Sie sicher, dass Sie diese Aktivität löschen möchten?",
   "StringPool_CANCEL": "Abbrechen",
   "StringPool_SUMMARY": "Zusammenfassung",
-
   "StringPool_SETTINGS": "Einstellungen",
   "StringPool_LANGUAGE": "Sprache",
   "StringPool_MEASUREMENT": "Maßeinheit",
@@ -51,13 +45,11 @@
   "StringPool_CURRENT_MEASUREMENT": "Aktuelles System: ",
   "StringPool_MEASUREMENT_METRIC": "Metrisch",
   "StringPool_MEASUREMENT_IMPERIAL": "Imperial",
-
   "StringPool_UNKNOWN_AREA": "Unbekannt",
   "StringPool_FREE_RIDE": "Freeride",
   "StringPool_SLOPE_PISTE": "Piste",
   "StringPool_NOTIFICATION_TEXT": "Deine Skifahrt wird im Hintergrund getrackt. Genieß die Fahrt!",
   "StringPool_NOTIFICATION_TITLE": "Aktivität läuft",
-
   "StringPool_BUTTON_TEXT": "Weiter",
   "StringPool_OPEN_SETTINGS": "Einstellungen öffnen",
   "StringPool_ENABLE_LOCATION": "Standort aktivieren",
@@ -76,5 +68,7 @@
   "StringPool_PRIVACY_POLICY": "Datenschutzerklärung",
   "StringPool_LEGAL_TEXT_1": "Ich stimme den ",
   "StringPool_LEGAL_TEXT_2": " und der ",
-  "StringPool_LEGAL_TEXT_3": " zu."
+  "StringPool_LEGAL_TEXT_3": " zu.",
+  "StringPool_STATISTICS": "Statistiken",
+  "StringPool_BESTS": "Deine Bestleistungen"
 }

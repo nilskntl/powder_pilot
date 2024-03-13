@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:powder_pilot/activity/data_provider.dart';
 import 'package:powder_pilot/ui/map/map_overview.dart';
-import 'package:powder_pilot/ui/widgets/single_graph.dart';
+import 'package:powder_pilot/ui/widgets/single_line_graph.dart';
 
 import '../../activity/data.dart';
 import '../../activity/database.dart';

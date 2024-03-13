@@ -30,7 +30,7 @@ class Statistics {
   Duration timeUphill = const Duration(seconds: 0);
 
   /// Initial downhill and uphill duration
-  Duration _inititialDownhillAndUphillTime = const Duration(seconds: 0);
+  Duration _initialDownhillAndUphillTime = const Duration(seconds: 0);
 
   /// Longest run (in km)
   double longestRun = 0.0;
@@ -88,7 +88,7 @@ class Statistics {
         seconds: await SharedPref.readInt(PowderPilot.allTimeDurationDownhill));
     timeUphill = Duration(
         seconds: await SharedPref.readInt(PowderPilot.allTimeDurationUphill));
-    _inititialDownhillAndUphillTime = timeDownhill + timeUphill;
+    _initialDownhillAndUphillTime = timeDownhill + timeUphill;
     longestRun = await SharedPref.readDouble(PowderPilot.longestRun);
     numRuns = await SharedPref.readInt(PowderPilot.numberRuns);
     maxSpeed = await SharedPref.readDouble(PowderPilot.fastestSpeed);
@@ -120,7 +120,7 @@ class Statistics {
     SharedPref.saveDouble(PowderPilot.fastestSpeed, maxSpeed);
     SharedPref.saveDouble(PowderPilot.allTimeAverageSpeed, avgSpeed);
     _initialAvgSpeed = avgSpeed;
-    _inititialDownhillAndUphillTime = timeDownhill + timeUphill;
+    _initialDownhillAndUphillTime = timeDownhill + timeUphill;
   }
 
   /// Update average speed
@@ -128,13 +128,13 @@ class Statistics {
   /// @param avgSpeed The average speed from the current activity
   void updateAvgSpeed(double avgSpeed) {
     int timeDiff =
-        (timeDownhill + timeUphill - _inititialDownhillAndUphillTime).inSeconds;
+        (timeDownhill + timeUphill - _initialDownhillAndUphillTime).inSeconds;
     if (timeDiff <= 0) {
       return;
     }
-    avgSpeed = ((_inititialDownhillAndUphillTime.inSeconds * _initialAvgSpeed) +
+    avgSpeed = ((_initialDownhillAndUphillTime.inSeconds * _initialAvgSpeed) +
             (timeDiff * avgSpeed)) /
-        (timeDiff + _inititialDownhillAndUphillTime.inSeconds);
+        (timeDiff + _initialDownhillAndUphillTime.inSeconds);
   }
 
   /// Getter for the flag to indicate if the statistics are loaded

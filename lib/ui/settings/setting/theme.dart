@@ -9,6 +9,7 @@ import '../../../theme/color.dart';
 import '../../../theme/widget.dart';
 import '../../../utils/general_utils.dart';
 import '../../history/history.dart';
+import '../../statistics/statistics.dart';
 import '../settings.dart';
 
 /// The app theme setting allows the user to change the (color) app theme.
@@ -34,6 +35,7 @@ class _AppThemeSettingState extends State<AppThemeSetting> {
       PowderPilot.reload();
       HistoryPage.reload();
       ActivityPage.reload();
+      StatisticsPage.reload();
     });
   }
 

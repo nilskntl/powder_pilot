@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:powder_pilot/ui/statistics/activities/number_activities.dart';
-import 'package:provider/provider.dart';
-
-import '../../activity/data_provider.dart';
-import '../../main.dart';
-import '../controller.dart';
+import 'package:powder_pilot/ui/statistics/areas/most_visited_areas.dart';
+import 'package:powder_pilot/ui/statistics/bests/bests.dart';
+import 'package:powder_pilot/ui/statistics/distance/distances.dart';
+import 'package:powder_pilot/ui/statistics/header/statistics_header.dart';
 
 /// The page on which the statistics are displayed.
 class StatisticsPage extends StatefulWidget {
@@ -28,9 +26,29 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       children: [
-        NumberActivities(),
+        StatisticsHeader(),
+        Distances(),
+        SizedBox(height: 16),
+        Bests(),
+        SizedBox(height: 16),
+        SizedBox(
+          height: 200,
+          child: Row(
+            children: [
+              SizedBox(
+                width: 8,
+              ),
+              Expanded(
+                child: MostVisitedAreas(),
+              ),
+              SizedBox(
+                width: 8.0,
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

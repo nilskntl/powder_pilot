@@ -88,7 +88,10 @@ class StringPool {
       name: 'StringPool_HISTORY', locale: PowderPilot.language[0]);
 
   static String get STATISTICS => Intl.message('Statistics',
-      name: 'StringPool_Statistics', locale: PowderPilot.language[0]);
+      name: 'StringPool_STATISTICS', locale: PowderPilot.language[0]);
+
+  static String get BESTS => Intl.message('Your personal bests',
+      name: 'StringPool_BESTS', locale: PowderPilot.language[0]);
 
   static String get MAP => Intl.message('Map',
       name: 'StringPool_MAP', locale: PowderPilot.language[0]);

@@ -27,6 +27,7 @@ class CustomMaterialAppBar {
           color: dark ? ColorTheme.contrast : ColorTheme.secondary,
           fontSize: FontTheme.sizeSubHeader - 4),
       actions: [child],
+      centerTitle: true,
     );
   }
 }

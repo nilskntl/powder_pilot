@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:powder_pilot/main.dart';
 import 'package:powder_pilot/theme/icon.dart';
 import 'package:powder_pilot/ui/settings/settings.dart';
+import 'package:powder_pilot/ui/statistics/statistics.dart';
 
 import '../../../string_pool.dart';
 import '../../../theme/color.dart';
@@ -38,6 +39,7 @@ class _MeasurementSettingState extends State<MeasurementSetting> {
       PowderPilot.reload();
       HistoryPage.reload();
       ActivityPage.reload();
+      StatisticsPage.reload();
     });
   }
 
