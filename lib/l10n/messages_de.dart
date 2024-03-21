@@ -95,5 +95,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "StringPool_LEGAL_TEXT_2": MessageLookupByLibrary.simpleMessage(' und der '),
     "StringPool_LEGAL_TEXT_3": MessageLookupByLibrary.simpleMessage(' zu.'),
     "StringPool_MAP": MessageLookupByLibrary.simpleMessage('Karte'),
+    "StringPool_STATISTICS": MessageLookupByLibrary.simpleMessage('Statistiken'),
+    "StringPool_BESTS": MessageLookupByLibrary.simpleMessage('Deine Bestleistungen'),
+    "StringPool_NO_DATA": MessageLookupByLibrary.simpleMessage('Keine Daten gefunden.'),
+    "StringPool_MOST_VISITED_AREAS": MessageLookupByLibrary.simpleMessage('Meistbesuchte Skigebiete'),
   };
 }

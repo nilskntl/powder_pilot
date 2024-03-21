@@ -93,6 +93,12 @@ class StringPool {
   static String get BESTS => Intl.message('Your personal bests',
       name: 'StringPool_BESTS', locale: PowderPilot.language[0]);
 
+  static String get MOST_VISITED_AREAS => Intl.message('Most visited areas',
+      name: 'StringPool_MOST_VISITED_AREAS', locale: PowderPilot.language[0]);
+
+  static String get NO_DATA => Intl.message('No data found.',
+      name: 'StringPool_NO_DATA', locale: PowderPilot.language[0]);
+
   static String get MAP => Intl.message('Map',
       name: 'StringPool_MAP', locale: PowderPilot.language[0]);
 
