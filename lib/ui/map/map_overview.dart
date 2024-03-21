@@ -118,22 +118,13 @@ class _MapOverviewState extends State<MapOverview> {
                   ? widget.dataProvider!.internetStatus == true
                   : PowderPilot.connectivityController.status == true &&
                       (widget.static || widget.dataProvider!.latitude != 0.0))
-                _map
-              else
-                Container(
-                  color: ColorTheme.background,
-                  child: Center(
-                    child: Icon(
-                      LogoTheme.activity,
-                      color: ColorTheme.contrast,
-                    ),
-                  ),
-                ),
+                _map,
               _mapOverlay(),
               if (!widget.static && !widget.static
                   ? widget.dataProvider!.internetStatus == true
                   : PowderPilot.connectivityController.status == true &&
-                  !widget.static && widget.dataProvider!.latitude != 0.0)
+                      !widget.static &&
+                      widget.dataProvider!.latitude != 0.0)
                 _drawLocationMark(),
               if (!widget.static
                   ? widget.dataProvider!.internetStatus == true
