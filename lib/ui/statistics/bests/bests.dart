@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:powder_pilot/ui/statistics/utils/material_text_button.dart';
 
 import '../../../main.dart';
 import '../../../string_pool.dart';
@@ -18,27 +19,9 @@ class Bests extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            const SizedBox(width: 8),
-            Expanded(
-              child: MaterialButton(
-                onPressed: () {},
-                color: ColorTheme.secondary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                splashColor: ColorTheme.grey.withOpacity(0.2),
-                child: Utils.buildText(
-                  text: StringPool.BESTS,
-                  fontSize: FontTheme.size,
-                  fontWeight: FontWeight.bold,
-                  color: ColorTheme.grey,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-          ],
+        MaterialTextButton(
+          text: StringPool.BESTS,
+          color: ColorTheme.secondary,
         ),
         const SizedBox(height: 16),
         Row(children: [

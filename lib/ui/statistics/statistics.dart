@@ -32,23 +32,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
         Distances(),
         SizedBox(height: 16),
         Bests(),
-        SizedBox(height: 16),
-        SizedBox(
-          height: 200,
-          child: Row(
-            children: [
-              SizedBox(
-                width: 8,
-              ),
-              Expanded(
-                child: MostVisitedAreas(),
-              ),
-              SizedBox(
-                width: 8.0,
-              ),
-            ],
-          ),
-        ),
+        SizedBox(height: 24),
+        MostVisitedAreas(),
       ],
     );
   }
