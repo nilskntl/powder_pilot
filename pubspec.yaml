@@ -5,7 +5,7 @@ description: "The best Ski Tracker."
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.1.0+12
+version: 1.1.0+13
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -88,19 +88,22 @@ flutter:
 
   assets:
     - assets/images/icon_256.png
-    - assets/images/background.png
     - assets/images/welcome_pages/finish.png
     - assets/images/welcome_pages/location.png
-    - assets/images/lift/chair_lift.png
-    - assets/images/lift/gondola.png
     - assets/images/welcome_pages/slope_info.png
     - assets/images/welcome_pages/stats.png
     - assets/images/welcome_pages/activity.png
     - assets/images/welcome_pages/battery_optimization.png
+    - assets/images/lift/chair_lift.png
+    - assets/images/lift/gondola.png
     - assets/legal/terms_of_service.txt
     - assets/legal/privacy_policy.txt
-    - lib/l10n/intl_en.arb
-    - lib/l10n/intl_de.arb
+    - assets/images/backgrounds/Alpine.jpg
+    - assets/images/backgrounds/Chalet.jpg
+    - assets/images/backgrounds/Exotic.jpg
+    - assets/images/backgrounds/Ice.jpg
+    - assets/images/backgrounds/Snowy.jpg
+    - assets/images/backgrounds/Village.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
