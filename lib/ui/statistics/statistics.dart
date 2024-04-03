@@ -26,14 +26,26 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: [
-        StatisticsHeader(),
-        Distances(),
-        SizedBox(height: 16),
-        Bests(),
-        SizedBox(height: 24),
-        MostVisitedAreas(),
+        const StatisticsHeader(),
+        const Distances(),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: MediaQuery.of(context).size.height - 444,
+          child: ListView(
+            shrinkWrap: true,
+            children: const [
+              Column(
+                children: [
+                  Bests(),
+                  SizedBox(height: 24),
+                  MostVisitedAreas(),
+                ],
+              )
+            ],
+          ),
+        ),
       ],
     );
   }
