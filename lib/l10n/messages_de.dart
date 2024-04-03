@@ -64,6 +64,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "StringPool_LANGUAGE": MessageLookupByLibrary.simpleMessage('Sprache'),
     "StringPool_MEASUREMENT": MessageLookupByLibrary.simpleMessage('Maßeinheit'),
     "StringPool_APP_THEME": MessageLookupByLibrary.simpleMessage('App Theme'),
+    "StringPool_THEME": MessageLookupByLibrary.simpleMessage('Theme'),
     "StringPool_CHANGE_APP_THEME": MessageLookupByLibrary.simpleMessage('Ändere das App Theme'),
     "StringPool_LIGHT_THEME": MessageLookupByLibrary.simpleMessage('Hell'),
     "StringPool_DARK_THEME": MessageLookupByLibrary.simpleMessage('Dunkel'),

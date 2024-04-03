@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:powder_pilot/location.dart';
 import 'package:powder_pilot/statistics/statistics.dart';
+import 'package:powder_pilot/theme/background.dart';
 import 'package:powder_pilot/theme/color.dart';
 import 'package:powder_pilot/theme/measurement.dart';
 import 'package:powder_pilot/ui/controller.dart';
@@ -123,11 +124,14 @@ void _init() async {
   await initializeMessages(language);
 
   /// Read the theme key from shared preferences and set the theme
-  String theme = await SharedPref.readString(PowderPilot.themeKey);
+  String theme = await SharedPref.readString(PowderPilot.colorThemeKey);
   if (theme == '') {
     theme = ThemeChanger.defaultTheme;
   }
   ThemeChanger.changeTheme(theme);
+
+  /// Load the background image
+  BackgroundTheme.loadBackground();
 
   /// Read the units key from shared preferences and set the units
   String units = await SharedPref.readString(PowderPilot.unitsKey);
@@ -210,7 +214,9 @@ class PowderPilot extends StatefulWidget {
   static const String startKey = 'start';
   static const String unitsKey = 'units';
   static const String languageKey = 'language';
-  static const String themeKey = 'theme';
+  static const String colorThemeKey = 'theme';
+  static const String backgroundKey = 'background';
+  
 
   static const List<List<String>> availableLanguages = [
     ['de', 'Deutsch'],
@@ -305,7 +311,7 @@ class PowderPilotState extends State<PowderPilot> {
         body: Stack(
           children: [
             Image.asset(
-              'assets/images/background.png',
+              BackgroundTheme.currentBackgroundAsset,
               fit: BoxFit.cover,
               width: double.infinity,
             ),

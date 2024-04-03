@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:powder_pilot/theme/background.dart';
 
 import '../../main.dart';
 import '../../theme/color.dart';
@@ -79,7 +80,7 @@ class CustomAppBar extends StatelessWidget {
                 text: PowderPilot.appName,
                 fontSize: FontTheme.size,
                 fontWeight: FontWeight.bold,
-                color: ColorTheme.secondary,
+                color: BackgroundTheme.currentBackgroundKey == 'Chalet' ? ColorTheme.primary.withOpacity(0.7) : ColorTheme.secondary,
               ),
               Row(
                 children: [
@@ -108,7 +109,7 @@ class CustomAppBar extends StatelessWidget {
                       height: itemsSize,
                       child: Icon(
                         LogoTheme.settings,
-                        color: ColorTheme.secondary,
+                        color: BackgroundTheme.currentBackgroundKey == 'Chalet' ? ColorTheme.primary.withOpacity(0.7) : ColorTheme.secondary,
                       ),
                     ),
                   ),

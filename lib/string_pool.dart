@@ -143,6 +143,9 @@ class StringPool {
   static String get APP_THEME => Intl.message('App Theme',
       name: 'StringPool_APP_THEME', locale: PowderPilot.language[0]);
 
+  static String get THEME => Intl.message('Theme',
+      name: 'StringPool_THEME', locale: PowderPilot.language[0]);
+
   static String get CHANGE_APP_THEME => Intl.message('Change the app theme',
       name: 'StringPool_CHANGE_APP_THEME', locale: PowderPilot.language[0]);
 
