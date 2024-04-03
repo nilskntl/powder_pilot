@@ -120,6 +120,9 @@ class StringPool {
   static String get DELETE_ACTIVITY => Intl.message('Delete activity?',
       name: 'StringPool_DELETE_ACTIVITY', locale: PowderPilot.language[0]);
 
+  static String get SUCCESSFULLY_DELETED => Intl.message('Successfully deleted',
+      name: 'StringPool_SUCCESSFULLY_DELETED', locale: PowderPilot.language[0]);
+
   static String get DELETE_ACTIVITY_CONFIRMATION =>
       Intl.message('Are you sure you want to delete this activity?',
           name: 'StringPool_DELETE_ACTIVITY_CONFIRMATION',

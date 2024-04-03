@@ -49,6 +49,20 @@ class DeleteActivity {
               onPressed: () {
                 PowderPilot.pastActivities.removeActivity(activity.id);
                 Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Utils.buildText(
+                      text: StringPool.SUCCESSFULLY_DELETED,
+                      fontWeight: FontWeight.bold,
+                      caps: false,
+                    ),
+                    backgroundColor: ColorTheme.secondary,
+                    elevation: 4,
+                    showCloseIcon: true,
+                    closeIconColor: ColorTheme.contrast,
+                    duration: const Duration(seconds: 3), // Set the duration
+                  ),
+                );
                 onPressed();
               },
               child: Utils.buildText(

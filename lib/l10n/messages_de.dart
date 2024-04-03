@@ -57,6 +57,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "StringPool_EARLIEST": MessageLookupByLibrary.simpleMessage('Früheste'),
     "StringPool_DELETE": MessageLookupByLibrary.simpleMessage('Löschen'),
     "StringPool_DELETE_ACTIVITY": MessageLookupByLibrary.simpleMessage('Aktivität löschen?'),
+    "StringPool_SUCCESSFULLY_DELETED": MessageLookupByLibrary.simpleMessage('Erfolgreich gelöscht'),
     "StringPool_DELETE_ACTIVITY_CONFIRMATION": MessageLookupByLibrary.simpleMessage('Sind Sie sicher, dass Sie diese Aktivität löschen möchten?'),
     "StringPool_CANCEL": MessageLookupByLibrary.simpleMessage('Abbrechen'),
     "StringPool_SUMMARY": MessageLookupByLibrary.simpleMessage('Zusammenfassung'),
