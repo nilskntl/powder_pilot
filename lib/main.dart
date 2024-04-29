@@ -1,165 +1,25 @@
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:powder_pilot/init.dart';
 import 'package:powder_pilot/location.dart';
 import 'package:powder_pilot/statistics/statistics.dart';
 import 'package:powder_pilot/theme/background.dart';
 import 'package:powder_pilot/theme/color.dart';
-import 'package:powder_pilot/theme/measurement.dart';
 import 'package:powder_pilot/ui/controller.dart';
 import 'package:powder_pilot/ui/scroll_view.dart';
 import 'package:powder_pilot/ui/welcome_pages/welcome_pages.dart';
 import 'package:powder_pilot/ui/widgets/bottom_bar.dart';
 import 'package:powder_pilot/utils/connectivity_controller.dart';
 import 'package:powder_pilot/utils/shared_preferences.dart';
-import 'package:provider/provider.dart';
 
 import 'activity/activity.dart';
 import 'activity/data_provider.dart';
 import 'history/past_activities.dart';
-import 'l10n/messages_all_locales.dart';
 import 'ui/widgets/app_bar.dart';
 
 void main() {
-  _init();
-}
-
-void _init() async {
-  /// Set the error handler
-  FlutterError.onError = (FlutterErrorDetails details) {
-    FlutterError.dumpErrorToConsole(details);
-  };
-
-  /// Ensure that that WidgetsBinding is initialized
-  WidgetsFlutterBinding.ensureInitialized();
-
-  /// Set the orientation to portrait
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
-  /// Set the system UI overlay style
-  SystemUiOverlayStyle systemUiOverlayStyle = const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
-    systemNavigationBarIconBrightness: Brightness.light,
-    systemNavigationBarColor: Colors.transparent,
-    systemNavigationBarDividerColor: Colors.transparent,
-    systemNavigationBarContrastEnforced: false,
-    systemStatusBarContrastEnforced: false,
-  );
-  SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
-
-  /// Set the system UI mode
-  SystemChrome.setEnabledSystemUIMode(
-    SystemUiMode.manual,
-    overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
-  );
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky,
-      overlays: [SystemUiOverlay.bottom]);
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-
-  /// Read the welcome key from shared preferences
-  bool welcome = await SharedPref.readBool(PowderPilot.startKey);
-
-  /// Read the language key from the shared preferences
-  String language = await SharedPref.readString(PowderPilot.languageKey);
-
-  /// Load the all-time statistics from the shared preferences
-  PowderPilot.statistics.loadFromSharedPref();
-
-  /// Load the past activities from the database
-  PowderPilot.pastActivities.loadActivities();
-
-  /// Set the language to the system language
-  /// If the system language is not available, set it to English
-  Future<void> setLocaleLanguage() async {
-    /// Check if the system language is available
-    bool containsSystemLanguage(String l) {
-      for (List<String> lang in PowderPilot.availableLanguages) {
-        if (lang[0] == l) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    // ignore: deprecated_member_use
-    String locale = ui.window.locale.toString();
-    if (locale.contains('_')) {
-      locale = locale.split('_').first;
-    }
-    if (containsSystemLanguage(locale)) {
-      language = locale;
-    } else {
-      if (locale == 'at' || locale == 'ch' || locale == 'de') {
-        language = 'de';
-      } else {
-        language = 'en';
-      }
-    }
-    SharedPref.saveString(PowderPilot.languageKey, language);
-  }
-
-  /// Check if the language defined in the shared preferences is available
-  bool containsLanguage() {
-    for (List<String> lang in PowderPilot.availableLanguages) {
-      if (language == lang[0]) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /// If language was not set or is unavailable, set it to the system language
-  if (language == '' || !containsLanguage()) {
-    await setLocaleLanguage();
-  }
-
-  // Set the default locale
-  Intl.defaultLocale = language;
-  PowderPilot.setLanguage(language);
-  await initializeMessages(language);
-
-  /// Read the theme key from shared preferences and set the theme
-  String theme = await SharedPref.readString(PowderPilot.colorThemeKey);
-  if (theme == '') {
-    theme = ThemeChanger.defaultTheme;
-  }
-  ThemeChanger.changeTheme(theme);
-
-  /// Load the background image
-  BackgroundTheme.loadBackground();
-
-  /// Read the units key from shared preferences and set the units
-  String units = await SharedPref.readString(PowderPilot.unitsKey);
-
-  /// If units was not set, set it to metric
-  if (units == '') {
-    units = 'metric';
-    SharedPref.saveString(PowderPilot.unitsKey, units);
-  } else if (units == 'imperial') {
-    Measurement.setUnits(units);
-  } else if (units != 'metric') {
-    SharedPref.saveString(PowderPilot.unitsKey, 'metric');
-  }
-
-  if (welcome) {
-    PowderPilot.locationService.init();
-  }
-  PowderPilot.connectivityController.init();
-
-  /// Run the app
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ActivityDataProvider(),
-      child: Start(
-        welcome: welcome,
-      ),
-    ),
-  );
+  init();
 }
 
 class Start extends StatelessWidget {
@@ -197,26 +57,25 @@ class PowderPilot extends StatefulWidget {
   static const String appName = 'Powder Pilot';
 
   /// Key names for SharedPreferences
-  static const String numActivitiesKey = 'numActivities';
-  static const String allTimeDistance = 'allTimeDistance';
-  static const String allTimeDistanceDownhill = 'allTimeDistanceDownhill';
-  static const String allTimeDistanceUphill = 'allTimeDistanceUphill';
-  static const String allTimeDuration = 'allTimeDuration';
-  static const String allTimeDurationDownhill = 'allTimeDurationDownhill';
-  static const String allTimeDurationUphill = 'allTimeDurationUphill';
-  static const String fastestSpeed = 'fastestSpeed';
-  static const String highestAltitude = 'highestAltitude';
-  static const String longestRun = 'longestRun';
-  static const String numberRuns = 'numberRuns';
-  static const String allTimeAverageSpeed = 'allTimeAverageSpeed';
+  static const String keyNumActivities = 'numActivities';
+  static const String keyAllTimeDistance = 'allTimeDistance';
+  static const String keyAllTimeDistanceDownhill = 'allTimeDistanceDownhill';
+  static const String keyAllTimeDistanceUphill = 'allTimeDistanceUphill';
+  static const String keyAllTimeDuration = 'allTimeDuration';
+  static const String keyAllTimeDurationDownhill = 'allTimeDurationDownhill';
+  static const String keyAllTimeDurationUphill = 'allTimeDurationUphill';
+  static const String keyFastestSpeed = 'fastestSpeed';
+  static const String keyHighestAltitude = 'highestAltitude';
+  static const String keyLongestRun = 'longestRun';
+  static const String keyNumberRuns = 'numberRuns';
+  static const String keyAllTimeAverageSpeed = 'allTimeAverageSpeed';
 
-  static const String activityKey = 'activity';
-  static const String startKey = 'start';
-  static const String unitsKey = 'units';
-  static const String languageKey = 'language';
-  static const String colorThemeKey = 'theme';
-  static const String backgroundKey = 'background';
-  
+  static const String keyActivity = 'activity';
+  static const String keyStart = 'start';
+  static const String keyUnits = 'units';
+  static const String keyLanguage = 'language';
+  static const String keyColorTheme = 'theme';
+  static const String keyBackground = 'background';
 
   static const List<List<String>> availableLanguages = [
     ['de', 'Deutsch'],
@@ -242,7 +101,7 @@ class PowderPilot extends StatefulWidget {
     for (List<String> l in availableLanguages) {
       if (l[0] == lang) {
         _language = l;
-        SharedPref.saveString(languageKey, lang);
+        SharedPref.saveString(keyLanguage, lang);
         return;
       }
     }
