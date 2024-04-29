@@ -5,7 +5,7 @@ import 'package:powder_pilot/utils/shared_preferences.dart';
 /// This file contains the list of background images used in the app.
 class BackgroundTheme {
   /// Theme key
-  static const String key = PowderPilot.backgroundKey;
+  static const String key = PowderPilot.keyBackground;
 
   /// The current background image
   static String currentBackgroundKey = backgrounds[0][0];

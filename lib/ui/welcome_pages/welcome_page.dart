@@ -231,7 +231,7 @@ class _WelcomePageState extends State<WelcomePage> {
                                   MaterialPageRoute(
                                       builder: (context) =>
                                           const PowderPilot()));
-                              SharedPref.saveBool(PowderPilot.startKey, true);
+                              SharedPref.saveBool(PowderPilot.keyStart, true);
                             } else {
                               if (widget.currentPage == 3) {
                                 PowderPilot.locationService.init();

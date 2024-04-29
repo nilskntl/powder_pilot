@@ -105,7 +105,7 @@ class ThemeChanger {
     ColorTheme.grey = availableThemes[_indexOfTheme(theme)].colors[4];
     ColorTheme.red = availableThemes[_indexOfTheme(theme)].colors[5];
     ColorTheme.green = availableThemes[_indexOfTheme(theme)].colors[6];
-    SharedPref.saveString(PowderPilot.colorThemeKey, theme);
+    SharedPref.saveString(PowderPilot.keyColorTheme, theme);
     ThemeChanger.currentTheme = availableThemes[_indexOfTheme(theme)];
   }
 

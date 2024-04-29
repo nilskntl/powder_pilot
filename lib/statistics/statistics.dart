@@ -75,24 +75,24 @@ class Statistics {
     _isLoading = true;
 
     /// Read the statistics from the shared preferences
-    numActivities = await SharedPref.readInt(PowderPilot.numActivitiesKey);
-    distanceTotal = await SharedPref.readDouble(PowderPilot.allTimeDistance);
+    numActivities = await SharedPref.readInt(PowderPilot.keyNumActivities);
+    distanceTotal = await SharedPref.readDouble(PowderPilot.keyAllTimeDistance);
     distanceDownhill =
-        await SharedPref.readDouble(PowderPilot.allTimeDistanceDownhill);
+        await SharedPref.readDouble(PowderPilot.keyAllTimeDistanceDownhill);
     distanceUphill =
-        await SharedPref.readDouble(PowderPilot.allTimeDistanceUphill);
-    maxAltitude = await SharedPref.readDouble(PowderPilot.highestAltitude);
+        await SharedPref.readDouble(PowderPilot.keyAllTimeDistanceUphill);
+    maxAltitude = await SharedPref.readDouble(PowderPilot.keyHighestAltitude);
     timeTotal = Duration(
-        seconds: await SharedPref.readInt(PowderPilot.allTimeDuration));
+        seconds: await SharedPref.readInt(PowderPilot.keyAllTimeDuration));
     timeDownhill = Duration(
-        seconds: await SharedPref.readInt(PowderPilot.allTimeDurationDownhill));
+        seconds: await SharedPref.readInt(PowderPilot.keyAllTimeDurationDownhill));
     timeUphill = Duration(
-        seconds: await SharedPref.readInt(PowderPilot.allTimeDurationUphill));
+        seconds: await SharedPref.readInt(PowderPilot.keyAllTimeDurationUphill));
     _initialDownhillAndUphillTime = timeDownhill + timeUphill;
-    longestRun = await SharedPref.readDouble(PowderPilot.longestRun);
-    numRuns = await SharedPref.readInt(PowderPilot.numberRuns);
-    maxSpeed = await SharedPref.readDouble(PowderPilot.fastestSpeed);
-    avgSpeed = await SharedPref.readDouble(PowderPilot.allTimeAverageSpeed);
+    longestRun = await SharedPref.readDouble(PowderPilot.keyLongestRun);
+    numRuns = await SharedPref.readInt(PowderPilot.keyNumberRuns);
+    maxSpeed = await SharedPref.readDouble(PowderPilot.keyFastestSpeed);
+    avgSpeed = await SharedPref.readDouble(PowderPilot.keyAllTimeAverageSpeed);
     _initialAvgSpeed = avgSpeed;
 
     /// Set the flag to indicate that the statistics are no longer being loaded
@@ -105,20 +105,20 @@ class Statistics {
 
   /// Save the statistics to the shared preferences
   void saveToSharedPref() {
-    SharedPref.saveInt(PowderPilot.numActivitiesKey, numActivities);
-    SharedPref.saveDouble(PowderPilot.allTimeDistance, distanceTotal);
+    SharedPref.saveInt(PowderPilot.keyNumActivities, numActivities);
+    SharedPref.saveDouble(PowderPilot.keyAllTimeDistance, distanceTotal);
     SharedPref.saveDouble(
-        PowderPilot.allTimeDistanceDownhill, distanceDownhill);
-    SharedPref.saveDouble(PowderPilot.allTimeDistanceUphill, distanceUphill);
-    SharedPref.saveDouble(PowderPilot.highestAltitude, maxAltitude);
-    SharedPref.saveInt(PowderPilot.allTimeDuration, timeTotal.inSeconds);
+        PowderPilot.keyAllTimeDistanceDownhill, distanceDownhill);
+    SharedPref.saveDouble(PowderPilot.keyAllTimeDistanceUphill, distanceUphill);
+    SharedPref.saveDouble(PowderPilot.keyHighestAltitude, maxAltitude);
+    SharedPref.saveInt(PowderPilot.keyAllTimeDuration, timeTotal.inSeconds);
     SharedPref.saveInt(
-        PowderPilot.allTimeDurationDownhill, timeDownhill.inSeconds);
-    SharedPref.saveInt(PowderPilot.allTimeDurationUphill, timeUphill.inSeconds);
-    SharedPref.saveDouble(PowderPilot.longestRun, longestRun);
-    SharedPref.saveInt(PowderPilot.numberRuns, numRuns);
-    SharedPref.saveDouble(PowderPilot.fastestSpeed, maxSpeed);
-    SharedPref.saveDouble(PowderPilot.allTimeAverageSpeed, avgSpeed);
+        PowderPilot.keyAllTimeDurationDownhill, timeDownhill.inSeconds);
+    SharedPref.saveInt(PowderPilot.keyAllTimeDurationUphill, timeUphill.inSeconds);
+    SharedPref.saveDouble(PowderPilot.keyLongestRun, longestRun);
+    SharedPref.saveInt(PowderPilot.keyNumberRuns, numRuns);
+    SharedPref.saveDouble(PowderPilot.keyFastestSpeed, maxSpeed);
+    SharedPref.saveDouble(PowderPilot.keyAllTimeAverageSpeed, avgSpeed);
     _initialAvgSpeed = avgSpeed;
     _initialDownhillAndUphillTime = timeDownhill + timeUphill;
   }
